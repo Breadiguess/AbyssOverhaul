@@ -1,0 +1,4 @@
+displayName = Hadopelagia
+author = Bread
+version = 0.1
+modReferences = CalamityMod, BreadLibrary, Wayfarer, Luminance, Daybreak

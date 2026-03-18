@@ -1,0 +1,80 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<!-- Import tModLoader mod properties -->
+	<Import Project="..\tModLoader.targets" />
+
+		
+	<!-- General -->
+	<PropertyGroup>
+		<LangVersion>preview</LangVersion>
+	</PropertyGroup>
+	<ItemGroup>
+		<Reference Include="Daybreak">
+		  <HintPath>..\..\ModReader\Daybreak\Daybreak.dll</HintPath>
+		</Reference>
+		<Reference Include="Wayfarer">
+			<HintPath>Lib\Wayfarer.dll</HintPath>
+			<Private>true</Private>
+		</Reference>
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <AdditionalFiles Remove="Common\OldBrain\**" />
+	  <AdditionalFiles Remove="Content\BehaviorOverrides\ReaperShark\**" />
+	  <Compile Remove="Common\OldBrain\**" />
+	  <Compile Remove="Content\BehaviorOverrides\ReaperShark\**" />
+	  <EmbeddedResource Remove="Common\OldBrain\**" />
+	  <EmbeddedResource Remove="Content\BehaviorOverrides\ReaperShark\**" />
+	  <None Remove="Common\OldBrain\**" />
+	  <None Remove="Content\BehaviorOverrides\ReaperShark\**" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Remove="Content\Layers\ThermalVents\ThermalVentsLayer.cs" />
+	  <Compile Remove="Content\NPCs\DepthFeeder.cs" />
+	  <Compile Remove="Core\AbyssGenerationHooks.cs" />
+	  <Compile Remove="Core\AbyssHookSystem.cs" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Reference Include="BreadLibrary">
+	    <HintPath>..\BreadLibrary\obj\Debug\net8.0\BreadLibrary.dll</HintPath>
+	  </Reference>
+	  <Reference Include="CalamityMod">
+	    <HintPath>..\..\ModReader\CalamityMod\CalamityMod.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Luminance">
+	    <HintPath>..\..\ModReader\Luminance\Luminance.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Content\Layers\TheVeil\WorldGeneration\" />
+	  <Folder Include="Content\NPCs\Critters\VoidDreamerNPC\Skirts\" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Krafs.Publicizer" Version="2.3.0" PrivateAssets="all" ExcludeAssets="runtime" />
+	</ItemGroup>
+
+	<!-- Taken from: <https://github.com/krafs/Publicizer/pull/128>.  This is
+         used to fix an annoying warning because the publicizer we're using
+         emits a type also included by MonoMod.Utils. -->
+	<Target Name="RemoveIgnoresAccessChecksToAttributeCs" AfterTargets="PublicizeAssemblies">
+		<ItemGroup>
+			<FilesToRemove Include="@(Compile)" Condition="'%(Filename)' == 'IgnoresAccessChecksToAttribute'" />
+		</ItemGroup>
+		<ItemGroup>
+			<Compile Remove="@(FilesToRemove)" />
+		</ItemGroup>
+	</Target>
+
+
+	<ItemGroup>
+	<Publicize Include="tModLoader" IncludeCompilerGeneratedMembers="false" IncludeVirtualMembers="false" />
+	<DoNotPublicize Include="tModLoader:Terraria.Tile" />
+
+	<Publicize Include="CalamityMod" />
+		
+	<Publicize Include="FNA" IncludeCompilerGeneratedMembers="false" IncludeVirtualMembers="false" />
+	<Publicize Include="ReLogic" IncludeCompilerGeneratedMembers="false" IncludeVirtualMembers="false" />
+	</ItemGroup>
+
+	<!-- References -->
+
+</Project>

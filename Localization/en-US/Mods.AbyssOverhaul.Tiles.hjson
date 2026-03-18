@@ -1,0 +1,19 @@
+CarbonShale_Item: {
+	DisplayName: Carbon Shale_ Item
+	Tooltip: ""
+}
+
+CarbonShale_Wall_Item: {
+	DisplayName: Carbon Shale_ Wall_ Item
+	Tooltip: ""
+}
+
+CyanobacteriaSludge_Item: {
+	DisplayName: Cyanobacteria Sludge_ Item
+	Tooltip: ""
+}
+
+VoidstoneMantle_Item: {
+	DisplayName: Voidstone Mantle_ Item
+	Tooltip: ""
+}

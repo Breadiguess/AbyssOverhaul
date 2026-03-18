@@ -1,0 +1,23 @@
+Armor: {
+	PreHardmode: {
+		BlackMoonBreastplate: {
+			DisplayName: Black Moon Breastplate
+			Tooltip: ""
+		}
+	}
+
+	BlackMoonGreaves: {
+		DisplayName: Black Moon Greaves
+		Tooltip: ""
+	}
+
+	BlackMoonBreastplate: {
+		DisplayName: Black Moon Breastplate
+		Tooltip: ""
+	}
+}
+
+BlackMoonHelmet: {
+	DisplayName: Black Moon Helmet
+	Tooltip: ""
+}

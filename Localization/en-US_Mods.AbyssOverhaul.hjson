@@ -1,0 +1,81 @@
+Biomes: {
+	FossilShaleBiome: {
+		DisplayName: Fossil Shale Biome
+		TownNPCDialogueName: the Fossil Shale Biome
+	}
+
+	MurkyWatersBiome: {
+		DisplayName: Murky Waters Biome
+		TownNPCDialogueName: the Murky Waters Biome
+	}
+
+	TenebrousMarshBiome: {
+		DisplayName: Tenebrous Marsh Biome
+		TownNPCDialogueName: the Tenebrous Marsh Biome
+	}
+}
+
+Items: {
+	FossilShale_MusicBox: {
+		DisplayName: Fossil Shale_ Music Box
+		Tooltip: ""
+	}
+
+	Accessories: {
+		Wings: {
+			OmegaBlue_SailFins: {
+				DisplayName: Omega Blue_ Sail Fins
+				Tooltip: ""
+			}
+		}
+	}
+
+	BlackTideEarring: {
+		DisplayName: Black Tide Earring
+		Tooltip: ""
+	}
+
+	Weapons: {
+		Melee: {
+			EschatonItem: {
+				DisplayName: Eschaton
+				Tooltip:
+					'''
+
+					"One day came a tall, slim and well-spoken man. Nyarlathotep was the name he used." 
+					'''
+			}
+		}
+	}
+
+	SeaShellItem: {
+		DisplayName: Sea Shell
+		Tooltip:
+			'''
+			while the shell is active, you gain 4 defense, and have a 5% move-speed penalty.
+			after taking damage, the aformentioned stats are dropped, and you heal a tiny amount and gain increased dash
+			'''
+	}
+}
+
+NPCs: {
+	Wrothfish.DisplayName: Wrothfish
+	ScavagerCrab.DisplayName: Scavager Crab
+	VoidDreamer.DisplayName: Void Dreamer
+	DeepSnapper.DisplayName: Deep Snapper
+	BoxJellyfish.DisplayName: Box Jellyfish
+	CarcassLeechNPC.DisplayName: Carcass Leech
+}
+
+Buffs: {
+	LunacyDebuff: {
+		DisplayName: Lunacy
+		Description: Mods.AbyssOverhaul.Buffs.LunacyDebuff.Description
+	}
+}
+
+Projectiles: {
+	BlackTideBlastProjectile.DisplayName: Judgement
+	BlackTideMoonProjectile.DisplayName: Black Tide Moon Projectile
+	EschatonSoulProjectile.DisplayName: Eschaton Soul Projectile
+}
