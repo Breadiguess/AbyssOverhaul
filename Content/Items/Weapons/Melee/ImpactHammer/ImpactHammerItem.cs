@@ -31,7 +31,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
         {
             Item.width = 52;
             Item.height = 36;
-            Item.damage = 50;
+            Item.damage = 90;
             Item.DamageType = DamageClass.Melee;
             Item.useAnimation = 20;
             Item.useTime = 20;
@@ -39,20 +39,19 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
             Item.knockBack = 12f;
             Item.autoReuse = true;
             Item.value = CalamityGlobalItem.RarityTurquoiseBuyPrice;
-            Item.rare = ModContent.RarityType<AbyssalRarity>();
-            Item.useStyle = ItemUseStyleID.MowTheLawn;
+            Item.rare = ItemRarityID.Green;
+            Item.useStyle = ItemUseStyleID.HiddenAnimation;
             Item.channel = true;
             Item.shoot = ModContent.ProjectileType<ImpactHammer>();
             Item.noUseGraphic = true;
             Item.noMelee = true;
         }
         public override bool MeleePrefix() => true;
-        //public override bool CanUseItem(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0; not sure if this is needed
         public override void HoldItem(Player player)
         {
             if (player.ownedProjectileCounts[Item.shoot] <= 0 && player.HeldItem.type == ModContent.ItemType<ImpactHammerItem>())
             {
-                Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, Vector2.Zero, ModContent.ProjectileType<ImpactHammer>(), 0, 0);
+                Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, Vector2.Zero, ModContent.ProjectileType<ImpactHammer>(), Item.damage, Item.knockBack);
             }
         }
 

@@ -17,6 +17,13 @@ namespace AbyssOverhaul.Common.Brain.SharedModules
 
         public NpcDirective Evaluate(NpcContext context)
         {
+            if (context is null)
+            {
+                Main.NewText("crying");
+                    return NpcDirective.None;
+            }
+
+
             if (!context.HasTargetPoint || context.PathAgent is null)
                 return NpcDirective.None;
 
@@ -66,6 +73,7 @@ namespace AbyssOverhaul.Common.Brain.SharedModules
             WayfarerAPI.RecalculateNavMesh(agent.Handle, startTile);
             WayfarerAPI.RecalculatePath(agent.Handle, [goalTile], result =>
             {
+
                 agent.CurrentPath = result;
                 agent.WaitingForPath = false;
 
@@ -80,7 +88,8 @@ namespace AbyssOverhaul.Common.Brain.SharedModules
                 Main.NewText(msg);
             });
 
-            
+
+            context.PathAgent = agent;
 
             return new NpcDirective
             {

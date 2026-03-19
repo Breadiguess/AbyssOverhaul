@@ -350,7 +350,7 @@ namespace AbyssOverhaul.Core.Carcasses
                 ["VelocityY"] = velocity.Y,
                 ["FleshRemaining"] = FleshRemaining,
                 ["PendingDelete"] = PendingDelete,
-                ["TimeAlive"] = TimeAlive,
+                ["Time"] = TimeAlive,
                 ["Rotation"] = Rotation,
                 ["Snapshot"] = Snapshot?.Save() ?? new TagCompound(),
                 ["Hitbox"] = Hitbox
@@ -369,7 +369,7 @@ namespace AbyssOverhaul.Core.Carcasses
                 velocity = new Vector2(tag.GetFloat("VelocityX"), tag.GetFloat("VelocityY")),
                 FleshRemaining = tag.GetInt("FleshRemaining"),
                 PendingDelete = tag.GetBool("PendingDelete"),
-                TimeAlive = tag.GetInt("TimeAlive"),
+                TimeAlive = tag.GetInt("Time"),
                 Rotation = tag.GetFloat("Rotation"),
                 Snapshot = CarcassSnapshot.Load(tag.GetCompound("Snapshot")),
                 Hitbox = tag.Get<Rectangle>("Hitbox")

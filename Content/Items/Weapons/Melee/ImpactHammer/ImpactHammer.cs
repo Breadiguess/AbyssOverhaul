@@ -1,92 +1,598 @@
-﻿using AbyssOverhaul.Content.Rarities;
+﻿using BreadLibrary.Common.IK;
+using BreadLibrary.Core.Graphics.Particles;
+using BreadLibrary.Core.Sounds;
 using CalamityMod;
-using CalamityMod.CustomRecipes;
-using CalamityMod.Dusts;
-using CalamityMod.Items;
-using CalamityMod.Items.BaseItems;
-using CalamityMod.Items.Materials;
-using CalamityMod.Particles;
-using CalamityMod.Projectiles.Melee;
-using CalamityMod.Projectiles.Typeless;
-using CalamityMod.Rarities;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using rail;
-using ReLogic.Content;
-using System;
-using System.Collections.Generic;
-using Terraria;
+using CalamityMod.NPCs;
+using System.IO;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent;
-using Terraria.ID;
-using Terraria.ModLoader;
 
 namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
 {
     public class ImpactHammer : ModProjectile, ILocalizedModType
     {
-        public ref float TimeAlive => ref Projectile.ai[1];
-        public ref Player Owner => ref Main.player[Projectile.owner];
-        public static string Path => ModContent.GetInstance<ImpactHammer>().GetPath();
-        public new string LocalizationCategory => "Items.Weapons.Melee";
 
-        public int ShakingLevel = 0;
+        public ref float Time => ref Projectile.ai[0];
+        public ref Player Owner => ref Main.player[Projectile.owner];
+        public override string LocalizationCategory => "Items.Weapons.Melee";
+
+
+
         public static Asset<Texture2D> HeadTex;
         public static Asset<Texture2D> ArmTex;
+        public bool HitReady = false;
+        public bool HitRealeased;
         public enum State
         {
             Idle,
             Charging,
             Hitting,
         }
-        public State CurrentState = State.Idle;
+        public State CurrentState
+        {
+            get => (State)Projectile.ai[1];
+            set => Projectile.ai[1] = (float)value;
+        }
 
+
+        public float ExtensionAmount => 12 * -ChargeInterpolant;
+
+        public float ChargeInterpolant;
+
+        public float ChargePitchVariance
+        {
+            get => Projectile.localAI[0];
+            set => Projectile.localAI[0] = value;
+        }
         public override void Load()
         {
-            HeadTex = ModContent.Request<Texture2D>($"{ImpactHammer.Path}Head");
-            ArmTex = ModContent.Request<Texture2D>($"{ImpactHammer.Path}Arm");
+            string path = this.GetPath();
+            HeadTex = ModContent.Request<Texture2D>($"{path}Head");
+            ArmTex = ModContent.Request<Texture2D>($"{path}Arm");
         }
+
+        public LoopedSoundInstance? Compression;
+        public LoopedSoundInstance? ChargeHeld;
+
+        public IKSkeletonAnalytic ArmJoint;
+
+        public override void SetStaticDefaults()
+        {
+            ProjectileID.Sets.DismountsPlayersOnHit[Type] = true;
+            ProjectileID.Sets.DontCancelChannelOnKill[Type] = true;
+            ProjectileID.Sets.NoLiquidDistortion[Type] = true;
+        }
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write(HitReady);
+            writer.Write(HitRealeased);
+            writer.Write(ChargeInterpolant);
+            writer.Write(HasPlayedSound);
+        }
+
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            HitReady = reader.ReadBoolean();
+            HitRealeased = reader.ReadBoolean();
+            ChargeInterpolant = reader.ReadSingle();
+            HasPlayedSound = reader.ReadBoolean();
+        }
+
         public override void SetDefaults()
         {
             Projectile.width = 40;
-            Projectile.height = 24; 
+            Projectile.height = 24;
             Projectile.DamageType = DamageClass.Melee;
             Projectile.ContinuouslyUpdateDamageStats = true;
+            Projectile.tileCollide = false;
+            Projectile.timeLeft = 2;
+            Projectile.ignoreWater = true;
+            Projectile.penetrate = -1;
+            Projectile.usesLocalNPCImmunity = true;
+            Projectile.localNPCHitCooldown = -1;
+        }
+
+
+        public override void OnSpawn(IEntitySource source)
+        {
+            base.OnSpawn(source);
+        }
+        private readonly HashSet<int> deflectedProjectiles = new();
+        public override void AI()
+        {
+            Vector2 newAim = Owner.Calamity().mouseWorld;
+
+            SyncedAimWorld = newAim;
+
+
+            ManageIK();
+            DoPlayerCheck();
+            SetPosition();
+
+            if (Compression is not null)
+            {
+                Compression.Update(Projectile.Center, sound =>
+                {
+                    sound.Volume = 0.4f * Utilities.InverseLerpBump(0, 30, 59, 60, 60f * ChargeInterpolant);
+                    sound.Pitch = 0.1f * ChargeInterpolant + ChargePitchVariance;
+                });
+            }
+
+            if (ChargeHeld is not null)
+            {
+                ChargeHeld.Update(Projectile.Center, sound =>
+                {
+                    sound.Volume = 0.02f;
+                    sound.Pitch = 1+1*MathF.Sin(Time*0.1f);
+
+                }
+                );
+            }
+
+            StateMachine();
+            if (HitRealeased)
+                TryDeflectProjectiles();
+
+
+            if (!Owner.channel)
+                ChargeInterpolant = float.Lerp(ChargeInterpolant, 0f, 0.2f);
+
+            Time++;
+        }
+
+
+
+        #region StateMachine
+        public Vector2 SyncedAimWorld;
+        private bool HasPlayedSound = false;
+        private void StateMachine()
+        {
+            switch (CurrentState)
+            {
+                case State.Idle:
+                    if (Owner.controlUseItem)
+                    {
+                        Owner.StartChanneling();
+
+                        Compression?.Stop();
+                        ChargePitchVariance = Main.rand.NextFloat(0f, 0.4f);
+                        Compression = LoopedSoundManager.CreateNew(
+                            Assets.Sounds.Items.Melee.ImpactHammer.HydralicRetraction.Asset with { pitchVariance = 0.2f, PauseBehavior = PauseBehavior.PauseWithGame },
+                            () => !Projectile.active
+                        );
+
+                        CurrentState = State.Charging;
+                        Time = -1f;
+                        HasMadeVisual = false;
+                        HitReady = false;
+                        HitRealeased = false;
+                        HasPlayedSound = false;
+                        Projectile.netUpdate = true;
+                    }
+                    break;
+
+                case State.Charging:
+                    if (Owner.channel)
+                    {
+                        float oldCharge = ChargeInterpolant;
+                        bool oldReady = HitReady;
+
+                        ChargeInterpolant = Utilities.InverseLerp(0f, 60f, Time);
+
+                        if (ChargeInterpolant >= 1f)
+                        {
+                            ChargeInterpolant = 1f;
+                            ChargeHeld = LoopedSoundManager.CreateNew(
+                                Assets.Sounds.Items.Melee.ImpactHammer.ChargeHeldLoop.Asset with { pitchVariance = 0.2f, PauseBehavior = PauseBehavior.PauseWithGame },
+                                () => !Projectile.active || HitRealeased
+                            );
+                            if (!HasPlayedSound)
+                            {
+                                SoundEngine.PlaySound(
+                                    Assets.Sounds.Items.Melee.ImpactHammer.ChargeCompleted.Asset with { pitchVariance = 0.2f },
+                                    Projectile.Center
+                                );
+                                HasPlayedSound = true;
+                            }
+
+                            HitReady = true;
+                        }
+
+                        if (oldCharge != ChargeInterpolant || oldReady != HitReady)
+                            Projectile.netUpdate = true;
+                    }
+                    else
+                    {
+                        ChargeHeld?.Stop();
+                        if (!HitReady)
+                        {
+                            CurrentState = State.Idle;
+                            Time = 0f;
+                            Projectile.netUpdate = true;
+                        }
+                        else
+                        {
+                            HasPlayedSound = false;
+                            CurrentState = State.Hitting;
+                            Time = -1f;
+                            Projectile.netUpdate = true;
+                        }
+                    }
+                    break;
+
+                case State.Hitting:
+                    Vector2 HeadPos = Projectile.Center + new Vector2(40, 0).RotatedBy(Projectile.rotation);
+                    if (!HasPlayedSound )
+                    {
+                        SoundEngine.PlaySound(
+                            Assets.Sounds.Items.Melee.ImpactHammer.MechanicalImpact.Asset with { pitchVariance = 0.3f, volume = 0.7f},
+                            Owner.Center
+                        );
+                        HasPlayedSound = true;
+
+                        ImpactHammer_HitParticle Particle = new ImpactHammer_HitParticle();
+                        Particle.Prepare(HeadPos, Projectile.rotation, 60);
+                        ParticleEngine.ShaderParticles.Add( Particle );
+                    }
+                    if(Time <=10)
+                    {
+                        ImpactHammer_CloudParticle particle = new();
+                        particle.Prepare(HeadPos, Projectile.rotation.ToRotationVector2().RotatedByRandom(0.3f) * 10, Main.rand.NextFloat(3), 40);
+                        ParticleEngine.ShaderParticles.Add(particle);
+
+                    }
+
+
+
+                    HitRealeased = true;
+                    ChargeInterpolant = float.Lerp(ChargeInterpolant, -0.4f, 0.45f);
+
+                    if (Time > 10f && HitRealeased)
+                    {
+                        HitRealeased = false;
+                        Projectile.netUpdate = true;
+                    }
+
+                    // You currently never leave Hitting, so add an exit:
+                    if (Time > 16f)
+                    {
+                        Projectile.ResetLocalNPCHitImmunity();
+                        CurrentState = State.Idle;
+
+                        deflectedProjectiles.Clear();
+                        Time = 0f;
+                        HitReady = false;
+                        HitRealeased = false;
+                        HasPlayedSound = false;
+                        Projectile.netUpdate = true;
+                    }
+                    break;
+            }
+        }
+
+        #endregion
+
+
+        #region Collisions And Damage
+        public bool HasMadeVisual = false;
+        public override void OnHitPlayer(Player target, Player.HurtInfo info)
+        {
+            info.Dodgeable = false;
+
+        }
+        public override void ModifyHitPlayer(Player target, ref Player.HurtModifiers modifiers)
+        {
+            modifiers.KnockbackImmunityEffectiveness *= 0;
+            modifiers.Knockback *= 4;
+        }
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            if (target.CanBeMoved(true))
+            {
+                target.noTileCollide = false;
+                Vector2 launchVel = Utils.DirectionTo(Owner.Center, Owner.Calamity().mouseWorld);
+                float launchPower = 30 * 1;
+                target.MoveNPC(launchVel, launchPower * 0.5f, true);
+
+                // Remove knockback resist, just like it used to
+                target.knockBackResist = 1;
+
+                // Apply tile collison damage (is boosted even further if both final bosses are gone)
+                float damageMults = 8;
+                int damage = (int)(Projectile.damage * damageMults);
+                target.GetGlobalNPC<CalamityTileCollisionHarmNPC>().ApplyCollisionDamage(target, Owner, damage, launchVel * launchPower, 5f, true);
+            }
+        }
+        public override bool CanHitPlayer(Player target)
+        {
+            return HitRealeased;
+        }
+        public override bool? CanHitNPC(NPC target)
+        {
+            return HitRealeased;
+        }
+        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+        {
+            if (ArmJoint is null || Owner is null || !Owner.active)
+                return false;
+
+            if (projHitbox.Intersects(targetHitbox))
+                return true;
+
+            if (Owner.Hitbox.Intersects(targetHitbox))
+                return true;
+
+            const int rootPadding = 4;
+            Rectangle rootBox = Utils.CenteredRectangle(ArmJoint.Root, new Vector2(rootPadding * 2));
+            if (rootBox.Intersects(targetHitbox))
+                return true;
+
+            float collisionPoint = 0f;
+            bool upperHit = Collision.CheckAABBvLineCollision(
+                targetHitbox.TopLeft(),
+                targetHitbox.Size(),
+                ArmJoint.Root,
+                ArmJoint.Joint,
+                2f,
+                ref collisionPoint
+            );
+
+            collisionPoint = 0f;
+            bool lowerHit = Collision.CheckAABBvLineCollision(
+                targetHitbox.TopLeft(),
+                targetHitbox.Size(),
+                ArmJoint.Joint,
+                ArmJoint.Tip,
+                2f,
+                ref collisionPoint
+            );
+
+            return upperHit || lowerHit;
+        }
+        #endregion
+
+        #region Helper
+
+        private void TryDeflectProjectiles()
+        {
+            if (ArmJoint is null || Owner is null || !Owner.active)
+                return;
+
+
+            Rectangle hammerSearchArea = GetHammerBoundingBox();
+            hammerSearchArea.Inflate(40, 40);
+
+            for (int i = 0; i < Main.maxProjectiles; i++)
+            {
+                Projectile other = Main.projectile[i];
+
+                if (!other.active || other.whoAmI == Projectile.whoAmI)
+                    continue;
+
+                if (deflectedProjectiles.Contains(i))
+                    continue;
+
+                // Only interact with dangerous enemy projectiles.
+                if (!CanDeflectProjectile(other))
+                    continue;
+
+                if (!other.Hitbox.Intersects(hammerSearchArea))
+                    continue;
+
+                if (!ProjectileIntersectsHammer(other))
+                    continue;
+
+                DeflectProjectile(other);
+                deflectedProjectiles.Add(i);
+            }
+        }
+        private bool ProjectileIntersectsHammer(Projectile other)
+        {
+            Rectangle targetHitbox = other.Hitbox;
+
+            // Hammer body
+            if (Projectile.Hitbox.Intersects(targetHitbox))
+                return true;
+
+            // Let it catch things overlapping the player as well.
+            if (Owner.Hitbox.Intersects(targetHitbox))
+                return true;
+
+            // Root / shoulder area
+            const int rootPadding = 4;
+            Rectangle rootBox = Utils.CenteredRectangle(ArmJoint.Root, new Vector2(rootPadding * 2));
+            if (rootBox.Intersects(targetHitbox))
+                return true;
+
+            float collisionPoint = 0f;
+            bool upperHit = Collision.CheckAABBvLineCollision(
+                targetHitbox.TopLeft(),
+                targetHitbox.Size(),
+                ArmJoint.Root,
+                ArmJoint.Joint,
+                8f,
+                ref collisionPoint
+            );
+
+            collisionPoint = 0f;
+            bool lowerHit = Collision.CheckAABBvLineCollision(
+                targetHitbox.TopLeft(),
+                targetHitbox.Size(),
+                ArmJoint.Joint,
+                ArmJoint.Tip,
+                12f,
+                ref collisionPoint
+            );
+
+            return upperHit || lowerHit;
+        }
+        private void DeflectProjectile(Projectile other)
+        {
+
+          
+
+            Vector2 hammerDirection = (Owner.Calamity().mouseWorld - Owner.Center).SafeNormalize(Vector2.UnitX * Owner.direction);
+
+            // Strong outward bat direction.
+            Vector2 newVelocity = hammerDirection * Math.Max(other.velocity.Length(), 14f);
+
+            // Flip it to the player side.
+            other.hostile = false;
+            other.friendly = true;
+            other.owner = Owner.whoAmI;
+
+            other.DamageType = DamageClass.Melee;
+
+            // Give it a useful reflected damage value.
+            other.damage = (int)(Projectile.damage * 10f);
+
+            other.velocity = newVelocity*6;
+            if (!HasMadeVisual)
+            {
+                ImpactHammer_HitParticle particle = new ImpactHammer_HitParticle();
+                particle.Prepare(Projectile.Center + new Vector2(40, 0).RotatedBy(Projectile.rotation), other.velocity.ToRotation(), isAReflect: true);
+                ParticleEngine.ShaderParticles.Add(particle);
+                HasMadeVisual = false;
+            }
+            other.netUpdate = true;
+
+            // Nice audiovisual feedback.
+            SoundEngine.PlaySound(
+                Assets.Sounds.Items.Melee.ImpactHammer.Reflect.Asset with { pitchVariance = 0.2f, volume = 3},
+                other.Center
+            );
+        }
+        private bool CanDeflectProjectile(Projectile other)
+        {
+            if (!other.active)
+                return false;
+
+            // Ignore harmless visuals and things that cannot deal damage.
+            if (other.damage <= 0)
+                return false;
+
+            // Usually you want hostile projectiles only.
+            if (!other.hostile)
+                return false;
+
+            // Ignore friendly/minion/player-owned stuff.
+            if (other.friendly)
+                return false;
+
+            // Optional: ignore tiles/immovable things if desired.
+            // if (other.tileCollide == false) ...
+
+            // Optional: skip unreflectable special cases.
+            // if (other.type == ProjectileID.SomeSpecialThing)
+            //     return false;
+
+            return true;
+        }
+        private Rectangle GetHammerBoundingBox()
+        {
+            Vector2 min = Vector2.Min(ArmJoint.Root, Vector2.Min(ArmJoint.Joint, ArmJoint.Tip));
+            Vector2 max = Vector2.Max(ArmJoint.Root, Vector2.Max(ArmJoint.Joint, ArmJoint.Tip));
+
+            min -= new Vector2(24f);
+            max += new Vector2(24f);
+
+            return new Rectangle(
+                (int)min.X,
+                (int)min.Y,
+                (int)(max.X - min.X),
+                (int)(max.Y - min.Y)
+            );
+        }
+        private void ManageIK()
+        {
+
+            ArmJoint ??= new IKSkeletonAnalytic()
+            {
+                UpperLength = ArmTex.Value.Height * 0.7f,
+                LowerLength = 12f
+            };
+
+            ArmJoint.Root = Owner.MountedCenter + new Vector2(-8f * Owner.direction, 4f);
+            //todo: fix this because its kind of ridiculous  that you can just hit anything from anywhere
+            Vector2 target = Owner.Calamity().mouseWorld;
+            Vector2 pole = ArmJoint.Root + new Vector2(-10f * Owner.direction, 28f);
+            ArmJoint.Solve(target, pole);
+        }
+        private void SetPosition()
+        {
+
+            Projectile.Center = ArmJoint.Joint;
+            Projectile.rotation = Projectile.rotation.AngleLerp(Owner.Calamity().mouseWorld.AngleFrom(Projectile.Center), 0.4f);
+            Projectile.velocity = Projectile.rotation.ToRotationVector2() * 12;
+        }
+        private void DoPlayerCheck()
+        {
+            if (Owner.HeldItem.type == ModContent.ItemType<ImpactHammerItem>() && !Owner.dead)
+            {
+                Projectile.timeLeft = 2;
+                Owner.heldProj = this.Projectile.whoAmI;
+                Owner.direction = Projectile.velocity.X.DirectionalSign();
+            }
+        }
+        #endregion
+
+
+        #region DrawCode
+
+        public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
+        {
+            overPlayers.Add(index);
+        }
+        private void DrawHead(Vector2 PosOffset, float rot, Color lightColor)
+        {
+            Vector2 DrawPos = Projectile.Center - Main.screenPosition + PosOffset;
+
+            var tex = HeadTex.Value;
+
+            Main.EntitySpriteDraw(tex, DrawPos, null, lightColor, rot, new Vector2(0, tex.Height / 2f), 1, 0);
+        }
+        private void DrawArmPiece(Color lightColor)
+        {
+            var tex = ArmTex.Value;
+
+            float rot = ArmJoint.Root.AngleTo(ArmJoint.Joint);
+            Main.EntitySpriteDraw(tex, ArmJoint.Root - Main.screenPosition, null, lightColor, rot - MathHelper.PiOver2, tex.Size() / 2, 1, Projectile.direction.ToSpriteDirection());
         }
 
         public override bool PreDraw(ref Color lightColor)
         {
-            return base.PreDraw(ref lightColor);
-        }
-        public override void OnSpawn(IEntitySource source) 
-        {
-            base.OnSpawn(source);
-        }
-        public override void AI()
-        {
-            TimeAlive++;
-            DoPlayerCheck();
-            Vector2 TruePosition = Owner.Center;
-            Projectile.rotation = Projectile.rotation.AngleLerp(Projectile.Center.AngleTo(Owner.Calamity().mouseWorld), 0.5f);
+            Texture2D tex = TextureAssets.Projectile[Type].Value;
 
-            if (ShakingLevel > 0)
+
+            Vector2 DrawPos = Projectile.Center - Main.screenPosition;
+
+            DrawArmPiece(lightColor);
+
+            float rot = ArmJoint.Joint.AngleTo(ArmJoint.Tip);
+            Vector2 Offset = new Vector2(ExtensionAmount, 2 * -Projectile.direction).RotatedBy(rot);
+
+            DrawHead(Offset, rot, lightColor);
+
+
+            SpriteEffects flip = Projectile.direction == 1 ? SpriteEffects.None : SpriteEffects.FlipVertically;
+
+
+            Main.EntitySpriteDraw(tex, DrawPos, null, lightColor, rot, tex.Size() / 2 - new Vector2(-10, 0), Projectile.scale, flip);
+
+            // Utils.DrawLine(Main.spriteBatch, Projectile.Center, Projectile.Center+ ArmJoint.Tip.AngleFrom(ArmJoint.Joint).ToRotationVector2()*100, Color.Red);
+
+            if (ArmJoint is not null)
             {
-                Projectile.position = TruePosition + new Vector2(ShakingLevel * 0.5f, 0).RotatedByRandom(Math.PI * 2);
-            }
-            else
-            {
-                Projectile.position = TruePosition;
+                //Utils.DrawLine(Main.spriteBatch, ArmJoint.Root, ArmJoint.Joint, Color.White);
+                //Utils.DrawLine(Main.spriteBatch, ArmJoint.Joint, ArmJoint.Tip, Color.White, Color.Wheat, 10);
             }
 
+            string msg = "";
+            msg += CurrentState.ToString() + $"\n";
+            //Utils.DrawBorderString(Main.spriteBatch, msg, DrawPos, Color.White);
+            return false;
         }
-
-        private void DoPlayerCheck()
-        {
-            if (Owner.HeldItem.type == ModContent.ItemType<ImpactHammerItem>())
-            {
-                Projectile.timeLeft = 2;
-            }
-        }
+        #endregion
     }
 }
