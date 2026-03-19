@@ -50,6 +50,8 @@ Items: {
 				DisplayName: Impact Hammer Item
 				Tooltip: ""
 			}
+
+			ImpactHammer.DisplayName: Impact Hammer
 		}
 	}
 

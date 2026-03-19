@@ -129,18 +129,7 @@ namespace AbyssOverhaul.Content.NPCs.Critters
             if (Brain is null) return false;
 
 
-            string msg = "";
-            msg += $"NPC tile loc: {NPC.Center.ToTileCoordinates()}";
-            msg += PathAgent.DebugStatus + $"\n";
-            msg += Brain.CurrentDebugInfo + $"\n";
-            msg += Brain.Context.PathAgent.DebugStatus + $"\n";
-            foreach (var a in Brain.Modules)
-            {
-                msg += a.ToString() + $"\n";
-            }
-
-            Utils.DrawBorderString(spriteBatch, msg, NPC.Center - screenPos, drawColor);
-
+            Brain.DrawContextDebug(spriteBatch, NPC.Center - screenPos);
             WayfarerAPI.DebugRenderNavMesh(PathAgent.Handle, spriteBatch);
 
             return base.PreDraw(spriteBatch, screenPos, drawColor);

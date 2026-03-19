@@ -1,10 +1,4 @@
-﻿using AbyssOverhaul.Common.Brain.AbyssOverhaul.Common.Brain;
-using AbyssOverhaul.Common.Brain.Contexts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AbyssOverhaul.Common.Brain.Contexts;
 using Wayfarer.Edges;
 
 namespace AbyssOverhaul.Common.Brain.SharedModules
@@ -19,9 +13,9 @@ namespace AbyssOverhaul.Common.Brain.SharedModules
         public NpcDirective Evaluate(NpcContext context)
         {
             NpcPathAgent agent = context.PathAgent;
-            if (agent is null || agent.WaitingForPath||
-  agent.CurrentPath is null)
-        return NpcDirective.None;
+            if (agent is null || agent.WaitingForPath ||
+            agent.CurrentPath is null)
+                return NpcDirective.None;
 
             if (agent.CurrentPath.Current is not PathEdge edge)
             {

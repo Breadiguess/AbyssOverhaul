@@ -28,7 +28,6 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
     {
         public ref float TimeAlive => ref Projectile.ai[1];
         public ref Player Owner => ref Main.player[Projectile.owner];
-        public static string Path => ModContent.GetInstance<ImpactHammer>().GetPath();
         public new string LocalizationCategory => "Items.Weapons.Melee";
 
         public int ShakingLevel = 0;
@@ -44,8 +43,9 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
 
         public override void Load()
         {
-            HeadTex = ModContent.Request<Texture2D>($"{ImpactHammer.Path}Head");
-            ArmTex = ModContent.Request<Texture2D>($"{ImpactHammer.Path}Arm");
+            string path = this.GetPath();
+            HeadTex = ModContent.Request<Texture2D>($"{path}Head");
+            ArmTex = ModContent.Request<Texture2D>($"{path}Arm");
         }
         public override void SetDefaults()
         {

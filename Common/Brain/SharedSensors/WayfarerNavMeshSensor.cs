@@ -34,7 +34,6 @@ namespace AbyssOverhaul.Common.Brain.SharedSensors
             {
                 Point startTile = GetNavStartTile(context.Self);
                 WayfarerAPI.RecalculateNavMesh(agent.Handle, startTile);
-                agent.CurrentPath = null;
                 agent.DebugStatus = $"NavMeshRebuilt from {startTile}";
             }
         }
