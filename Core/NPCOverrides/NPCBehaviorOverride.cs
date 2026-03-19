@@ -6,6 +6,11 @@ namespace AbyssOverhaul.Core.NPCOverrides
 {
     public abstract class NPCBehaviorOverride
     {
+
+        public virtual void ModifyTypeName(NPC npc, ref string typeName)
+        {
+
+        }
         /// <summary>
         /// The vanilla/modded NPC type this override is for.
         /// </summary>

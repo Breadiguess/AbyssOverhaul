@@ -1,28 +1,29 @@
-global using AbyssOverhaul.Core;
+global using AbyssOverhaul.Common.Brain.AbyssOverhaul.Common.Brain;
+global using AbyssOverhaul.Core.NPCOverrides;
+global using AbyssOverhaul.Core.Systems;
+global using BreadLibrary.Common.Graphics;
+global using BreadLibrary.Core.Utilities;
+global using CalamityMod.NPCs.Abyss;
 global using Microsoft.Xna.Framework;
+global using Microsoft.Xna.Framework.Graphics;
+global using ReLogic.Content;
 global using System;
 global using System.Collections.Generic;
 global using System.Linq;
 global using System.Text;
-global using System.Threading.Tasks;
 global using Terraria;
-global using Terraria.ID;
 global using Terraria.GameContent.Generation;
+global using Terraria.ID;
 global using Terraria.IO;
 global using Terraria.ModLoader;
 global using Terraria.WorldBuilding;
-global using AbyssOverhaul.Common.Brain.AbyssOverhaul.Common.Brain;
 global using static AbyssOverhaul.AbyssOverhaul;
-global using BreadLibrary.Common.Graphics;
-global using BreadLibrary.Core.Utilities;
-using AbyssOverhaul.Core.Systems;
-using System.IO;
 using Wayfarer.API;
 
 namespace AbyssOverhaul
 {
-	public partial class AbyssOverhaul : Mod
-	{
+    public partial class AbyssOverhaul : Mod
+    {
 
         public AbyssOverhaul()
         {

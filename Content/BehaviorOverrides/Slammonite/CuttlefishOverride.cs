@@ -7,6 +7,7 @@ using CalamityMod.NPCs.Abyss;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria.DataStructures;
+using Terraria.Localization;
 
 namespace AbyssOverhaul.Content.BehaviorOverrides.Slammonite
 {
@@ -14,7 +15,10 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Slammonite
     {
         public override int NPCType => ModContent.NPCType<Cuttlefish>();
 
-
+        public override void ModifyTypeName(NPC npc, ref string typeName)
+        {
+            typeName = Language.GetOrRegister($"Mods.AbyssOverhaul.NPCOverrides.Cuttlefish").Value;
+        }
 
         public static Asset<Texture2D> SlamTex;
         public override void Load()

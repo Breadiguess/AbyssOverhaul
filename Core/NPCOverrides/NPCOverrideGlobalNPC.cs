@@ -12,6 +12,8 @@ namespace AbyssOverhaul.Core.NPCOverrides
     {
         public override bool InstancePerEntity => true;
 
+        public bool SuppressOriginalPostDrawThisFrame = true;
+
         public NPCBehaviorOverride OverrideInstance;
 
         public NPCBehaviorOverride GetOverride(NPC npc)
@@ -69,5 +71,12 @@ namespace AbyssOverhaul.Core.NPCOverrides
         {
             GetOverride(npc)?.PostDraw(npc, spriteBatch, screenPos, drawColor);
         }
+
+        //lets get this baby rolling !!
+        public override void ModifyTypeName(NPC npc, ref string typeName)
+        {
+            GetOverride(npc)?.ModifyTypeName(npc, ref typeName);
+        }
+
     }
 }
