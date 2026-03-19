@@ -120,15 +120,16 @@ namespace AbyssOverhaul.Content.Layers.TheVeil.NPCs.VoidDreamerNPC
             {
                 HorseMode = true;
 
-
-                string path = "AbyssOverhaul/Content/NPCs/Critters/VoidDreamerNPC/Heads/";
-
+                string Path = this.GetPath();
+                const string suffix = "/VoidDreamer";
+                if (Path.EndsWith(suffix))
+                    Path = Path[..^suffix.Length];
                 if (Main.rand.NextBool())
 
-                    HeadTex = ModContent.Request<Texture2D>($"{path}HorseHead");
+                    HeadTex = ModContent.Request<Texture2D>($"{Path}/Heads/HorseHead");
                 else
 
-                    HeadTex = ModContent.Request<Texture2D>($"{path}Glooby");
+                    HeadTex = ModContent.Request<Texture2D>($"{Path}/Heads/Glooby");
             }
             else
                 HeadTex = HeadPieces[HeadVar];
