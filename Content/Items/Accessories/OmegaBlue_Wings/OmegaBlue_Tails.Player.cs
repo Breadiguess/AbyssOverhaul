@@ -1,5 +1,4 @@
 ﻿using BreadLibrary.Core.Verlet;
-using Luminance.Common.Utilities;
 
 namespace AbyssOverhaul.Content.Items.Accessories.OmegaBlue_Wings
 {
@@ -10,9 +9,9 @@ namespace AbyssOverhaul.Content.Items.Accessories.OmegaBlue_Wings
         public bool Active;
 
 
-      
 
-        
+
+
 
         public override void Initialize()
         {
@@ -65,8 +64,8 @@ namespace AbyssOverhaul.Content.Items.Accessories.OmegaBlue_Wings
                 Vector2 rootedOffset = offsets[i] * new Vector2(player.direction, 1f);
                 Vector2 root = player.MountedCenter + rootedOffset;
 
-                if (tail.Positions[^1].Distance(player.Center)>400)
-                    for(int x = 0; x< tail.Positions.Length; x++)
+                if (tail.Positions[^1].Distance(player.Center) > 400)
+                    for (int x = 0; x < tail.Positions.Length; x++)
                     {
                         tail.Positions[x] = player.Center;
                         tail.OldPositions[x] = player.Center;

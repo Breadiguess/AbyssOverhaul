@@ -1,12 +1,4 @@
-﻿using AbyssOverhaul.Common.Brain.AbyssOverhaul.Common.Brain;
-using Luminance.Common.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AbyssOverhaul.Content.NPCs.Critters.VoidDreamerNPC
+﻿namespace AbyssOverhaul.Content.NPCs.Critters.VoidDreamerNPC
 {
     public sealed class CombatObservationSensor : INpcSensor<ObservationNpcContext>
     {
@@ -30,8 +22,8 @@ namespace AbyssOverhaul.Content.NPCs.Critters.VoidDreamerNPC
 
 
                     if (player.itemAnimation > 0 || player.ItemAnimationActive)
-                        if(player.HeldItem.damage>0)
-                        context.SawWeaponSwing = true;
+                        if (player.HeldItem.damage > 0)
+                            context.SawWeaponSwing = true;
 
                     if (dist < context.ObservedDistance)
                     {

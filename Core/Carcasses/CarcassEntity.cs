@@ -1,12 +1,4 @@
-﻿using log4net.Core;
-using Luminance.Common.Utilities;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 using Terraria.ModLoader.IO;
 
 namespace AbyssOverhaul.Core.Carcasses
@@ -51,7 +43,7 @@ namespace AbyssOverhaul.Core.Carcasses
             oldPosition = position;
             oldVelocity = velocity;
             oldDirection = direction;
-            
+
             float oldRotation = Rotation;
             float oldAngularVelocity = AngularVelocity;
             int oldFlesh = FleshRemaining;
@@ -61,7 +53,7 @@ namespace AbyssOverhaul.Core.Carcasses
             ApplyGravity();
             MoveWithTileCollisionAndGrounding();
             ApplyRotationalPhysics();
-          
+
             if (FleshRemaining <= 0)
             {
                 FleshRemaining = 0;
@@ -260,9 +252,9 @@ namespace AbyssOverhaul.Core.Carcasses
              player.oldPosition.Y + player.height <= Top.Y + 8f &&
              player.velocity.Y >= 0f;
 
-          
-             
-            
+
+
+
         }
 
         private void ApplyPlayerPushImpulse(Player player)
@@ -412,7 +404,7 @@ namespace AbyssOverhaul.Core.Carcasses
             writer.Write(PendingDelete);
             writer.Write(TimeAlive);
             writer.Write(Rotation);
-            writer.Write(AngularVelocity);  
+            writer.Write(AngularVelocity);
             Snapshot.NetSend(writer);
         }
 

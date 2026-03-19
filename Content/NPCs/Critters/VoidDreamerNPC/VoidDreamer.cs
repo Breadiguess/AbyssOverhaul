@@ -3,11 +3,9 @@ using AbyssOverhaul.Common.Brain.SharedModules;
 using AbyssOverhaul.Core.Graphics;
 using BreadLibrary.Core.Graphics;
 using BreadLibrary.Core.Graphics.PixelationShit;
+using BreadLibrary.Core.Sounds;
 using BreadLibrary.Core.Verlet;
 using CalamityMod.BiomeManagers;
-using Luminance.Assets;
-using Luminance.Common.Utilities;
-using Luminance.Core.Sounds;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System.IO;
@@ -18,7 +16,6 @@ namespace AbyssOverhaul.Content.NPCs.Critters.VoidDreamerNPC
 {
     internal class VoidDreamer : ModNPC, IDrawPixellated
     {
-        public override string Texture => MiscTexturesRegistry.InvisiblePixelPath;
 
         private const int HeadVariationCount = 6;
         private const int EyeVariationCount = 6;

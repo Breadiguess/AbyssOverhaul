@@ -1,8 +1,4 @@
-﻿using BreadLibrary.Core.Raycasting;
-using Luminance.Common.Utilities;
-using Luminance.Core.Graphics;
-
-namespace AbyssOverhaul.Content.Items.Armor.BlackMoon.Players
+﻿namespace AbyssOverhaul.Content.Items.Armor.BlackMoon.Players
 {
     public partial class BlackMoonPlayer : ModPlayer
     {
@@ -42,9 +38,9 @@ namespace AbyssOverhaul.Content.Items.Armor.BlackMoon.Players
                 HasTeleported = false;
                 TeleportDelayTime--;
                 PreTeleportLoc = Player.Center;
-                CameraPanSystem.PanTowards(TeleportLoc - Vector2.UnitY * 20, 1 - Utilities.InverseLerp(0, 10, TeleportDelayTime));
+                //CameraPanSystem.PanTowards(TeleportLoc - Vector2.UnitY * 20, 1 - Utilities.InverseLerp(0, 10, TeleportDelayTime));
             }
-           else if (!HasTeleported && !TeleportLoc.Equals(Vector2.Zero))
+            else if (!HasTeleported && !TeleportLoc.Equals(Vector2.Zero))
             {
 
                 //CameraPanSystem.PanTowards(PreTeleportLoc, 1);
@@ -52,14 +48,14 @@ namespace AbyssOverhaul.Content.Items.Armor.BlackMoon.Players
 
                 Point? tilesToHit;
 
-                for(int i = -3; i<4; i++)
+                for (int i = -3; i < 4; i++)
                 {
-                    Vector2 Start = Player.Center + Vector2.UnitX * i*10;
+                    Vector2 Start = Player.Center + Vector2.UnitX * i * 10;
 
                     tilesToHit = LineAlgorithm.RaycastTo(Start, Start + Vector2.UnitY * 600, debug: true);
                     if (tilesToHit.HasValue)
                     {
-                        Collision.HitTiles(tilesToHit.Value.ToWorldCoordinates()- Vector2.UnitY * 32, new Vector2(0, 40), 10, 10);
+                        Collision.HitTiles(tilesToHit.Value.ToWorldCoordinates() - Vector2.UnitY * 32, new Vector2(0, 40), 10, 10);
                     }
                 }
 
@@ -77,7 +73,7 @@ namespace AbyssOverhaul.Content.Items.Armor.BlackMoon.Players
         {
 
 
-             
+
 
 
 
@@ -85,7 +81,7 @@ namespace AbyssOverhaul.Content.Items.Armor.BlackMoon.Players
                 return;
 
             Vector2 StartPos = Player.Center;
-            Vector2 EndPos = StartPos + Vector2.UnitX.RotatedBy(-new Vector2(Player.velocity.X*0.2f, -4).ToRotation()) * 700;
+            Vector2 EndPos = StartPos + Vector2.UnitX.RotatedBy(-new Vector2(Player.velocity.X * 0.2f, -4).ToRotation()) * 700;
             Point? HitTile = LineAlgorithm.RaycastTo(StartPos, EndPos, debug: true);
 
 

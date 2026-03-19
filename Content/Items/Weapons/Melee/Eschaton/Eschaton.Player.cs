@@ -1,4 +1,4 @@
-﻿namespace AbyssOverhaul.Content.Items.Weapons
+﻿namespace AbyssOverhaul.Content.Items.Weapons.Melee.Eschaton
 {
     internal class EschatonPlayer : ModPlayer
     {
@@ -11,7 +11,7 @@
         public override float UseSpeedMultiplier(Item item)
         {
             if (item.type == ModContent.ItemType<EschatonItem>())
-                return 1f + (FinalityStacks / (float)MaxFinalityStacks)*1.2f;
+                return 1f + FinalityStacks / (float)MaxFinalityStacks*1.2f;
 
             return 1f;
         }
@@ -21,7 +21,7 @@
             if (item.type == ModContent.ItemType<EschatonItem>())
             {
                 if (Player.itemAnimation == Player.itemAnimationMax)
-                    scale *= 1f + (FinalityStacks / (float)MaxFinalityStacks);
+                    scale *= 1f + FinalityStacks / (float)MaxFinalityStacks;
 
             }
         }

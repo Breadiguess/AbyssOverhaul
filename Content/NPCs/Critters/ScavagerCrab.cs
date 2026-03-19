@@ -2,15 +2,8 @@
 using AbyssOverhaul.Common.Brain.Contexts;
 using AbyssOverhaul.Common.Brain.SharedModules;
 using AbyssOverhaul.Common.Brain.SharedSensors;
-using Luminance.Assets;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria.DataStructures;
-using Terraria.ID;
 using Wayfarer.API;
 using Wayfarer.Data;
 
@@ -19,7 +12,6 @@ namespace AbyssOverhaul.Content.NPCs.Critters
 {
     internal class ScavagerCrab : ModNPC
     {
-        public override string Texture => MiscTexturesRegistry.InvisiblePixelPath;
         public ModularNpcBrain<NpcContext> Brain;
         public NpcPathAgent PathAgent;
 
@@ -33,7 +25,7 @@ namespace AbyssOverhaul.Content.NPCs.Critters
             NPC.Size = new Vector2(35);
             NPC.lifeMax = 40;
             NPC.defense = 400;
-            
+
         }
         public override void OnSpawn(IEntitySource source)
         {
@@ -64,7 +56,7 @@ namespace AbyssOverhaul.Content.NPCs.Critters
                 // Optional fallback if instance allocation somehow fails.
             }
 
-            
+
             Brain.Modules.Add(new RequestPathToTargetModule());
             Brain.Modules.Add(new FollowWayfarerPathModule());
             Brain.Sensors.Add(new WayfarerNavMeshSensor());
@@ -112,14 +104,14 @@ namespace AbyssOverhaul.Content.NPCs.Critters
             }
             Brain.Update(NPC);
 
-            
+
 
             if (PathAgent.HasDestination)
             {
                 //Dust a = Dust.NewDustPerfect(PathAgent.Destination, DustID.Cloud, Vector2.Zero);
             }
             NPC.spriteDirection = NPC.velocity.X >= 0f ? 1 : -1;
-           
+
         }
 
 
@@ -141,13 +133,13 @@ namespace AbyssOverhaul.Content.NPCs.Critters
             msg += $"NPC tile loc: {NPC.Center.ToTileCoordinates()}";
             msg += PathAgent.DebugStatus + $"\n";
             msg += Brain.CurrentDebugInfo + $"\n";
-            msg += Brain.Context.PathAgent.DebugStatus+$"\n";
-            foreach(var a in Brain.Modules)
+            msg += Brain.Context.PathAgent.DebugStatus + $"\n";
+            foreach (var a in Brain.Modules)
             {
                 msg += a.ToString() + $"\n";
             }
-            
-            Utils.DrawBorderString(spriteBatch, msg, NPC.Center- screenPos, drawColor);
+
+            Utils.DrawBorderString(spriteBatch, msg, NPC.Center - screenPos, drawColor);
 
             WayfarerAPI.DebugRenderNavMesh(PathAgent.Handle, spriteBatch);
 

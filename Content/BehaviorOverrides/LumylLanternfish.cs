@@ -5,16 +5,12 @@ using AbyssOverhaul.Common.Brain.SharedSensors;
 using AbyssOverhaul.Core.NPCOverrides;
 using BreadLibrary.Core.Graphics;
 using BreadLibrary.Core.Graphics.PixelationShit;
+using BreadLibrary.Core.Utilities;
 using CalamityMod;
-using CalamityMod.Projectiles.Boss;
-using Luminance.Common.Utilities;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
-using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
-using Terraria.ID;
 
 namespace AbyssOverhaul.Content.BehaviorOverrides
 {
@@ -24,7 +20,7 @@ namespace AbyssOverhaul.Content.BehaviorOverrides
 
 
         public static readonly SoundStyle ScreamSound = new("CalamityMod/Sounds/Custom/CorvinaScream");
-        public Asset<Texture2D> Tex;
+        public static Asset<Texture2D> Tex;
 
         public ModularNpcBrain<CreatureNpcContext> NpcBrain;
         public override void SetDefaults(NPC npc)
@@ -33,7 +29,7 @@ namespace AbyssOverhaul.Content.BehaviorOverrides
             npc.noTileCollide = false;
 
             npc.lifeMax = 12_000;
-            
+
             InitializeBrain();
 
         }
@@ -52,7 +48,7 @@ namespace AbyssOverhaul.Content.BehaviorOverrides
 
             NpcBrain.Sensors.Add(new SharedCreatureAwarenessSensor()
             {
-                
+
             });
 
             NpcBrain.Modules.Add(new AvoidTilesSwimModule
@@ -73,7 +69,8 @@ namespace AbyssOverhaul.Content.BehaviorOverrides
             });
 
             NpcBrain.Modules.Add(new CreatureSwimWanderModule
-            { VerticalStrength = 20,
+            {
+                VerticalStrength = 20,
                 Score = 30f,
                 MoveSpeed = 6.2f,
                 HomeRadius = 1000f,
@@ -85,8 +82,8 @@ namespace AbyssOverhaul.Content.BehaviorOverrides
                 MoveSpeed = 12
             });
 
-           
-        
+
+
         }
 
         public override void OnSpawn(NPC npc, IEntitySource source)
@@ -108,16 +105,16 @@ namespace AbyssOverhaul.Content.BehaviorOverrides
 
             NpcBrain.Update(npc);
 
-            if((Main.GameUpdateCount*0.05f) % 10 == 0)
+            if ((Main.GameUpdateCount * 0.05f) % 10 == 0)
             {
                 NpcBrain.Context.TargetPoint = Main.rand.NextVector2Unit() + npc.Center;
                 //Main.NewText("Im a stupid fucking fish");   
             }
 
-            if (NpcBrain.Context.HasDisturbance && NpcBrain.Context.ThreatLevel >0.5f)
+            if (NpcBrain.Context.HasDisturbance && NpcBrain.Context.ThreatLevel > 0.5f)
             {
                 //SoundEngine.PlaySound(ScreamSound with { pitchVariance = 0.2f, pitch= 0.2f, MaxInstances = 0}, npc.Center);
-                
+
             }
 
 
@@ -142,10 +139,10 @@ namespace AbyssOverhaul.Content.BehaviorOverrides
 
             Dust.NewDustPerfect(NpcBrain.Context.HomePosition, DustID.Cloud, Vector2.zeroVector);
 
-            return true; 
+            return true;
         }
 
-       
+
         public override bool PreDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             Vector2 DrawPos = npc.Center - screenPos;

@@ -13,7 +13,8 @@ global using Terraria.ModLoader;
 global using Terraria.WorldBuilding;
 global using AbyssOverhaul.Common.Brain.AbyssOverhaul.Common.Brain;
 global using static AbyssOverhaul.AbyssOverhaul;
-
+global using BreadLibrary.Common.Graphics;
+global using BreadLibrary.Core.Utilities;
 using AbyssOverhaul.Core.Systems;
 using System.IO;
 using Wayfarer.API;
@@ -22,6 +23,11 @@ namespace AbyssOverhaul
 {
 	public partial class AbyssOverhaul : Mod
 	{
+
+        public AbyssOverhaul()
+        {
+            MusicAutoloadingEnabled = false;
+        }
         public override void Unload()
         {
             WayfarerAPI.Shutdown();

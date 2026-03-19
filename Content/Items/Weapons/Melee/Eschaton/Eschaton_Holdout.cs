@@ -2,15 +2,13 @@
 using CalamityMod.Buffs.DamageOverTime;
 using CalamityMod.NPCs;
 using CalamityMod.Projectiles.BaseProjectiles;
-using Luminance.Common.Utilities;
-using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria.Audio;
 using Terraria.Graphics;
 using Terraria.Localization;
 
-namespace AbyssOverhaul.Content.Items.Weapons
+namespace AbyssOverhaul.Content.Items.Weapons.Melee.Eschaton
 {
     [PierceResistException]
     public class Eschaton_Holdout : BaseCustomUseStyleProjectile, ILocalizedModType
@@ -42,7 +40,7 @@ namespace AbyssOverhaul.Content.Items.Weapons
             base.SetDefaults();
             Projectile.usesLocalNPCImmunity = true;
             Projectile.localNPCHitCooldown = -1;
-            Projectile.DamageType = TrueMeleeDamageClass.Instance;
+            Projectile.DamageType = DamageClass.MeleeNoSpeed;//TrueMeleeDamageClass.Instance;
 
 
             const int slashLength = 34;
@@ -140,9 +138,9 @@ namespace AbyssOverhaul.Content.Items.Weapons
             {
                 if (!CanHit && !postSwing)
                 {
-                   
-                        if (mousePos.X < Owner.Center.X) Owner.direction = -1;
-                        else Owner.direction = 1;
+
+                    if (mousePos.X < Owner.Center.X) Owner.direction = -1;
+                    else Owner.direction = 1;
 
                     ResetSlash();
                 }
@@ -154,7 +152,7 @@ namespace AbyssOverhaul.Content.Items.Weapons
 
                 Projectile.rotation = Projectile.rotation.AngleLerp(Owner.AngleTo(mousePos) + MathHelper.ToRadians(45f), 0.1f);
 
-                if (AnimationProgress < (useAnim / 1.5f))
+                if (AnimationProgress < useAnim / 1.5f)
                 {
                     aimVel = (Owner.Center - Owner.Calamity().mouseWorld).SafeNormalize(Vector2.UnitX) * 65;
                     CanHit = false;
@@ -164,7 +162,7 @@ namespace AbyssOverhaul.Content.Items.Weapons
                         doSwing = false;
                         Projectile.ai[1] = -Projectile.ai[1];
                     }
-                    RotationOffset = MathHelper.Lerp(RotationOffset, MathHelper.ToRadians(120f * Projectile.ai[1] * Owner.direction * (1 + (Utils.GetLerpValue(useAnim * 0.8f, useAnim, Animation, true)) * 0.35f)), 0.2f);
+                    RotationOffset = MathHelper.Lerp(RotationOffset, MathHelper.ToRadians(120f * Projectile.ai[1] * Owner.direction * (1 + Utils.GetLerpValue(useAnim * 0.8f, useAnim, Animation, true) * 0.35f)), 0.2f);
                 }
                 else
                 {
@@ -173,8 +171,8 @@ namespace AbyssOverhaul.Content.Items.Weapons
                         FlipAsSword = Owner.direction < 0;
                     }
 
-                    float time = (AnimationProgress) - (useAnim / 3);
-                    float timeMax = useAnim - (useAnim / 3);
+                    float time = AnimationProgress - useAnim / 3;
+                    float timeMax = useAnim - useAnim / 3;
 
                     if (time >= (int)(timeMax * 0.4f) && swingSound)
                     {
@@ -233,7 +231,7 @@ namespace AbyssOverhaul.Content.Items.Weapons
         }
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
-            if ((target.life <= 0 && target.realLife == -1) && Projectile.numHits > 0)
+            if (target.life <= 0 && target.realLife == -1 && Projectile.numHits > 0)
                 Projectile.numHits -= 1;
             if (damageDone <= 2)
                 armoredHits++;
@@ -248,7 +246,7 @@ namespace AbyssOverhaul.Content.Items.Weapons
                 //SoundEngine.PlaySound(fire2 with { Volume = 0.65f, Pitch = Main.rand.NextFloat(-0.2f, -0.3f) }, Projectile.Center);
             }
 
-            int heal = (int)(MathHelper.Clamp(20 - Projectile.numHits * 12, 1, 20));
+            int heal = MathHelper.Clamp(20 - Projectile.numHits * 12, 1, 20);
             if (Projectile.numHits < 10)
             {
                 Owner.DoLifestealDirect(target, heal, 0.5f);
@@ -259,7 +257,7 @@ namespace AbyssOverhaul.Content.Items.Weapons
 
             Vector2 SpawnPos = target.Center + new Vector2(target.width + 100, 0).RotatedBy(target.AngleFrom(Owner.Center));
             int Type = ModContent.ProjectileType<EschatonSoulProjectile>();
-            Projectile a = Projectile.NewProjectileDirect(Projectile.GetItemSource_FromThis(), SpawnPos, new Vector2(3, 0).RotatedByRandom(1), Type, this.Projectile.damage / 2, 0);
+            Projectile a = Projectile.NewProjectileDirect(Projectile.GetItemSource_FromThis(), SpawnPos, new Vector2(3, 0).RotatedByRandom(1), Type, Projectile.damage / 2, 0);
             a.As<EschatonSoulProjectile>().TargetWhoami = target.whoAmI;
 
         }
@@ -346,7 +344,7 @@ namespace AbyssOverhaul.Content.Items.Weapons
         {
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
-
+            /*
             var trailShader = ShaderManager.GetShader("AbyssOverhaul.LonginusSlash");
 
 
@@ -357,7 +355,7 @@ namespace AbyssOverhaul.Content.Items.Weapons
             trailShader.TrySetParameter("uWorldViewProjection", Main.GameViewMatrix.NormalizedTransformationmatrix);
             trailShader.TrySetParameter("uColor", Color.White.ToVector4() * 1.0f);
             trailShader.Apply();
-
+            */
             // Rendering primitives involves setting vertices of each triangle to form quads
             // This does it for us
             // Have a list of positions and rotations to create vertices, width function to determine how far vertices are from the center
@@ -371,7 +369,7 @@ namespace AbyssOverhaul.Content.Items.Weapons
         }
         private float TrailWidthFunction(float p)
         {
-            return (100 * Projectile.scale * _slashScale * Projectile.direction);
+            return 100 * Projectile.scale * _slashScale * Projectile.direction;
         }
 
         private Color TrailColorFunction(float p)
@@ -405,8 +403,8 @@ namespace AbyssOverhaul.Content.Items.Weapons
 
 
 
-                Main.EntitySpriteDraw(tex.Value, Projectile.Center - Main.screenPosition + new Vector2(0, Owner.gfxOffY), tex.Frame(1, FrameCount, 0, Frame), lightColor, Projectile.rotation + RotationOffset + r, FlipAsSword ? new Vector2(tex.Width() - SpriteOrigin.X, SpriteOrigin.Y) : SpriteOrigin, Projectile.scale, spriteEffects != SpriteEffects.None ? spriteEffects : (FlipAsSword ? SpriteEffects.FlipHorizontally : SpriteEffects.None));
-                Main.EntitySpriteDraw(glowTex.Value, Projectile.Center - Main.screenPosition + new Vector2(0, Owner.gfxOffY), glowTex.Frame(1, FrameCount, 0, Frame), Color.White, Projectile.rotation + RotationOffset + r, FlipAsSword ? new Vector2(glowTex.Width() - SpriteOrigin.X, SpriteOrigin.Y) : SpriteOrigin, Projectile.scale, spriteEffects != SpriteEffects.None ? spriteEffects : (FlipAsSword ? SpriteEffects.FlipHorizontally : SpriteEffects.None));
+                Main.EntitySpriteDraw(tex.Value, Projectile.Center - Main.screenPosition + new Vector2(0, Owner.gfxOffY), tex.Frame(1, FrameCount, 0, Frame), lightColor, Projectile.rotation + RotationOffset + r, FlipAsSword ? new Vector2(tex.Width() - SpriteOrigin.X, SpriteOrigin.Y) : SpriteOrigin, Projectile.scale, spriteEffects != SpriteEffects.None ? spriteEffects : FlipAsSword ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
+                Main.EntitySpriteDraw(glowTex.Value, Projectile.Center - Main.screenPosition + new Vector2(0, Owner.gfxOffY), glowTex.Frame(1, FrameCount, 0, Frame), Color.White, Projectile.rotation + RotationOffset + r, FlipAsSword ? new Vector2(glowTex.Width() - SpriteOrigin.X, SpriteOrigin.Y) : SpriteOrigin, Projectile.scale, spriteEffects != SpriteEffects.None ? spriteEffects : FlipAsSword ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
 
             }
 

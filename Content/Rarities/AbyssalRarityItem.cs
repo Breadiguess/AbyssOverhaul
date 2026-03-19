@@ -1,12 +1,4 @@
-﻿using Luminance.Common.Utilities;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using ReLogic.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
 
 namespace AbyssOverhaul.Content.Rarities
@@ -18,7 +10,7 @@ namespace AbyssOverhaul.Content.Rarities
 
         public override bool AppliesToEntity(Item entity, bool lateInstantiation)
         {
-            return entity.rare == ModContent.RarityType<AbyssalRarity>(); 
+            return entity.rare == ModContent.RarityType<AbyssalRarity>();
         }
 
 
@@ -43,7 +35,7 @@ namespace AbyssOverhaul.Content.Rarities
 
             var center = position + offset;
 
-            
+
             DrawText(in position, text);
 
             return false;
@@ -56,7 +48,7 @@ namespace AbyssOverhaul.Content.Rarities
             var font = FontRegistry.BlackSide;
             var cursor = position;
 
-           
+
             var batch = Main.spriteBatch;
 
             for (var i = 0; i < text.Length; i++)
@@ -70,9 +62,9 @@ namespace AbyssOverhaul.Content.Rarities
 
                 var empty = string.IsNullOrEmpty(letter) || string.IsNullOrWhiteSpace(letter);
 
-              
 
-                var wave = MathF.Cos(i/(float)(text.Length)+Main.GlobalTimeWrappedHourly);
+
+                var wave = MathF.Cos(i / (float)(text.Length) + Main.GlobalTimeWrappedHourly);
 
                 offset = new Vector2(0f, wave);
 
@@ -84,8 +76,8 @@ namespace AbyssOverhaul.Content.Rarities
                 Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, default, Main.graphics.graphicsDevice.RasterizerState, null, Main.UIScaleMatrix);
                 for (int x = 0; x < 10; x++)
                 {
-                    float thing =  x / 10f * MathHelper.TwoPi*2 + Main.GlobalTimeWrappedHourly*1f;
-                    Utils.DrawBorderStringFourWay(batch, font, letter, cursor.X + (new Vector2(1).RotatedBy(thing)).X, cursor.Y+ (new Vector2(1).RotatedBy(thing)).Y, color, Color.Black, Vector2.zeroVector);
+                    float thing = x / 10f * MathHelper.TwoPi * 2 + Main.GlobalTimeWrappedHourly * 1f;
+                    Utils.DrawBorderStringFourWay(batch, font, letter, cursor.X + (new Vector2(1).RotatedBy(thing)).X, cursor.Y + (new Vector2(1).RotatedBy(thing)).Y, color, Color.Black, Vector2.zeroVector);
 
                     //Utils.DrawBorderString(Main.spriteBatch, letter, cursor + new Vector2(1).RotatedBy(thing), color, scale * 1.2f);
                 }

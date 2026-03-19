@@ -1,10 +1,4 @@
-﻿using Luminance.Common.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria.ObjectData;
+﻿using Terraria.ObjectData;
 
 namespace AbyssOverhaul.Content.Layers.FossilShale.Tiles.Rubble
 {

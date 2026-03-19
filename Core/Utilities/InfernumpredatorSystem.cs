@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria.Utilities;
-using static Luminance.Common.Utilities.Utilities;
+﻿using Terraria.Utilities;
 namespace AbyssOverhaul.Core.Utilities
 {
     public static partial class AbyssUtilities
@@ -73,8 +67,8 @@ namespace AbyssOverhaul.Core.Utilities
 
         public static void TurnAroundBehavior(NPC npc, Vector2 ahead, bool aboutToLeaveWorld)
         {
-            float distanceToTileOnLeft = DistanceToTileCollisionHit(npc.Center, npc.velocity.RotatedBy(-MathHelper.PiOver2)) ?? 999f;
-            float distanceToTileOnRight = DistanceToTileCollisionHit(npc.Center, npc.velocity.RotatedBy(MathHelper.PiOver2)) ?? 999f;
+            float distanceToTileOnLeft = BreadLibrary.Core.Utilities.Utilities.DistanceToTileCollisionHit(npc.Center, npc.velocity.RotatedBy(-MathHelper.PiOver2)) ?? 999f;
+            float distanceToTileOnRight = BreadLibrary.Core.Utilities.Utilities.DistanceToTileCollisionHit(npc.Center, npc.velocity.RotatedBy(MathHelper.PiOver2)) ?? 999f;
             float turnDirection = distanceToTileOnLeft > distanceToTileOnRight ? -1f : 1f;
             Vector2 idealVelocity = npc.velocity.RotatedBy(MathHelper.PiOver2 * turnDirection);
             if (aboutToLeaveWorld)
@@ -83,6 +77,8 @@ namespace AbyssOverhaul.Core.Utilities
             npc.velocity = npc.velocity.MoveTowards(idealVelocity, 0.15f);
             npc.velocity = Vector2.Lerp(npc.velocity, idealVelocity, 0.15f);
         }
+
+        
     }
 }
 

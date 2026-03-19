@@ -3,21 +3,13 @@ using AbyssOverhaul.Common.Brain.Contexts;
 using AbyssOverhaul.Common.Brain.SharedModules;
 using BreadLibrary.Core;
 using BreadLibrary.Core.Verlet;
-using Luminance.Assets;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria.Audio;
 using Terraria.DataStructures;
 
 namespace AbyssOverhaul.Content.NPCs
 {
     internal class Wrothfish : ModNPC, IMultiSegmentNPC
     {
-        public override string Texture =>  MiscTexturesRegistry.InvisiblePixelPath;
         private VerletChain Chain;
         private List<ExtraNPCSegment> _ExtraHitBoxes;
 
@@ -66,11 +58,11 @@ namespace AbyssOverhaul.Content.NPCs
 
             this.Brain = Brain;
         }
-        
+
 
         public override void OnSpawn(IEntitySource source)
         {
-           
+
         }
         public override bool PreAI()
         {
@@ -85,7 +77,7 @@ namespace AbyssOverhaul.Content.NPCs
         {
             Brain.Update(NPC);
 
-            if (Brain.Context.ClosestPlayer.Center.Distance(NPC.Center) < 190&& FirstTimeSeeingPlayer)
+            if (Brain.Context.ClosestPlayer.Center.Distance(NPC.Center) < 190 && FirstTimeSeeingPlayer)
             {
                 FirstTimeSeeingPlayer = false;
             }
@@ -97,7 +89,7 @@ namespace AbyssOverhaul.Content.NPCs
 
             for (int i = 0; i < _ExtraHitBoxes.Count; i++)
             {
-                _ExtraHitBoxes[i].Hitbox.Location = (Chain.Positions[i] - _ExtraHitBoxes[i].Hitbox.Size()/2).ToPoint();
+                _ExtraHitBoxes[i].Hitbox.Location = (Chain.Positions[i] - _ExtraHitBoxes[i].Hitbox.Size() / 2).ToPoint();
             }
         }
 
@@ -111,7 +103,7 @@ namespace AbyssOverhaul.Content.NPCs
             if (Chain is null)
                 return false;
 
-            for(int i = 0; i< _ExtraHitBoxes.Count; i++)
+            for (int i = 0; i < _ExtraHitBoxes.Count; i++)
             {
                 Utils.DrawRect(spriteBatch, _ExtraHitBoxes[i].Hitbox, drawColor);
             }
@@ -119,6 +111,6 @@ namespace AbyssOverhaul.Content.NPCs
             return false;
         }
 
-        
+
     }
 }

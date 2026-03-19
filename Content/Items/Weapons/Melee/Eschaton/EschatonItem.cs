@@ -1,27 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using AbyssOverhaul.Content.Rarities;
+﻿using AbyssOverhaul.Content.Rarities;
 using CalamityMod;
-using CalamityMod.Dusts;
 using CalamityMod.Items;
 using CalamityMod.Items.BaseItems;
-using CalamityMod.Items.Materials;
-using CalamityMod.Particles;
-using CalamityMod.Projectiles.Melee;
-using CalamityMod.Projectiles.Typeless;
-using CalamityMod.Rarities;
-using Luminance.Common.Utilities;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
-using Terraria;
-using Terraria.Audio;
-using Terraria.DataStructures;
-using Terraria.GameContent;
-using Terraria.ID;
-using Terraria.ModLoader;
 
-namespace AbyssOverhaul.Content.Items.Weapons
+namespace AbyssOverhaul.Content.Items.Weapons.Melee.Eschaton
 {
     public class EschatonItem : CustomUseProjItem, ILocalizedModType
     {
@@ -37,7 +21,7 @@ namespace AbyssOverhaul.Content.Items.Weapons
             Item.width = 124;
             Item.height = 124;
             Item.damage = 14007; // Feel free to change these 7s as balance requires. The other 7s should stay - Update: no more 2777... :(
-            Item.DamageType = TrueMeleeDamageClass.Instance;
+            Item.DamageType = DamageClass.MeleeNoSpeed;//TrueMeleeDamageClass.Instance;
             Item.useAnimation = 66;
             Item.useTime = 66;
             Item.useTurn = true;
@@ -55,7 +39,7 @@ namespace AbyssOverhaul.Content.Items.Weapons
         public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
         {
             Vector2 DrawPos = Item.Center - Main.screenPosition;
-            Vector2 origin = new Vector2(GlowTex.Value.Width / 2f, GlowTex.Value.Height/2f);
+            Vector2 origin = new Vector2(GlowTex.Value.Width / 2f, GlowTex.Value.Height / 2f);
             //Main.EntitySpriteDraw(GlowTex.Value, DrawPos, null, Color.White, rotation, origin, Item.scale, Item.direction.ToSpriteDirection());
             //Item.DrawItemGlowmaskSingleFrame(spriteBatch, rotation, ModContent.Request<Texture2D>(this.GetPath()+"Holdout_Glow").Value);
         }
@@ -69,7 +53,7 @@ namespace AbyssOverhaul.Content.Items.Weapons
         {
 
         }
-      
-        
+
+
     }
 }

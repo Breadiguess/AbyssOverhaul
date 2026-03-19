@@ -58,12 +58,12 @@ namespace AbyssOverhaul.Core.NPCOverrides
                     mod.Logger.Warn($"Duplicate NPC override for type {npcType}: {existing.GetType().FullName} replaced by {t.FullName}");
                 }
 
-                instance.Load();
+                instance.Load(); // static/shared assets only
                 _overrides[npcType] = instance;
             }
         }
 
-        public static NPCBehaviorOverride Get(NPC npc)
+        public static NPCBehaviorOverride GetPrototype(NPC npc)
         {
             if (npc is null || _overrides is null)
                 return null;
@@ -74,6 +74,19 @@ namespace AbyssOverhaul.Core.NPCOverrides
             return ov.ShouldOverride(npc) ? ov : null;
         }
 
-        public static bool HasOverride(NPC npc) => Get(npc) is not null;
+        public static NPCBehaviorOverride CreateFor(NPC npc)
+        {
+            NPCBehaviorOverride prototype = GetPrototype(npc);
+            if (prototype is null)
+                return null;
+
+            if (Activator.CreateInstance(prototype.GetType()) is not NPCBehaviorOverride instance)
+                return null;
+
+            return instance;
+        }
+
+        public static bool HasOverride(NPC npc) => GetPrototype(npc) is not null;
     }
+
 }

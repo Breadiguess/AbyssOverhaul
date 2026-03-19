@@ -1,12 +1,6 @@
-﻿using Luminance.Core.Graphics;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using Terraria;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria.Audio;
 using Terraria.GameContent;
-using Terraria.ID;
-using Terraria.ModLoader;
 
 namespace AbyssOverhaul.Content.Items.Accessories.BlackTide
 {
@@ -130,7 +124,7 @@ namespace AbyssOverhaul.Content.Items.Accessories.BlackTide
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
             ApplyLunacy(target, LunacyTime);
-            ScreenShakeSystem.StartShakeAtPoint(target.Center, 2);
+            //ScreenShakeSystem.StartShakeAtPoint(target.Center, 2);
             if (Main.myPlayer == Projectile.owner)
             {
                 BlackTideEarringNPC data = target.GetGlobalNPC<BlackTideEarringNPC>();
@@ -189,7 +183,7 @@ namespace AbyssOverhaul.Content.Items.Accessories.BlackTide
 
         private static void ApplyLunacy(NPC target, int time)
         {
-            
+
             target.AddBuff(ModContent.BuffType<LunacyDebuff>(), time);
         }
 

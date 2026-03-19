@@ -1,5 +1,4 @@
-﻿using AbyssOverhaul.Core.ModPlayers;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.IO;
 using Terraria;
@@ -13,63 +12,62 @@ namespace AbyssOverhaul.Core.NPCOverrides
     {
         public override bool InstancePerEntity => true;
 
-        
-       
+        public NPCBehaviorOverride OverrideInstance;
+
+        public NPCBehaviorOverride GetOverride(NPC npc)
+        {
+            if (OverrideInstance is not null)
+                return OverrideInstance;
+
+            OverrideInstance = NPCOverrideRegistry.CreateFor(npc);
+            return OverrideInstance;
+        }
+
         public override void SetDefaults(NPC npc)
         {
-            NPCOverrideRegistry.Get(npc)?.SetDefaults(npc);
+            GetOverride(npc)?.SetDefaults(npc);
         }
+
         public override void OnSpawn(NPC npc, IEntitySource source)
         {
-            NPCOverrideRegistry.Get(npc)?.OnSpawn(npc, source);
+            GetOverride(npc)?.OnSpawn(npc, source);
         }
-      
 
         public override bool CheckDead(NPC npc)
         {
-            NPCBehaviorOverride ov = NPCOverrideRegistry.Get(npc);
-            if (ov is null)
-                return true;
-
-            return ov.CheckDead(npc);
+            NPCBehaviorOverride ov = GetOverride(npc);
+            return ov?.CheckDead(npc) ?? true;
         }
 
         public override void BossHeadSlot(NPC npc, ref int index)
         {
-            NPCOverrideRegistry.Get(npc)?.BossHeadSlot(npc, ref index);
+            GetOverride(npc)?.BossHeadSlot(npc, ref index);
         }
 
         public override void SendExtraAI(NPC npc, BitWriter bitWriter, BinaryWriter binaryWriter)
         {
-            NPCOverrideRegistry.Get(npc)?.SendExtraAI(npc, binaryWriter);
+            GetOverride(npc)?.SendExtraAI(npc, binaryWriter);
         }
 
         public override void ReceiveExtraAI(NPC npc, BitReader bitReader, BinaryReader binaryReader)
         {
-            NPCOverrideRegistry.Get(npc)?.ReceiveExtraAI(npc, binaryReader);
+            GetOverride(npc)?.ReceiveExtraAI(npc, binaryReader);
         }
 
         public override void OnHitPlayer(NPC npc, Player target, Player.HurtInfo hurtInfo)
         {
-            NPCOverrideRegistry.Get(npc)?.OnHitPlayer(npc, target, hurtInfo);
+            GetOverride(npc)?.OnHitPlayer(npc, target, hurtInfo);
         }
-
-
 
         public override bool PreDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            NPCBehaviorOverride ov = NPCOverrideRegistry.Get(npc);
-            if (ov is null)
-                return base.PreDraw(npc, spriteBatch, screenPos, drawColor);
-
-            return ov.PreDraw(npc, spriteBatch, screenPos, drawColor);
+            NPCBehaviorOverride ov = GetOverride(npc);
+            return ov?.PreDraw(npc, spriteBatch, screenPos, drawColor) ?? base.PreDraw(npc, spriteBatch, screenPos, drawColor);
         }
-        
+
         public override void PostDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            NPCBehaviorOverride ov = NPCOverrideRegistry.Get(npc);
-            if (ov is not null)
-                ov.PostDraw(npc, spriteBatch, screenPos, drawColor);
+            GetOverride(npc)?.PostDraw(npc, spriteBatch, screenPos, drawColor);
         }
     }
 }

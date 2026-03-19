@@ -1,18 +1,10 @@
-﻿using BreadLibrary.Common.Graphics;
+﻿
 using CalamityMod.Items.Accessories.Wings;
 using CalamityMod.Items.Materials;
 using CalamityMod.Rarities;
-using Luminance.Common.Utilities;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria.DataStructures;
-using Terraria.ID;
-using static Daybreak.Common.Features.Hooks.GlobalInfoDisplayHooks;
 
 namespace AbyssOverhaul.Content.Items.Accessories.OmegaBlue_Wings
 {
@@ -171,18 +163,18 @@ namespace AbyssOverhaul.Content.Items.Accessories.OmegaBlue_Wings
                 return;
             Texture2D texture = sailFin_Tex.Value;
             Vector2 Position = drawInfo.Position;
-            Vector2 pos = drawInfo.BodyPosition() - new Vector2(12*drawPlayer.direction,-5);// new Vector2((int)(Position.X - Main.screenPosition.X + drawPlayer.width / 2 - 2 * drawPlayer.direction), (int)(Position.Y - Main.screenPosition.Y + (drawPlayer.height / 2 + drawPlayer.HeightOffsetVisual / 2f) - 2f * drawPlayer.gravDir));
+            Vector2 pos = drawInfo.BodyPosition() - new Vector2(12 * drawPlayer.direction, -5);// new Vector2((int)(Position.X - Main.screenPosition.X + drawPlayer.width / 2 - 2 * drawPlayer.direction), (int)(Position.Y - Main.screenPosition.Y + (drawPlayer.height / 2 + drawPlayer.HeightOffsetVisual / 2f) - 2f * drawPlayer.gravDir));
             Color lightColor = Lighting.GetColor((int)drawPlayer.Center.X / 16, (int)drawPlayer.Center.Y / 16, Color.White);
             Color color = lightColor * (1 - drawInfo.shadow);
             if (drawPlayer.TryGetModPlayer<OmegaBlue_Tails>(out var tails))
             {
                 Rectangle Frame = texture.Frame(1, 20, 0, drawPlayer.wingFrame);
-                DrawData d = new DrawData(texture, pos, Frame, color, 0f, Frame.Size()/2f, 1f, drawInfo.playerEffect, 0);
+                DrawData d = new DrawData(texture, pos, Frame, color, 0f, Frame.Size() / 2f, 1f, drawInfo.playerEffect, 0);
                 d.shader = drawInfo.drawPlayer.cWings;
                 drawInfo.DrawDataCache.Add(d);
             }
-            
-        
+
+
         }
     }
 }

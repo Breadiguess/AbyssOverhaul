@@ -4,7 +4,6 @@ using AbyssOverhaul.Common.Brain.SharedSensors;
 using AbyssOverhaul.Core.NPCOverrides;
 using CalamityMod.Buffs.StatDebuffs;
 using CalamityMod.NPCs.Abyss;
-using Luminance.Common.Utilities;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria.DataStructures;
@@ -55,6 +54,8 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Slammonite
         }
 
         public Entity Target;
+
+
 
         public int Time;
         public bool Windup;
@@ -157,7 +158,7 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Slammonite
             }
             return true;
         }
-       
+
 
         public override void PostDraw(NPC NPC, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {

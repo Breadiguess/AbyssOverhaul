@@ -16,8 +16,6 @@ namespace AbyssOverhaul.Core.NPCOverrides
             On_Main.DrawNPCDirect += DrawNPCDirectHook;
         }
 
-      
-
         public override void Unload()
         {
             if (Main.dedServ)
@@ -28,10 +26,8 @@ namespace AbyssOverhaul.Core.NPCOverrides
 
         private void DrawNPCDirectHook(On_Main.orig_DrawNPCDirect orig, Main self, SpriteBatch spriteBatch, NPC npc, bool behindTiles, Vector2 screenPos)
         {
-            NPCBehaviorOverride ov = NPCOverrideRegistry.Get(npc);
+            NPCBehaviorOverride ov = npc.GetGlobalNPC<NPCOverrideGlobalNPC>().GetOverride(npc);
 
-
-            
             if (ov is not null && ov.DrawDirect(npc, spriteBatch, screenPos, behindTiles))
                 return;
 
