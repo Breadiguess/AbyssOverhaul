@@ -2,7 +2,6 @@
 using AbyssOverhaul.Common.Brain.Contexts;
 using AbyssOverhaul.Common.Brain.SharedModules;
 using AbyssOverhaul.Common.Brain.SharedSensors;
-using AbyssOverhaul.Content.NPCs.Critters.VoidDreamerNPC;
 using System;
 using System.Collections.Generic;
 using System.Linq;

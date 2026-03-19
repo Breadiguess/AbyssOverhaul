@@ -11,7 +11,6 @@ namespace AbyssOverhaul.Common.Brain.SharedSensors
     {
         public float SearchRadius = 320f;
         public Func<Tile, bool> TileCondition;
-
         public FindTileSensor(Func<Tile, bool> tileCondition)
         {
             TileCondition = tileCondition;

@@ -1,16 +1,23 @@
-﻿using BreadLibrary.Core;
+﻿using AbyssOverhaul.Common.Brain;
+using AbyssOverhaul.Common.Brain.Contexts;
+using AbyssOverhaul.Common.Brain.SharedModules;
+using AbyssOverhaul.Common.Brain.SharedSensors;
+using BreadLibrary.Core;
+using BreadLibrary.Core.SoftBodySim;
 using BreadLibrary.Core.Verlet;
+using CalamityMod.Tiles.Abyss;
 using Terraria.DataStructures;
 using Terraria.Localization;
 
 namespace AbyssOverhaul.Content.BehaviorOverrides.Brooding_Oarfish
 {
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-
+#pragma warning disable CS8618 
     public class BroodingOarfish : NPCBehaviorOverride, IMultiSegmentNPC
     {
         public override int NPCType => ModContent.NPCType<OarfishHead>();
 
+
+        public ModularNpcBrain<CreatureNpcContext> NpcBrain;
         public VerletChain Body;
         private List<ExtraNPCSegment> _ExtraHitBoxes;
         public List<VerletChain> MouthThings;
@@ -38,6 +45,23 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Brooding_Oarfish
 
             MouthThings.Add(new(10, 2, NPC.Center));
 
+
+            NpcBrain = new(new());
+
+            NpcBrain.Modules.Add(new CreatureSwimWanderModule()
+            {
+                Score = 10
+            });
+            NpcBrain.Modules.Add(new AvoidTilesSwimModule()
+            {
+                ProbeDistance = 60
+            });
+            NpcBrain.Sensors.Add(new FindTileSensor(tile => tile.HasTile && tile.TileType == ModContent.TileType<PlantyMush>())
+            {
+
+            });
+            NpcBrain.Sensors.Add(new CreatureVitalsSensor<CreatureNpcContext>());
+           
         }
         public ref List<ExtraNPCSegment> ExtraHitBoxes()
         {
@@ -52,6 +76,11 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Brooding_Oarfish
 
         }
 
+        public int Time(NPC npc)
+        {
+            
+            return (int)npc.ai[0];
+        }
         public override bool OverrideAI(NPC NPC)
         {
             if (Body is null || _ExtraHitBoxes is null)
@@ -62,19 +91,30 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Brooding_Oarfish
             NPC.noGravity = NPC.wet;
             NPC.GravityMultiplier *= 0;
 
-            Body.Simulate(Vector2.zeroVector, NPC.Center, NPC.gravity, 0.6f, collideWithTiles: false);
+            Body.Simulate(Vector2.zeroVector, NPC.Center, NPC.gravity, 0.95f, collideWithTiles: false);
 
             for (int i = 0; i < _ExtraHitBoxes.Count; i++)
             {
                 _ExtraHitBoxes[i].Hitbox.Location = (Body.Positions[i] - _ExtraHitBoxes[i].Hitbox.Size() / 2).ToPoint();
             }
 
-            NPC.velocity = NPC.DirectionTo(Main.MouseWorld) * 3;
+            NpcBrain.Update(NPC);
+            //NPC.velocity = NPC.DirectionTo(Main.MouseWorld) * 3;
             NPC.rotation = NPC.velocity.ToRotation();
 
             UpdateVisuals(NPC);
 
 
+
+            NPC.ai[0]++;
+
+            if (NPC.ai[0] % 60==0)
+            {
+                Vector2 SpawnPos =
+                Body.Positions[Body.Positions.Length - 4];
+                Projectile a = Projectile.NewProjectileDirect(NPC.GetSource_FromThis(), SpawnPos, Vector2.zeroVector, ModContent.ProjectileType<FishFeed>(), 1, 0);
+                
+            }
 
 
             return true;
@@ -85,7 +125,7 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Brooding_Oarfish
 
             for (int i = 0; i < MouthThings.Count; i++)
             {
-                MouthThings[i].Simulate(Vector2.zeroVector, NPC.Center, 0, 0.4f);
+                MouthThings[i].Simulate(Vector2.zeroVector, NPC.Center, 0, 0.4f, collideWithTiles: false);
                 Lighting.AddLight(MouthThings[i].Positions[^1], r:1, 0.1f, 0.1f);
             }
 
@@ -123,6 +163,27 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Brooding_Oarfish
             Main.EntitySpriteDraw(GlowCone, DrawPos, null, Color.Red with { A = 0 }, rotation, origin, new Vector2(1f, 0.2f), 0);
 
         }
+
+        void DrawEggSack()
+        {
+            if (Body is null)
+                return;
+
+
+            Texture2D tex = ModContent.Request<Texture2D>("AbyssOverhaul/Content/BehaviorOverrides/Brooding_Oarfish/BroodingOarfish_Sack").Value;
+            Vector2 DrawPos =
+                Body.Positions[Body.Positions.Length - 4] - Main.screenPosition;
+            float rot =
+                Body.Positions[Body.Positions.Length - 4].AngleTo(
+                Body.Positions[Body.Positions.Length - 3]);
+            Main.EntitySpriteDraw(tex, DrawPos, null, Color.White, rot, tex.Size() / 2, 1, 0);
+
+        }
+
+        void DrawDebuglinesToTiles(NPC NPC, SpriteBatch spriteBatch)
+        {
+            Utils.DrawLine(spriteBatch,NPC.Center, NpcBrain.Context.TargetPoint, Color.White);
+        }
         public override bool PreDraw(NPC NPC, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             if (NPC.IsABestiaryIconDummy)
@@ -143,15 +204,24 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Brooding_Oarfish
 
                 Utilities.DrawLineBetter(spriteBatch, start, end, Color.White, 40);
             }
+
+            NpcBrain.DrawContextDebug(spriteBatch, NPC.Center - screenPos);
+
+
+            
+
+
+
             DrawTendrils(NPC, spriteBatch);
 
             DrawDetectionCone(NPC.Center - screenPos, NPC.rotation);
+            DrawEggSack();
 
+            DrawDebuglinesToTiles(NPC, spriteBatch);
             return false;
         }
     }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-
+#pragma warning restore CS8618 
 
 
 }

@@ -12,7 +12,7 @@ using System.IO;
 using Terraria.Audio;
 using Terraria.GameContent.Bestiary;
 
-namespace AbyssOverhaul.Content.NPCs.Critters.VoidDreamerNPC
+namespace AbyssOverhaul.Content.Layers.TheVeil.NPCs.VoidDreamerNPC
 {
     internal class VoidDreamer : ModNPC, IDrawPixellated
     {

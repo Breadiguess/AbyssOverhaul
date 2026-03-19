@@ -1,6 +1,6 @@
 ﻿using AbyssOverhaul.Content.Layers.ThermalVents;
+using AbyssOverhaul.Content.Layers.TheVeil.NPCs.VoidDreamerNPC;
 using AbyssOverhaul.Content.Layers.TheVeil.Tiles;
-using AbyssOverhaul.Content.NPCs.Critters.VoidDreamerNPC;
 using AbyssOverhaul.Core.DataStructures;
 using AbyssOverhaul.Core.Utilities;
 using AbyssOverhaul.Core.WorldGen;

@@ -1,5 +1,5 @@
 ﻿using AbyssOverhaul.Content.Layers.TenebrousMarsh.Tiles;
-using AbyssOverhaul.Content.NPCs.Critters.VoidDreamerNPC;
+using AbyssOverhaul.Content.Layers.TheVeil.NPCs.VoidDreamerNPC;
 using AbyssOverhaul.Core.DataStructures;
 using AbyssOverhaul.Core.Utilities;
 using AbyssOverhaul.Core.WorldGen;

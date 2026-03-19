@@ -4,6 +4,8 @@ namespace AbyssOverhaul.Common.Brain.Contexts
 {
     public class CreatureNpcContext : NpcContext, IThreatAware, IDisturbanceAware, ICreatureVitals, IHasPreferredSpacing, IHungry
     {
+        public float Aggression { get; set; } = 0;
+        public float Hunger { get; set; }
         public float Energy { get; set; } = 1f;
         public float Fatigue { get; set; }
         public float Fear { get; set; }
@@ -20,6 +22,5 @@ namespace AbyssOverhaul.Common.Brain.Contexts
 
         public int WanderTimer { get; set; }
         public int StuckTime { get; set; }
-        public float Hunger { get; set; }
     }
 }

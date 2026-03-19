@@ -1,7 +1,4 @@
-﻿using AbyssOverhaul.Common.Brain;
-using AbyssOverhaul.Common.Brain.Contexts;
-using Microsoft.Xna.Framework;
-using Terraria;
+﻿using AbyssOverhaul.Common.Brain.Contexts;
 
 namespace AbyssOverhaul.Common.Brain.SharedModules
 {
@@ -36,22 +33,23 @@ namespace AbyssOverhaul.Common.Brain.SharedModules
             if (!blockedForward && !blockedLeft && !blockedRight && !blockedUp && !blockedDown)
                 return NpcDirective.None;
 
+            float strength = 0.3f;
             Vector2 steer = Vector2.Zero;
 
             if (blockedForward)
-                steer -= forward * 1.3f;
+                steer = Vector2.Lerp(steer, steer - forward * 1.3f, strength);
 
             if (blockedLeft)
-                steer += right * 1.1f;
+                steer = Vector2.Lerp(steer, steer + right * 1.1f, strength);
 
             if (blockedRight)
-                steer += left * 1.1f;
+                steer = Vector2.Lerp(steer, steer + left * 1.1f, strength);
 
             if (blockedUp)
-                steer += Vector2.UnitY * 0.9f;
+                steer = Vector2.Lerp(steer, steer + Vector2.UnitY * 0.9f, strength);
 
             if (blockedDown)
-                steer -= Vector2.UnitY * 0.9f;
+                steer = Vector2.Lerp(steer, steer - Vector2.UnitY * 0.9f, strength);
 
             if (steer.LengthSquared() <= 0.0001f)
                 steer = left;

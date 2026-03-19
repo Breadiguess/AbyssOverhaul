@@ -1,4 +1,4 @@
-﻿namespace AbyssOverhaul.Content.NPCs.Critters.VoidDreamerNPC
+﻿namespace AbyssOverhaul.Content.Layers.TheVeil.NPCs.VoidDreamerNPC
 {
     public sealed class CombatObservationSensor : INpcSensor<ObservationNpcContext>
     {

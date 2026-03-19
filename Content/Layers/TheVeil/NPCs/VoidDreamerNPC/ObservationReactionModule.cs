@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using System;
 using Terraria;
 
-namespace AbyssOverhaul.Content.NPCs.Critters.VoidDreamerNPC
+namespace AbyssOverhaul.Content.Layers.TheVeil.NPCs.VoidDreamerNPC
 {
     public sealed class ObservationReactionModule : INpcModule<ObservationNpcContext>
     {
@@ -61,7 +61,7 @@ namespace AbyssOverhaul.Content.NPCs.Critters.VoidDreamerNPC
             }
 
             // Gentle hover motion so it does not look dead still.
-            desiredVelocity += Vector2.UnitY * (MathF.Cos((float)Main.GameUpdateCount * 0.05f + context.Self.whoAmI*12) * HoverWaveStrength);
+            desiredVelocity += Vector2.UnitY * (MathF.Cos(Main.GameUpdateCount * 0.05f + context.Self.whoAmI*12) * HoverWaveStrength);
 
             // Push away from nearby solid geometry.
             desiredVelocity += ComputeEnvironmentAvoidance(context);

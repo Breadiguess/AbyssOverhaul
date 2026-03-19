@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AbyssOverhaul.Content.NPCs.Critters.VoidDreamerNPC
+namespace AbyssOverhaul.Content.Layers.TheVeil.NPCs.VoidDreamerNPC
 {
     public class ObservationNpcContext : NpcContext
     {
