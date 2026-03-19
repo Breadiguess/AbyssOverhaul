@@ -1,4 +1,5 @@
-﻿using AbyssOverhaul.Core.Systems;
+﻿using AbyssOverhaul.Core.Ecosystem;
+using AbyssOverhaul.Core.Systems;
 using AbyssOverhaul.Core.Utilities;
 using AbyssOverhaul.Core.WorldGen;
 using System.IO;
@@ -59,7 +60,7 @@ namespace AbyssOverhaul.Core.Systems
                 // Fallback for old worlds with no saved abyss data.
                 // This should mainly matter for singleplayer / host-side old worlds.
                 AbyssGenUtils.Initialize(Mod);
-            }
+                }
 
             PresssureSystem.RefreshAfterBoundsChanged();
         }
