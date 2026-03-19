@@ -45,6 +45,11 @@ Items: {
 					"One day came a tall, slim and well-spoken man. Nyarlathotep was the name he used." 
 					'''
 			}
+
+			ImpactHammerItem: {
+				DisplayName: Impact Hammer Item
+				Tooltip: ""
+			}
 		}
 	}
 
