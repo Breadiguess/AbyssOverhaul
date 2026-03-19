@@ -2,10 +2,12 @@
 using AbyssOverhaul.Common.Brain.Contexts;
 using AbyssOverhaul.Common.Brain.SharedSensors;
 using AbyssOverhaul.Core.NPCOverrides;
+using CalamityMod;
 using CalamityMod.Buffs.StatDebuffs;
 using CalamityMod.NPCs.Abyss;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using Terraria;
 using Terraria.DataStructures;
 using Terraria.Localization;
 
@@ -26,13 +28,18 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Slammonite
             SlamTex = ModContent.Request<Texture2D>("AbyssOverhaul/Content/BehaviorOverrides/Slammonite/Slamonite");
             Main.npcFrameCount[NPCType] = 18;
         }
+
         private const int IdleStart = 0;
         private const int IdleEnd = 3;
+        private const int WindupStart = 4;
+        private const int WindupEnd = 7;
         private const int FlingStart = 8;
         private const int FlingEnd = 10;
+        private const int RecoverStart = 11;
+        private const int RecoverEnd = 12;
         private const int ImpactStart = 13;
         private const int ImpactEnd = 16;
-
+        private const int FleeFrame = 17;
 
         public ModularNpcBrain<CreatureNpcContext> NpcBrain;
 
@@ -61,107 +68,282 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Slammonite
 
 
 
-        public int Time;
-        public bool Windup;
-        public bool Dashing;
-        public Vector2 DashDirection;
+        public SlamState CurrentState;
+        public int StateTimer;
         public int DashCooldown;
+        public int RecoverTimer;
 
-        public enum State
+        public Vector2 DashDirection;
+        public Vector2 WanderOffset;
+        public int WanderRefreshTimer;
+
+        public float Visibility; // 0 invisible, 1 fully visible
+        public float LightExposure; // smoothed light value
+
+        public enum SlamState
         {
-            SneakingAround,
-            Dashing,
-            Idle
+            Sneak,
+            Windup,
+            Dash,
+            Recover,
+            FleeLit
         }
-
-        public State CurrentState;
         private int SlowDownTime;
         public override bool OverrideAI(NPC NPC)
         {
-            NPC.noGravity = NPC.wet;
+          
             if (NpcBrain is null)
-                InitializeBrain(NPC);
+                OnSpawn(NPC, null);
 
+            NPC.noGravity = NPC.wet;
 
-            if (NpcBrain.Context.HasThreat)
+            // Update brain FIRST.
+           NpcBrain.Update(NPC);
+
+            Player target = Main.player[NPC.target];
+            if (!target.active || target.dead)
             {
-                if (NpcBrain.Context.ClosestPlayer.Distance(NpcBrain.Context.ThreatPosition) < 12f && !Dashing && !Windup)
-                {
-                    DashDirection = NPC.Center.DirectionTo(NpcBrain.Context.ThreatPosition);
-                    Time = -1;
-                    Windup = true;
-                }
-
+                NPC.TargetClosest();
+                target = Main.player[NPC.target];
             }
 
+            UpdateLightAndVisibility(NPC);
 
-            if (Windup)
-            {
-                NPC.rotation = NPC.rotation.AngleLerp(DashDirection.ToRotation() + MathHelper.PiOver2, 0.2f);
+            bool brightlyLit = LightExposure >= 0.6f;
+            bool canAmbush = LightExposure <= 0.42f;
+            float distToTarget = NPC.Distance(target.Center);
 
-                if (Time > 30)
-                {
-                    Dashing = true;
-                    Time = -1;
-                    Windup = false;
-                }
-            }
-
-            if (Dashing)
-            {
-                NPC.velocity = DashDirection * 30 * Utilities.InverseLerpBump(0, 20, 40, 60, Time);
-                if (Time > 60)
-                {
-                    StopDashing();
-
-                }
-            }
-
-
-
-
-            NpcBrain.Update(NPC);
             if (DashCooldown > 0)
                 DashCooldown--;
-            if (SlowDownTime > 0)
+
+            StateTimer++;
+
+            switch (CurrentState)
             {
-                SlowDownTime--;
-                NPC.velocity *= 0.9f;
+                case SlamState.Sneak:
+                    DoSneak(NPC, target, canAmbush, brightlyLit, distToTarget);
+                    break;
+
+                case SlamState.Windup:
+                    DoWindup(NPC, target, brightlyLit);
+                    break;
+
+                case SlamState.Dash:
+                    DoDash(NPC, target, brightlyLit);
+                    break;
+
+                case SlamState.Recover:
+                    DoRecover(NPC, brightlyLit);
+                    break;
+
+                case SlamState.FleeLit:
+                    DoFlee(NPC, target, brightlyLit);
+                    break;
             }
-            Time++;
+
+            NPC.rotation = NPC.rotation.AngleLerp(NPC.velocity.ToRotation() + MathHelper.PiOver2, 0.16f);
+
             return true;
         }
-
-        void StopDashing()
-        {
-            Dashing = false;
-            Time = -1;
-            DashCooldown = 120;
-
-        }
-
+        
         public override void OnHitPlayer(NPC npc, Player target, Player.HurtInfo hurtInfo)
         {
 
-            if (Dashing)
+           
+        }
+
+        private void UpdateLightAndVisibility(NPC npc)
+        {
+            Point tilePos = npc.Center.ToTileCoordinates();
+
+            Vector3 light =
+                Lighting.GetColor(tilePos).ToVector3() +
+                Lighting.GetColor(tilePos + new Point(1, 0)).ToVector3() +
+                Lighting.GetColor(tilePos + new Point(-1, 0)).ToVector3() +
+                Lighting.GetColor(tilePos + new Point(0, 1)).ToVector3() +
+                Lighting.GetColor(tilePos + new Point(0, -1)).ToVector3();
+
+            light /= 5f;
+
+            float exposure = light.Length() / 1.732f; 
+            // normalize approx from RGB vector length
+            LightExposure = MathHelper.Lerp(LightExposure, exposure, 0.12f);
+
+            float targetVisibility = 0.08f;
+
+            switch (CurrentState)
             {
+                case SlamState.Sneak:
+                    targetVisibility = MathHelper.Lerp(0.06f, 0.45f, LightExposure);
+                    break;
 
-                target.AddBuff(ModContent.BuffType<FishAlert>(), 60 * 6);
-                StopDashing();
+                case SlamState.Windup:
+                    targetVisibility = MathHelper.Lerp(0.35f, 0.8f, LightExposure);
+                    break;
 
-                //todo: Lumyl Cloud particle
+                case SlamState.Dash:
+                    targetVisibility = 1f;
+                    break;
 
+                case SlamState.Recover:
+                    targetVisibility = 0.7f;
+                    break;
+
+                case SlamState.FleeLit:
+                    targetVisibility = MathHelper.Lerp(0.7f, 1f, LightExposure);
+                    break;
+            }
+
+            Visibility = MathHelper.Lerp(Visibility, targetVisibility, 0.14f);
+            npc.Opacity = MathHelper.Clamp(Visibility, 0.05f, 1f);
+        }
+        private void ChangeState(NPC npc, SlamState newState)
+        {
+            CurrentState = newState;
+            StateTimer = 0;
+            npc.netUpdate = true;
+        }
+
+        #region StateMachine
+
+        private void DoSneak(NPC npc, Player target, bool canAmbush, bool brightlyLit, float distToTarget)
+        {
+            if (brightlyLit)
+            {
+                ChangeState(npc, SlamState.FleeLit);
+                return;
+            }
+
+            if (WanderRefreshTimer-- <= 0)
+            {
+                Vector2 around = Main.rand.NextVector2Circular(90f, 55f);
+                around.Y -= 25f;
+                WanderOffset = around;
+                WanderRefreshTimer = Main.rand.Next(40, 90);
+            }
+
+            Vector2 desiredSpot = target.Center + WanderOffset;
+            Vector2 toSpot = desiredSpot - npc.Center;
+
+            float speed = 3.8f;
+            Vector2 desiredVelocity = toSpot.SafeNormalize(Vector2.UnitY) * speed;
+
+            // Soft sneaky movement
+            npc.velocity = Vector2.Lerp(npc.velocity, desiredVelocity, 0.06f);
+
+            // A little drift
+            npc.velocity += Main.rand.NextVector2Circular(0.02f, 0.02f);
+
+            if (canAmbush && DashCooldown <= 0 && distToTarget < 90f)
+            {
+                DashDirection = npc.SafeDirectionTo(target.Center);
+                ChangeState(npc, SlamState.Windup);
             }
         }
 
-        public override bool OverrideFindFrame(NPC NPC)
+        private void DoWindup(NPC npc, Player target,  bool brightlyLit)
         {
-            if (Dashing)
+            if (brightlyLit)
             {
-                NPC.frame.Y = (int)float.Lerp(FlingStart, FlingEnd, Utilities.InverseLerp(0, 60, Time));
+                ChangeState(npc, SlamState.FleeLit);
+                return;
             }
+
+            npc.velocity *= 0.90f;
+
+            Vector2 aimDir = npc.SafeDirectionTo(target.Center);
+            DashDirection = Vector2.Lerp(DashDirection, aimDir, 0.12f);
+            npc.rotation = npc.rotation.AngleLerp(DashDirection.ToRotation() + MathHelper.PiOver2, 0.25f);
+
+            // Brief commit phase
+            if (StateTimer >= 28)
+            {
+                ChangeState(npc, SlamState.Dash);
+            }
+        }
+
+        private void DoDash(NPC npc, Player target, bool brightlyLit)
+        {
+            // Commit to dash even if lit mid-attack.
+            float dashSpeed = 20f;
+            float dashCurve = Utilities.InverseLerpBump(0f, 4f, 18f, 28f, StateTimer);
+            npc.velocity = DashDirection * MathHelper.Lerp(10f, dashSpeed, dashCurve);
+
+            if (StateTimer >= 30)
+            {
+                RecoverTimer = 24;
+                DashCooldown = 120;
+                ChangeState(npc, SlamState.Recover);
+            }
+        }
+
+        private void DoRecover(NPC npc, bool brightlyLit)
+        {
+            npc.velocity *= 0.88f;
+
+            if (brightlyLit)
+            {
+                ChangeState(npc, SlamState.FleeLit);
+                return;
+            }
+
+            if (StateTimer >= RecoverTimer)
+                ChangeState(npc, SlamState.Sneak);
+        }
+
+        private void DoFlee(NPC npc, Player target, bool brightlyLit)
+        {
+            Vector2 away = target.Center.DirectionTo(npc.Center);
+            Vector2 desiredVelocity = away * 5.5f + new Vector2(0f, -0.8f);
+
+            npc.velocity = Vector2.Lerp(npc.velocity, desiredVelocity, 0.08f);
+
+            // Once it reaches darkness again, it can resume stalking.
+            if (!brightlyLit && StateTimer >= 35)
+            {
+                DashCooldown = 90;
+                ChangeState(npc, SlamState.Sneak);
+            }
+        }
+
+
+        #endregion
+
+
+
+
+        public override bool OverrideFindFrame(NPC npc)
+        {
+
+            int frame = 0;
+
+            switch (CurrentState)
+            {
+                case SlamState.Sneak:
+                    frame = IdleStart + (StateTimer / 8) % (IdleEnd - IdleStart + 1);
+                    break;
+
+                case SlamState.Windup:
+                    frame = (int)MathHelper.Lerp(WindupStart, WindupEnd, Utilities.InverseLerp(0f, 28f, StateTimer));
+                    break;
+
+                case SlamState.Dash:
+                    frame = (int)MathHelper.Lerp(FlingStart, FlingEnd, Utilities.InverseLerp(0f, 30f, StateTimer));
+                    break;
+
+                case SlamState.Recover:
+                    frame = RecoverStart + (StateTimer / 6) % (RecoverEnd - RecoverStart + 1);
+                    break;
+
+                case SlamState.FleeLit:
+                    frame = FleeFrame;
+                    break;
+            }
+
+            npc.frame.Y = frame;
             return true;
         }
+
 
 
         public override void PostDraw(NPC NPC, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)

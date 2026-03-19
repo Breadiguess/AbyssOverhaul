@@ -78,4 +78,5 @@ Projectiles: {
 	BlackTideBlastProjectile.DisplayName: Judgement
 	BlackTideMoonProjectile.DisplayName: Black Tide Moon Projectile
 	EschatonSoulProjectile.DisplayName: Eschaton Soul Projectile
+	FishFeed.DisplayName: Fish Feed
 }

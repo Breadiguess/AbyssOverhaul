@@ -49,6 +49,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Folder Include="Assets\AutoloadedEffects\" />
 		<Folder Include="Content\Layers\TheVeil\WorldGeneration\" />
 		<Folder Include="Content\NPCs\Critters\VoidDreamerNPC\Skirts\" />
 	</ItemGroup>

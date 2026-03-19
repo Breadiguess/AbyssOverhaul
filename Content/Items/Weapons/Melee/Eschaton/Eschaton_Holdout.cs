@@ -1,4 +1,5 @@
-﻿using CalamityMod;
+﻿using AbyssOverhaul.Core.Graphics.Shaders;
+using CalamityMod;
 using CalamityMod.Buffs.DamageOverTime;
 using CalamityMod.NPCs;
 using CalamityMod.Projectiles.BaseProjectiles;
@@ -344,18 +345,15 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.Eschaton
         {
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
-            /*
-            var trailShader = ShaderManager.GetShader("AbyssOverhaul.LonginusSlash");
+          
 
 
-            trailShader.SetTexture(ModContent.Request<Texture2D>("AbyssOverhaul/Assets/Textures/T_VoronoiNoiseCA001").Value, 0, SamplerState.PointClamp);
-
-
-            trailShader.TrySetParameter("uTime", Main.GlobalTimeWrappedHourly);
-            trailShader.TrySetParameter("uWorldViewProjection", Main.GameViewMatrix.NormalizedTransformationmatrix);
-            trailShader.TrySetParameter("uColor", Color.White.ToVector4() * 1.0f);
-            trailShader.Apply();
-            */
+            Effect trailShader = ShaderHolder.EschatonSlash.Value;
+            ShaderUtilities.BindTexture(ModContent.Request<Texture2D>("AbyssOverhaul/Assets/Textures/T_VoronoiNoiseCA001").Value, 0, SamplerState.PointWrap);
+            ShaderUtilities.SetParameter(trailShader, "uTime", Main.GlobalTimeWrappedHourly);
+            ShaderUtilities.SetParameter(trailShader, "uWorldViewProjection", Main.GameViewMatrix.NormalizedTransformationmatrix);
+            ShaderUtilities.SetParameter(trailShader, "uColor", Color.White.ToVector3());
+            trailShader.CurrentTechnique.Passes[0].Apply();
             // Rendering primitives involves setting vertices of each triangle to form quads
             // This does it for us
             // Have a list of positions and rotations to create vertices, width function to determine how far vertices are from the center

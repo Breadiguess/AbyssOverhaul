@@ -38,16 +38,25 @@ namespace AbyssOverhaul.Core.NPCOverrides
         }
 
         
+        public virtual void OnKill(NPC NPC) { }
+
         /// <summary>
         /// Hard AI replacement. Return true if you handled AI and want to suppress orig.
         /// </summary>
         public virtual bool OverrideAI(NPC NPC) => false;
 
+
+        #region Collision, onhit, etc.
         public virtual void OnHitPlayer(NPC npc, Player target, Player.HurtInfo hurtInfo)
         {
         }
 
+        public virtual void ModifyHitPlayer(NPC npc, Player target, ref Player.HurtModifiers modifiers) { }
 
+        public virtual bool ModifyCollisionData(NPC npc, Rectangle victimHitbox, ref int immunityCooldownSlot, ref MultipliableFloat damageMultiplier, ref Rectangle npcHitbox) { return false; }
+        
+
+        #endregion
 
         /// <summary>
         /// Hard FindFrame replacement. Return true if you handled framing and want to suppress orig.

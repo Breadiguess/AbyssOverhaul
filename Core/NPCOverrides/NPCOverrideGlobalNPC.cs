@@ -60,6 +60,17 @@ namespace AbyssOverhaul.Core.NPCOverrides
         {
             GetOverride(npc)?.OnHitPlayer(npc, target, hurtInfo);
         }
+        public override void ModifyHitPlayer(NPC npc, Player target, ref Player.HurtModifiers modifiers)
+        {
+            GetOverride(npc)?.ModifyHitPlayer(npc, target, ref modifiers);
+        }
+
+        public override bool ModifyCollisionData(NPC npc, Rectangle victimHitbox, ref int immunityCooldownSlot, ref MultipliableFloat damageMultiplier, ref Rectangle npcHitbox)
+        {
+            return (bool)(GetOverride(npc)?.ModifyCollisionData(npc, victimHitbox, ref immunityCooldownSlot, ref damageMultiplier, ref npcHitbox));
+        }
+
+
 
         public override bool PreDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
