@@ -338,17 +338,12 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
                 ref collisionPoint
             );
 
-            collisionPoint = 0f;
-            bool lowerHit = Collision.CheckAABBvLineCollision(
-                targetHitbox.TopLeft(),
-                targetHitbox.Size(),
-                ArmJoint.Joint,
-                ArmJoint.Tip,
-                2f,
-                ref collisionPoint
-            );
+            Rectangle hammerBox = GetHammerBoundingBox();
 
-            return upperHit || lowerHit;
+            if (hammerBox.Intersects(targetHitbox))
+                return true;
+
+            return upperHit;
         }
         #endregion
 
@@ -491,17 +486,18 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
         }
         private Rectangle GetHammerBoundingBox()
         {
-            Vector2 min = Vector2.Min(ArmJoint.Root, Vector2.Min(ArmJoint.Joint, ArmJoint.Tip));
-            Vector2 max = Vector2.Max(ArmJoint.Root, Vector2.Max(ArmJoint.Joint, ArmJoint.Tip));
+            Vector2 direction = (ArmJoint.Tip - ArmJoint.Joint).SafeNormalize(Vector2.UnitX * Projectile.direction);
 
-            min -= new Vector2(24f);
-            max += new Vector2(24f);
+            Vector2 headCenter = Projectile.Center + direction * 28f;
+
+            const int width = 75;
+            const int height = 75;
 
             return new Rectangle(
-                (int)min.X,
-                (int)min.Y,
-                (int)(max.X - min.X),
-                (int)(max.Y - min.Y)
+                (int)(headCenter.X - width * 0.5f),
+                (int)(headCenter.Y - height * 0.5f),
+                width,
+                height
             );
         }
         private void ManageIK()
@@ -514,8 +510,8 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
             };
 
             ArmJoint.Root = Owner.MountedCenter + new Vector2(-8f * Owner.direction, 4f);
-            //todo: fix this because its kind of ridiculous  that you can just hit anything from anywhere
-            Vector2 target = Owner.Calamity().mouseWorld;
+            ///fixed !!
+            Vector2 target = Owner.Calamity().mouseWorldDeltaFromPlayer+Owner.Center;
             Vector2 pole = ArmJoint.Root + new Vector2(-10f * Owner.direction, 28f);
             ArmJoint.Solve(target, pole);
         }
@@ -580,7 +576,9 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
 
             Main.EntitySpriteDraw(tex, DrawPos, null, lightColor, rot, tex.Size() / 2 - new Vector2(-10, 0), Projectile.scale, flip);
 
-            // Utils.DrawLine(Main.spriteBatch, Projectile.Center, Projectile.Center+ ArmJoint.Tip.AngleFrom(ArmJoint.Joint).ToRotationVector2()*100, Color.Red);
+
+            Utils.DrawRect(Main.spriteBatch, GetHammerBoundingBox(), Color.White);
+            Utils.DrawLine(Main.spriteBatch, Projectile.Center, Projectile.Center+ ArmJoint.Tip.AngleFrom(ArmJoint.Joint).ToRotationVector2()*100, Color.Red);
 
             if (ArmJoint is not null)
             {
