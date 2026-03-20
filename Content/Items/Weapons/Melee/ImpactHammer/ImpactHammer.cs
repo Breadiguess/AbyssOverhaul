@@ -1,4 +1,5 @@
-﻿using BreadLibrary.Common.IK;
+﻿using AbyssOverhaul.Content.Items.Accessories.BlackTide;
+using BreadLibrary.Common.IK;
 using BreadLibrary.Core.Graphics.Particles;
 using BreadLibrary.Core.Sounds;
 using CalamityMod;
@@ -349,27 +350,27 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
 
         #region Helper
 
+        #region Deflect
+
         private void TryDeflectProjectiles()
         {
-            if (ArmJoint is null || Owner is null || !Owner.active)
+            if (Owner.whoAmI != Main.myPlayer)
                 return;
 
+            if (ArmJoint is null || !Owner.active)
+                return;
 
             Rectangle hammerSearchArea = GetHammerBoundingBox();
-            hammerSearchArea.Inflate(40, 40);
+            hammerSearchArea.Inflate(48, 48);
 
             for (int i = 0; i < Main.maxProjectiles; i++)
             {
                 Projectile other = Main.projectile[i];
 
-                if (!other.active || other.whoAmI == Projectile.whoAmI)
+                if (!CanDeflectProjectile(other))
                     continue;
 
                 if (deflectedProjectiles.Contains(i))
-                    continue;
-
-                // Only interact with dangerous enemy projectiles.
-                if (!CanDeflectProjectile(other))
                     continue;
 
                 if (!other.Hitbox.Intersects(hammerSearchArea))
@@ -424,25 +425,32 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
         }
         private void DeflectProjectile(Projectile other)
         {
+            Vector2 origin = other.Center;
 
-          
+            // Use the hammer/mouse direction as the center of the cone.
+            Vector2 coneDirection = (Owner.Calamity().mouseWorld - Owner.Center)
+                .SafeNormalize(Vector2.UnitX * Owner.direction);
 
-            Vector2 hammerDirection = (Owner.Calamity().mouseWorld - Owner.Center).SafeNormalize(Vector2.UnitX * Owner.direction);
+            const float coneHalfAngle = MathHelper.PiOver2;
+            const float maxSeekDistance = 900f;
 
-            // Strong outward bat direction.
-            Vector2 newVelocity = hammerDirection * Math.Max(other.velocity.Length(), 14f);
+            Entity target = FindRedirectTarget(other, origin, coneDirection, coneHalfAngle, maxSeekDistance);
 
-            // Flip it to the player side.
+            float speed = Math.Max(other.velocity.Length(), 30f);
+
+            Vector2 finalDirection = coneDirection;
+            if (target is not null)
+                finalDirection = (target.Center - other.Center).SafeNormalize(coneDirection);
+
+            other.velocity = finalDirection * speed;
+
+            // Convert hostile enemy projectile into a friendly reflected shot.
             other.hostile = false;
             other.friendly = true;
             other.owner = Owner.whoAmI;
-
             other.DamageType = DamageClass.Melee;
-
-            // Give it a useful reflected damage value.
             other.damage = (int)(Projectile.damage * 10f);
-
-            other.velocity = newVelocity*6;
+            other.netUpdate = true;
             if (!HasMadeVisual)
             {
                 ImpactHammer_HitParticle particle = new ImpactHammer_HitParticle();
@@ -451,10 +459,10 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
                 HasMadeVisual = false;
             }
             other.netUpdate = true;
-
+            
             // Nice audiovisual feedback.
             SoundEngine.PlaySound(
-                Assets.Sounds.Items.Melee.ImpactHammer.Reflect.Asset with { pitchVariance = 0.2f, volume = 3},
+                Assets.Sounds.Items.Melee.ImpactHammer.Reflect.Asset with { pitchVariance = 0.2f, volume = 3 },
                 other.Center
             );
         }
@@ -463,26 +471,53 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
             if (!other.active)
                 return false;
 
+            if (other.type == this.Projectile.type)
+                return false;
             // Ignore harmless visuals and things that cannot deal damage.
             if (other.damage <= 0)
                 return false;
 
-            // Usually you want hostile projectiles only.
-            if (!other.hostile)
-                return false;
+            // Normal enemy projectile
+            if (other.hostile && !other.friendly)
+                return true;
 
-            // Ignore friendly/minion/player-owned stuff.
-            if (other.friendly)
-                return false;
+            // PvP projectile from another player
+            if (IsHostilePvPProjectile(other))
+                return true;
 
-            // Optional: ignore tiles/immovable things if desired.
-            // if (other.tileCollide == false) ...
-
-            // Optional: skip unreflectable special cases.
-            // if (other.type == ProjectileID.SomeSpecialThing)
-            //     return false;
-
+           
             return true;
+        }
+        private bool IsHostilePvPProjectile(Projectile other)
+        {
+            if (!Main.projectile.IndexInRange(other.whoAmI))
+                return false;
+
+            if (other.GetGlobalProjectile<BlackTideSourceTrackingProjectile>().SourceNpcIndex > 0)
+                return false;
+            if (!other.friendly || other.hostile)
+                return false;
+
+            if (other.owner < 0 || other.owner >= Main.maxPlayers)
+                return false;
+
+            Player attacker = Main.player[other.owner];
+
+            if (attacker is null || !attacker.active || attacker.dead)
+                return false;
+
+            if (attacker.whoAmI == Owner.whoAmI)
+                return false;
+
+            // Both players must be in PvP.
+            if (!attacker.hostile || !Owner.hostile)
+                return false;
+
+            // Same team usually cannot hurt each other in PvP.
+            if (attacker.team != 0 && attacker.team == Owner.team)
+                return false;
+
+            return false;
         }
         private Rectangle GetHammerBoundingBox()
         {
@@ -500,6 +535,45 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
                 height
             );
         }
+        private Entity FindRedirectTarget(Projectile other, Vector2 origin, Vector2 coneDirection, float coneAngle, float maxDistance)
+        {
+            Entity bestTarget = null;
+            float bestScore = float.MaxValue;
+
+            // NPC targets
+            for (int i = 0; i < Main.maxNPCs; i++)
+            {
+                NPC npc = Main.npc[i];
+                if (!npc.active || npc.friendly || npc.dontTakeDamage || npc.lifeMax <= 5)
+                    continue;
+
+                // If the projectile came from an NPC/enemy source, redirected shots should usually hit NPC enemies.
+                // Skip town NPCs / critters / invalid targets as needed.
+                if (!npc.CanBeChasedBy())
+                    continue;
+
+                Vector2 toTarget = npc.Center - origin;
+                float distance = toTarget.Length();
+                if (distance > maxDistance || distance <= 0.001f)
+                    continue;
+
+                Vector2 dirToTarget = toTarget / distance;
+                float angle = coneDirection.AngleBetween(dirToTarget);
+                if (angle > coneAngle)
+                    continue;
+
+                // Prefer closer targets and ones nearer the cone center.
+                float score = distance + angle * 200f;
+                if (score < bestScore)
+                {
+                    bestScore = score;
+                    bestTarget = npc;
+                }
+            }
+
+            return bestTarget;
+        }
+        #endregion
         private void ManageIK()
         {
 

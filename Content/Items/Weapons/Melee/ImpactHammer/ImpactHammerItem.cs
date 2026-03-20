@@ -49,9 +49,25 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
         public override bool MeleePrefix() => true;
         public override void HoldItem(Player player)
         {
-            if (player.ownedProjectileCounts[Item.shoot] <= 0 && player.HeldItem.type == ModContent.ItemType<ImpactHammerItem>())
+            if (player.whoAmI != Main.myPlayer)
+                return;
+
+            if (player.dead || !player.active)
+                return;
+
+            int hammerType = ModContent.ProjectileType<ImpactHammer>();
+
+            if (player.HeldItem.type == Type && player.ownedProjectileCounts[hammerType] <= 0)
             {
-                Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, Vector2.Zero, ModContent.ProjectileType<ImpactHammer>(), Item.damage, Item.knockBack);
+                Projectile.NewProjectile(
+                    player.GetSource_ItemUse(Item),
+                    player.Center,
+                    Vector2.Zero,
+                    hammerType,
+                    Item.damage,
+                    Item.knockBack,
+                    player.whoAmI
+                );
             }
         }
 
