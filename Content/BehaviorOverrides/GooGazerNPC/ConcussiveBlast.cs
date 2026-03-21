@@ -18,6 +18,7 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.GooGazerNPC
         public override void SetDefaults()
         {
             base.SetDefaults();
+            Projectile.Size = new(40);
             Projectile.timeLeft = 60;
             Projectile.tileCollide = false;
             Projectile.ignoreWater = true;
@@ -34,7 +35,7 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.GooGazerNPC
 
         public override bool PreDraw(ref Color lightColor)
         {
-            Utils.DrawRect(Main.spriteBatch, Projectile.Hitbox, Color.White);
+            // Utils.DrawRect(Main.spriteBatch, Projectile.Hitbox, Color.White);
             return false;
         }
         public void DrawPixelated(SpriteBatch spriteBatch)

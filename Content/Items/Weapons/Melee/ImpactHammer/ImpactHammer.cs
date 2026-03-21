@@ -135,9 +135,6 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
 
 
             ManageIK();
-            DoPlayerCheck();
-            SetPosition(); 
-            MangeVerlet();
             if (Compression is not null)
             {
                
@@ -169,6 +166,10 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
                 ChargeInterpolant = float.Lerp(ChargeInterpolant, 0f, 0.2f);
 
             Time++;
+
+            DoPlayerCheck();
+            SetPosition();
+            MangeVerlet();
         }
 
 
@@ -635,17 +636,20 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
             {
                 FunChain = new VerletChain(10, 2, Projectile.Center);
             }
-            FunChain.Positions[0] = Projectile.Center;
+            FunChain.Positions[0] = Projectile.Bottom;
             FunChain.Positions[^1] = Projectile.Center + new Vector2(Projectile.width/2, -8*Projectile.direction).RotatedBy(Projectile.rotation);
-            FunChain.Simulate(Vector2.zeroVector, Projectile.Center,2, 0.7f);
+            FunChain.Simulate(Vector2.zeroVector, Projectile.Center, 2, 0.7f, collideWithTiles: false);
+
         }
 
         private void SetPosition()
         {
 
             Projectile.Center = ArmJoint.Joint + Main.rand.NextVector2Unit() * ChargeInterpolant*0.5f;
-            Projectile.rotation = Projectile.rotation.AngleLerp(Owner.Calamity().mouseWorld.AngleFrom(Projectile.Center), 0.4f);
+            Projectile.rotation = Projectile.rotation.AngleLerp(SyncedAimWorld.AngleFrom(Projectile.Center), 0.3f);
             Projectile.velocity = Projectile.rotation.ToRotationVector2() * 12;
+
+            Owner.direction = (SyncedAimWorld - Owner.Center).X.DirectionalSign();
         }
         private void DoPlayerCheck()
         {
@@ -653,7 +657,6 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
             {
                 Projectile.timeLeft = 2;
                 Owner.heldProj = this.Projectile.whoAmI;
-                Owner.direction = (SyncedAimWorld - Owner.Center).X.DirectionalSign();
                 Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.None, 0);
             }
         }
@@ -928,16 +931,21 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
 
             
 
+          
 
             Main.EntitySpriteDraw(tex, DrawPos, null, lightColor, rot, tex.Size() / 2 - new Vector2(-10, 0), Projectile.scale, flip);
 
+            for (int i = 0; i < FunChain.Positions.Length - 1; i++)
+            {
+                //Utils.DrawLine(Main.spriteBatch, FunChain.Positions[i], FunChain.Positions[i + 1], Color.White);
+            }
 
             //Utils.DrawRect(Main.spriteBatch, GetHammerBoundingBox(), Color.White);
             //Utils.DrawLine(Main.spriteBatch, Projectile.Center, Projectile.Center+ ArmJoint.Tip.AngleFrom(ArmJoint.Joint).ToRotationVector2()*100, Color.Red);
 
-            
 
-         
+
+
             return false;
         }
 

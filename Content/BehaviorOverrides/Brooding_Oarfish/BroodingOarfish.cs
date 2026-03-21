@@ -225,10 +225,11 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Brooding_Oarfish
 
                 var tex = i == 0 ? TextureAssets.Npc[this.NPCType].Value : BodyTex.Value;
 
-                float rotation = i == 0 ? NPC.rotation : Body.Positions[i].AngleFrom(Body.Positions[i + 1]);
+                float rotation = i == 0 ? NPC.rotation : Body.Positions[i].AngleFrom(Body.Positions[i + 1]) ;
 
-                Main.EntitySpriteDraw(tex, DrawPos, null, drawColor, rotation, tex.Size() / 2, NPC.scale, 0);
+                Main.EntitySpriteDraw(tex, DrawPos, null, drawColor, rotation + MathHelper.PiOver2, tex.Size() / 2, NPC.scale, 0);
             }
+            Main.EntitySpriteDraw(TailTex.Value, Body.Positions[^1] - Main.screenPosition, null, drawColor, Body.Positions[^1].AngleFrom(Body.Positions[Body.Positions.Length - 2]) - MathHelper.PiOver2, TailTex.Value.Size()/2f, 1, 0);
 
 
                 //NpcBrain.DrawContextDebug(spriteBatch, NPC.Center - screenPos);

@@ -217,15 +217,19 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.GooGazerNPC
 
             Vector2 fireDirection = aimDirection;
 
-            Projectile.NewProjectile(
-                npc.GetSource_FromThis(),
-                npc.Center + fireDirection * 22f,
-                fireDirection * 8f,
-                ModContent.ProjectileType<ConcussiveBlast>(),
-                60,
-                0f,
-                Main.myPlayer
-            );
+            for(int i = 0; i< 3; i++)
+            {
+                Projectile.NewProjectile(
+              npc.GetSource_FromThis(),
+              npc.Center + fireDirection * 22f,
+              fireDirection * 4f * (i+1),
+              ModContent.ProjectileType<ConcussiveBlast>(),
+              60,
+              0f,
+              Main.myPlayer
+          );
+            }
+          
             npc.velocity -= fireDirection * 4;
 
             ChargeWindup = 0f;
