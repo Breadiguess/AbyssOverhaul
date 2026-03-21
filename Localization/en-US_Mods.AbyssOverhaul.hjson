@@ -72,6 +72,7 @@ NPCs: {
 	DeepSnapper.DisplayName: Deep Snapper
 	BoxJellyfish.DisplayName: Box Jellyfish
 	CarcassLeechNPC.DisplayName: Carcass Leech
+	HagFish.DisplayName: Hag Fish
 }
 
 Buffs: {
@@ -86,4 +87,5 @@ Projectiles: {
 	BlackTideMoonProjectile.DisplayName: Black Tide Moon Projectile
 	EschatonSoulProjectile.DisplayName: Eschaton Soul Projectile
 	FishFeed.DisplayName: Fish Feed
+	ConcussiveBlast.DisplayName: Concussive Blast
 }

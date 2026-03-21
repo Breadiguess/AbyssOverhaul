@@ -24,8 +24,8 @@ namespace AbyssOverhaul.Common.Brain.SharedSensors
             if (bestTile is null)
                 return;
 
-            context.TargetPoint = bestTile.Value.ToWorldCoordinates(8f, 8f);
-            context.HasTargetPoint = true;
+            context.FoundTileWorld = bestTile.Value.ToWorldCoordinates(8f, 8f);
+            context.HasFoundTile = true;
         }
 
         private static Point? FindNearestMatchingTile(Vector2 worldCenter, float radius, Func<Tile, bool> condition)

@@ -49,15 +49,18 @@ public sealed class NPCOverrideDrawDetourSystem : ModSystem
 
     private static void DrawNPCDirectWithoutPostDraw(Main self, SpriteBatch spriteBatch, NPC npc, bool behindTiles, Vector2 screenPos)
     {
-        //yeah, this is hardcoded.... sorry....
-        Color npcColor = npc.GetAlpha(Lighting.GetColor((int)npc.Center.X / 16, (int)npc.Center.Y / 16));
-
-        NPCLoader.DrawEffects(npc, ref npcColor);
-
-        if (NPCLoader.PreDraw(npc, spriteBatch, screenPos, npcColor))
+        //its okay if this fails, but don't throw a hissy fit about it.
+        try
         {
-            object[] args =
+            //yeah, this is hardcoded.... sorry....
+            Color npcColor = npc.GetAlpha(Lighting.GetColor((int)npc.Center.X / 16, (int)npc.Center.Y / 16));
+
+            NPCLoader.DrawEffects(npc, ref npcColor);
+
+            if (NPCLoader.PreDraw(npc, spriteBatch, screenPos, npcColor))
             {
+                object[] args =
+                {
                     spriteBatch,
                     npc,
                     behindTiles,
@@ -65,14 +68,18 @@ public sealed class NPCOverrideDrawDetourSystem : ModSystem
                     npcColor
                 };
 
-            drawNPCDirectInnerMethod.Invoke(self, args);
+                drawNPCDirectInnerMethod.Invoke(self, args);
 
-            // because npcColor is passed by ref, pull the boxed value back out if needed
-            npcColor = (Color)args[4];
+                // because npcColor is passed by ref, pull the boxed value back out if needed
+                npcColor = (Color)args[4];
+            }
+
+            //FUCK YOU FAPSOL
+            //GET FUCKED YOU GREASY PEDO 
+            // NPCLoader.PostDraw(npc, spriteBatch, screenPos, npcColor);
         }
+        catch { }
 
-        //FUCK YOU FAPSOL
-        //GET FUCKED YOU GREASY PEDO 
-        // NPCLoader.PostDraw(npc, spriteBatch, screenPos, npcColor);
+
     }
 }

@@ -26,8 +26,8 @@ namespace AbyssOverhaul.Content.Layers.ThermalVents
     internal class ThermalVentsLayer : AbyssLayer
     {
         public static Vector2 ExitPosition { get; private set; } = Vector2.Zero;
-        public override int StartHeight => AbyssGenUtils.YAt(0.45f);
-        public override int EndHeight => AbyssGenUtils.YAt(0.6f);
+        public override int StartHeight => AbyssGenUtils.YAt(0.55f);
+        public override int EndHeight => AbyssGenUtils.YAt(0.7f);
 
         public static ThermalVentsLayer Instance => ModContent.GetInstance<ThermalVentsLayer>();
         public override ModWaterStyle ModWaterStyle => ThermalVentsWater.Instance;

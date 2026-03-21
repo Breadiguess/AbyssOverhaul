@@ -20,8 +20,8 @@ namespace AbyssOverhaul.Content.Layers.TheVeil
 {
     internal class TheVeilLayer : AbyssLayer
     {
-        public override int StartHeight => AbyssGenUtils.YAt(0.6f);
-        public override int EndHeight => AbyssGenUtils.YAt(0.8f);
+        public override int StartHeight => AbyssGenUtils.YAt(0.7f);
+        public override int EndHeight => AbyssGenUtils.YAt(0.94f);
         private static int SnowType => ModContent.TileType<marine_snow>();
         private static int MantleType => ModContent.TileType<VoidstoneMantle>();
         private static int VoidstoneType => ModContent.TileType<Voidstone>();

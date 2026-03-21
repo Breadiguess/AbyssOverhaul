@@ -43,7 +43,8 @@ namespace AbyssOverhaul.Common.Brain
             if (best.WantsControl)
             {
                 LastDesiredVelocity = best.DesiredVelocity;
-                npc.velocity = Vector2.Lerp(npc.velocity, best.DesiredVelocity, 0.15f);
+
+                ApplySteering(npc, best.DesiredVelocity);
 
                 CurrentModuleName = best.DebugName;
                 CurrentDebugInfo = best.DebugInfo ?? "";
@@ -54,6 +55,25 @@ namespace AbyssOverhaul.Common.Brain
                 CurrentDebugInfo = "";
                 LastDesiredVelocity = Vector2.Zero;
             }
+        }
+        private static void ApplySteering(NPC npc, Vector2 desiredVelocity)
+        {
+            // Difference between where we are moving and where the brain wants to move.
+            Vector2 delta = desiredVelocity - npc.velocity;
+
+            // Cap how much the brain can change velocity per tick.
+            // This is the key thing that lets knockback survive.
+            float maxAcceleration = 0.18f;
+
+            if (delta.LengthSquared() > maxAcceleration * maxAcceleration)
+                delta = delta.SafeNormalize(Vector2.Zero) * maxAcceleration;
+
+            npc.velocity += delta;
+
+            // Optional light drag when there is no meaningful desired movement.
+            // Keeps idle creatures from drifting forever after knockback.
+            if (desiredVelocity.LengthSquared() <= 0.001f)
+                npc.velocity *= 0.985f;
         }
 
         public void DrawContextDebug(SpriteBatch spriteBatch, Vector2 DrawPos)

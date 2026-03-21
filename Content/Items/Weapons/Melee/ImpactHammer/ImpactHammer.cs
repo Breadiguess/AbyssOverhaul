@@ -1,9 +1,16 @@
 ﻿using AbyssOverhaul.Content.Items.Accessories.BlackTide;
 using BreadLibrary.Common.IK;
+using BreadLibrary.Core.Graphics;
 using BreadLibrary.Core.Graphics.Particles;
+using BreadLibrary.Core.Graphics.PixelationShit;
+using BreadLibrary.Core.ScreenShake;
 using BreadLibrary.Core.Sounds;
+using BreadLibrary.Core.Verlet;
 using CalamityMod;
+using CalamityMod.Items.Armor.Hydrothermic;
 using CalamityMod.NPCs;
+using CalamityMod.Particles;
+using CalamityMod.Projectiles.Typeless;
 using System.IO;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -11,15 +18,16 @@ using Terraria.GameContent;
 
 namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
 {
-    public class ImpactHammer : ModProjectile, ILocalizedModType
+    public class ImpactHammer : ModProjectile, ILocalizedModType, IDrawPixellated
     {
+
+       
+        public override string LocalizationCategory => "Items.Weapons.Melee";
+
+        #region Values
 
         public ref float Time => ref Projectile.ai[0];
         public ref Player Owner => ref Main.player[Projectile.owner];
-        public override string LocalizationCategory => "Items.Weapons.Melee";
-
-
-
         public static Asset<Texture2D> HeadTex;
         public static Asset<Texture2D> ArmTex;
         public bool HitReady = false;
@@ -46,6 +54,25 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
             get => Projectile.localAI[0];
             set => Projectile.localAI[0] = value;
         }
+
+        public LoopedSoundInstance? Compression;
+        public LoopedSoundInstance? ChargeHeld;
+
+        public IKSkeletonAnalytic ArmJoint;
+        public Vector2 SyncedAimWorld;
+
+        public bool ThisChargeIsFaster;
+        private bool HasPlayedSound = false;
+
+
+        public VerletChain FunChain;
+        private readonly HashSet<int> deflectedProjectiles = new();
+
+        public int ChargeTime => !ThisChargeIsFaster ? 60 : 30;
+
+        #endregion
+
+
         public override void Load()
         {
             string path = this.GetPath();
@@ -53,23 +80,14 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
             ArmTex = ModContent.Request<Texture2D>($"{path}Arm");
         }
 
-        public LoopedSoundInstance? Compression;
-        public LoopedSoundInstance? ChargeHeld;
-
-        public IKSkeletonAnalytic ArmJoint;
-
-        public override void SetStaticDefaults()
-        {
-            ProjectileID.Sets.DismountsPlayersOnHit[Type] = true;
-            ProjectileID.Sets.DontCancelChannelOnKill[Type] = true;
-            ProjectileID.Sets.NoLiquidDistortion[Type] = true;
-        }
         public override void SendExtraAI(BinaryWriter writer)
         {
             writer.Write(HitReady);
             writer.Write(HitRealeased);
             writer.Write(ChargeInterpolant);
             writer.Write(HasPlayedSound);
+            writer.Write(ThisChargeIsFaster);
+            writer.WriteVector2(SyncedAimWorld);
         }
 
         public override void ReceiveExtraAI(BinaryReader reader)
@@ -78,8 +96,18 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
             HitRealeased = reader.ReadBoolean();
             ChargeInterpolant = reader.ReadSingle();
             HasPlayedSound = reader.ReadBoolean();
+            ThisChargeIsFaster = reader.ReadBoolean();
+            SyncedAimWorld = reader.ReadVector2();
+
         }
 
+
+        public override void SetStaticDefaults()
+        {
+            ProjectileID.Sets.DismountsPlayersOnHit[Type] = true;
+            ProjectileID.Sets.DontCancelChannelOnKill[Type] = true;
+            ProjectileID.Sets.NoLiquidDistortion[Type] = true;
+        }
         public override void SetDefaults()
         {
             Projectile.width = 40;
@@ -99,7 +127,6 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
         {
             base.OnSpawn(source);
         }
-        private readonly HashSet<int> deflectedProjectiles = new();
         public override void AI()
         {
             Vector2 newAim = Owner.Calamity().mouseWorld;
@@ -109,13 +136,15 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
 
             ManageIK();
             DoPlayerCheck();
-            SetPosition();
-
+            SetPosition(); 
+            MangeVerlet();
             if (Compression is not null)
             {
+               
+
                 Compression.Update(Projectile.Center, sound =>
                 {
-                    sound.Volume = 0.4f * Utilities.InverseLerpBump(0, 30, 59, 60, 60f * ChargeInterpolant);
+                    sound.Volume = 0.4f * Utilities.InverseLerpBump(0, ChargeTime/2, ChargeTime-4, ChargeTime, ChargeTime * ChargeInterpolant);
                     sound.Pitch = 0.1f * ChargeInterpolant + ChargePitchVariance;
                 });
             }
@@ -143,10 +172,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
         }
 
 
-
         #region StateMachine
-        public Vector2 SyncedAimWorld;
-        private bool HasPlayedSound = false;
         private void StateMachine()
         {
             switch (CurrentState)
@@ -179,7 +205,8 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
                         float oldCharge = ChargeInterpolant;
                         bool oldReady = HitReady;
 
-                        ChargeInterpolant = Utilities.InverseLerp(0f, 60f, Time);
+                        
+                        ChargeInterpolant = Utilities.InverseLerp(0f, ChargeTime, Time);
 
                         if (ChargeInterpolant >= 1f)
                         {
@@ -197,6 +224,14 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
                                 HasPlayedSound = true;
                             }
 
+                            for(int i = 0; i< 2; i++)
+                            {
+
+                                Vector2 Direction = (ArmJoint.Joint.AngleFrom(ArmJoint.Tip)+ i/2f*MathHelper.PiOver2 * -Projectile.direction).ToRotationVector2().RotatedByRandom(0.2f) * 10;
+                                MediumMistParticle mist = new MediumMistParticle(ArmJoint.Joint, Direction,
+                                 Main.rand.NextBool(3) ? Color.LightSteelBlue : Color.SteelBlue, Color.LightSlateGray, Main.rand.NextFloat(0.4f, 0.65f), 130);
+                                GeneralParticleHandler.SpawnParticle(mist);
+                            }
                             HitReady = true;
                         }
 
@@ -205,6 +240,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
                     }
                     else
                     {
+                        ThisChargeIsFaster = false;
                         ChargeHeld?.Stop();
                         if (!HitReady)
                         {
@@ -226,8 +262,9 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
                     Vector2 HeadPos = Projectile.Center + new Vector2(40, 0).RotatedBy(Projectile.rotation);
                     if (!HasPlayedSound )
                     {
+                        ScreenShakeSystem.ShakeAt(HeadPos, 20, 10);
                         SoundEngine.PlaySound(
-                            Assets.Sounds.Items.Melee.ImpactHammer.MechanicalImpact.Asset with { pitchVariance = 0.3f, volume = 0.7f},
+                            Assets.Sounds.Items.Melee.ImpactHammer.MechanicalImpact.Asset with { pitchVariance = 1f, volume = 0.7f},
                             Owner.Center
                         );
                         HasPlayedSound = true;
@@ -236,10 +273,11 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
                         Particle.Prepare(HeadPos, Projectile.rotation, 60);
                         ParticleEngine.ShaderParticles.Add( Particle );
                     }
+
                     if(Time <=10)
                     {
                         ImpactHammer_CloudParticle particle = new();
-                        particle.Prepare(HeadPos, Projectile.rotation.ToRotationVector2().RotatedByRandom(0.3f) * 10, Main.rand.NextFloat(3), 40);
+                        particle.Prepare(HeadPos, Projectile.rotation.ToRotationVector2().RotatedByRandom(1f) * 10, Main.rand.NextFloat(3), 40);
                         ParticleEngine.ShaderParticles.Add(particle);
 
                     }
@@ -456,8 +494,10 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
                 ImpactHammer_HitParticle particle = new ImpactHammer_HitParticle();
                 particle.Prepare(Projectile.Center + new Vector2(40, 0).RotatedBy(Projectile.rotation), other.velocity.ToRotation(), isAReflect: true);
                 ParticleEngine.ShaderParticles.Add(particle);
-                HasMadeVisual = false;
+                 HasMadeVisual = true;
+                ThisChargeIsFaster = true;
             }
+            
             other.netUpdate = true;
             
             // Nice audiovisual feedback.
@@ -589,10 +629,21 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
             Vector2 pole = ArmJoint.Root + new Vector2(-10f * Owner.direction, 28f);
             ArmJoint.Solve(target, pole);
         }
+        private void MangeVerlet()
+        {
+            if(FunChain is null)
+            {
+                FunChain = new VerletChain(10, 2, Projectile.Center);
+            }
+            FunChain.Positions[0] = Projectile.Center;
+            FunChain.Positions[^1] = Projectile.Center + new Vector2(Projectile.width/2, -8*Projectile.direction).RotatedBy(Projectile.rotation);
+            FunChain.Simulate(Vector2.zeroVector, Projectile.Center,2, 0.7f);
+        }
+
         private void SetPosition()
         {
 
-            Projectile.Center = ArmJoint.Joint;
+            Projectile.Center = ArmJoint.Joint + Main.rand.NextVector2Unit() * ChargeInterpolant*0.5f;
             Projectile.rotation = Projectile.rotation.AngleLerp(Owner.Calamity().mouseWorld.AngleFrom(Projectile.Center), 0.4f);
             Projectile.velocity = Projectile.rotation.ToRotationVector2() * 12;
         }
@@ -602,7 +653,8 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
             {
                 Projectile.timeLeft = 2;
                 Owner.heldProj = this.Projectile.whoAmI;
-                Owner.direction = Projectile.velocity.X.DirectionalSign();
+                Owner.direction = (SyncedAimWorld - Owner.Center).X.DirectionalSign();
+                Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.None, 0);
             }
         }
         #endregion
@@ -614,13 +666,13 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
         {
             overPlayers.Add(index);
         }
-        private void DrawHead(Vector2 PosOffset, float rot, Color lightColor)
+        private void DrawHead(Vector2 PosOffset, float rot, Color lightColor, SpriteEffects flip)
         {
             Vector2 DrawPos = Projectile.Center - Main.screenPosition + PosOffset;
 
             var tex = HeadTex.Value;
 
-            Main.EntitySpriteDraw(tex, DrawPos, null, lightColor, rot, new Vector2(0, tex.Height / 2f), 1, 0);
+            Main.EntitySpriteDraw(tex, DrawPos, null, lightColor, rot, new Vector2(0, tex.Height / 2f), 1, flip);
         }
         private void DrawArmPiece(Color lightColor)
         {
@@ -630,6 +682,234 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
             Main.EntitySpriteDraw(tex, ArmJoint.Root - Main.screenPosition, null, lightColor, rot - MathHelper.PiOver2, tex.Size() / 2, 1, Projectile.direction.ToSpriteDirection());
         }
 
+        #region Primitive
+        private BasicEffect ChainEffect;
+        private VertexPositionColorTexture[] chainVertices;
+
+        private short[] chainIndices;
+        private void EnsureChainEffect()
+        {
+            if (Main.dedServ)
+                return;
+
+            if (ChainEffect is null || ChainEffect.IsDisposed)
+            {
+                ChainEffect = new BasicEffect(Main.instance.GraphicsDevice)
+                {
+                    VertexColorEnabled = true,
+                    TextureEnabled = true
+                };
+            }
+        }
+        private void DrawFunChainPrimitive(Vector2[] points, float width, Color color)
+        {
+            if (points is null || points.Length < 2 || Main.dedServ)
+                return;
+
+            EnsureChainEffect();
+
+            GraphicsDevice gd = Main.instance.GraphicsDevice;
+
+            int pointCount = points.Length;
+            int vertexCount = pointCount * 2;
+            int indexCount = (pointCount - 1) * 6;
+
+            if (chainVertices is null || chainVertices.Length != vertexCount)
+                chainVertices = new VertexPositionColorTexture[vertexCount];
+
+            if (chainIndices is null || chainIndices.Length != indexCount)
+            {
+                chainIndices = new short[indexCount];
+                int idx = 0;
+
+                for (int i = 0; i < pointCount - 1; i++)
+                {
+                    short a = (short)(i * 2);
+                    short b = (short)(i * 2 + 1);
+                    short c = (short)(i * 2 + 2);
+                    short d = (short)(i * 2 + 3);
+
+                    chainIndices[idx++] = a;
+                    chainIndices[idx++] = b;
+                    chainIndices[idx++] = c;
+
+                    chainIndices[idx++] = c;
+                    chainIndices[idx++] = b;
+                    chainIndices[idx++] = d;
+                }
+            }
+
+            float halfWidth = width * 0.5f;
+
+            Vector2[] segmentNormals = new Vector2[pointCount - 1];
+            for (int i = 0; i < pointCount - 1; i++)
+            {
+                Vector2 diff = points[i + 1] - points[i];
+                if (diff.LengthSquared() < 0.0001f)
+                    diff = Vector2.UnitX;
+
+                diff.Normalize();
+                segmentNormals[i] = diff.RotatedBy(MathHelper.PiOver2);
+            }
+
+            for (int i = 0; i < pointCount; i++)
+            {
+                Vector2 normal;
+
+                if (i == 0)
+                {
+                    normal = segmentNormals[0];
+                }
+                else if (i == pointCount - 1)
+                {
+                    normal = segmentNormals[pointCount - 2];
+                }
+                else
+                {
+                    Vector2 n0 = segmentNormals[i - 1];
+                    Vector2 n1 = segmentNormals[i];
+
+                    if (Vector2.Dot(n0, n1) < 0f)
+                        n1 = -n1;
+
+                    Vector2 miter = n0 + n1;
+
+                    if (miter.LengthSquared() < 0.0001f)
+                        normal = n1;
+                    else
+                    {
+                        miter.Normalize();
+
+                        float denom = Vector2.Dot(miter, n1);
+                        if (MathF.Abs(denom) < 0.15f)
+                            denom = 0.15f * MathF.Sign(denom == 0f ? 1f : denom);
+
+                        float miterLength = halfWidth / denom;
+
+                        // Prevent absurd spikes on sharp bends.
+                        miterLength = MathHelper.Clamp(miterLength, -halfWidth * 2f, halfWidth * 2f);
+
+                        normal = miter * miterLength / halfWidth;
+                    }
+                }
+
+                Vector2 offset = normal * halfWidth;
+
+                Vector2 left = points[i] - offset;
+                Vector2 right = points[i] + offset;
+
+                float u = i / (float)(pointCount - 1);
+
+
+                Color Actual = color.MultiplyRGB(Lighting.GetColor(points[i].ToTileCoordinates()));
+                chainVertices[i * 2] = new VertexPositionColorTexture(
+                    new Vector3(left - Main.screenPosition, 0f),
+                    Actual,
+                    new Vector2(u, 0f)
+                );
+
+                chainVertices[i * 2 + 1] = new VertexPositionColorTexture(
+                    new Vector3(right - Main.screenPosition, 0f),
+                   Actual,
+                    new Vector2(u, 1f)
+                );
+            }
+
+            ChainEffect.World = Matrix.Identity;
+            ChainEffect.View = Matrix.identity;
+            ChainEffect.Projection = Matrix.CreateOrthographicOffCenter(
+                0f,
+                Main.screenWidth,
+                Main.screenHeight,
+                0f,
+                0f,
+                1f
+            );
+            ChainEffect.Texture = TextureAssets.MagicPixel.Value;
+
+            gd.BlendState = BlendState.AlphaBlend;
+            gd.DepthStencilState = DepthStencilState.None;
+            gd.RasterizerState = new RasterizerState { CullMode = CullMode.None, FillMode = FillMode.WireFrame};
+            gd.SamplerStates[0] = SamplerState.LinearClamp;
+
+            foreach (EffectPass pass in ChainEffect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+                gd.DrawUserIndexedPrimitives(
+                    PrimitiveType.TriangleList,
+                    chainVertices,
+                    0,
+                    vertexCount,
+                    chainIndices,
+                    0,
+                    indexCount / 3
+                );
+            }
+        }
+        /// <summary>
+        /// this is so stupid bruh.
+        /// </summary>
+        /// <param name="points"></param>
+        /// <param name="subdivisionsPerSegment"></param>
+        /// <returns></returns>
+        private static Vector2[] SubdividePointsLinear(Vector2[] points, int subdivisionsPerSegment)
+        {
+            if (points is null || points.Length < 2)
+                return points;
+
+            if (subdivisionsPerSegment <= 1)
+                return points;
+
+            int segmentCount = points.Length - 1;
+            int newCount = segmentCount * subdivisionsPerSegment + 1;
+            Vector2[] result = new Vector2[newCount];
+
+            int index = 0;
+
+            for (int i = 0; i < segmentCount; i++)
+            {
+                Vector2 start = points[i];
+                Vector2 end = points[i + 1];
+
+                for (int j = 0; j < subdivisionsPerSegment; j++)
+                {
+                    float t = j / (float)subdivisionsPerSegment;
+                    result[index++] = Vector2.Lerp(start, end, t);
+                }
+            }
+
+            result[index] = points[^1];
+            return result;
+        }
+        private static Vector2[] SubdividePointsCatmullRom(Vector2[] points, int subdivisionsPerSegment)
+        {
+            if (points is null || points.Length < 2)
+                return points;
+
+            if (subdivisionsPerSegment <= 1 || points.Length < 3)
+                return SubdividePointsLinear(points, subdivisionsPerSegment);
+
+            int segmentCount = points.Length - 1;
+            List<Vector2> result = new List<Vector2>(segmentCount * subdivisionsPerSegment + 1);
+
+            for (int i = 0; i < segmentCount; i++)
+            {
+                Vector2 p0 = points[Math.Max(i - 1, 0)];
+                Vector2 p1 = points[i];
+                Vector2 p2 = points[i + 1];
+                Vector2 p3 = points[Math.Min(i + 2, points.Length - 1)];
+
+                for (int j = 0; j < subdivisionsPerSegment; j++)
+                {
+                    float t = j / (float)subdivisionsPerSegment;
+                    result.Add(Vector2.CatmullRom(p0, p1, p2, p3, t));
+                }
+            }
+
+            result.Add(points[^1]);
+            return result.ToArray();
+        }
+        #endregion
         public override bool PreDraw(ref Color lightColor)
         {
             Texture2D tex = TextureAssets.Projectile[Type].Value;
@@ -642,28 +922,34 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
             float rot = ArmJoint.Joint.AngleTo(ArmJoint.Tip);
             Vector2 Offset = new Vector2(ExtensionAmount, 2 * -Projectile.direction).RotatedBy(rot);
 
-            DrawHead(Offset, rot, lightColor);
-
-
             SpriteEffects flip = Projectile.direction == 1 ? SpriteEffects.None : SpriteEffects.FlipVertically;
+
+            DrawHead(Offset, rot, lightColor, flip);
+
+            
 
 
             Main.EntitySpriteDraw(tex, DrawPos, null, lightColor, rot, tex.Size() / 2 - new Vector2(-10, 0), Projectile.scale, flip);
 
 
-            Utils.DrawRect(Main.spriteBatch, GetHammerBoundingBox(), Color.White);
-            Utils.DrawLine(Main.spriteBatch, Projectile.Center, Projectile.Center+ ArmJoint.Tip.AngleFrom(ArmJoint.Joint).ToRotationVector2()*100, Color.Red);
+            //Utils.DrawRect(Main.spriteBatch, GetHammerBoundingBox(), Color.White);
+            //Utils.DrawLine(Main.spriteBatch, Projectile.Center, Projectile.Center+ ArmJoint.Tip.AngleFrom(ArmJoint.Joint).ToRotationVector2()*100, Color.Red);
 
-            if (ArmJoint is not null)
-            {
-                //Utils.DrawLine(Main.spriteBatch, ArmJoint.Root, ArmJoint.Joint, Color.White);
-                //Utils.DrawLine(Main.spriteBatch, ArmJoint.Joint, ArmJoint.Tip, Color.White, Color.Wheat, 10);
-            }
+            
 
-            string msg = "";
-            msg += CurrentState.ToString() + $"\n";
-            //Utils.DrawBorderString(Main.spriteBatch, msg, DrawPos, Color.White);
+         
             return false;
+        }
+
+        PixelLayer IDrawPixellated.PixelLayer => PixelLayer.AbovePlayer;
+        void IDrawPixellated.DrawPixelated(SpriteBatch spriteBatch)
+        {
+            if (FunChain is not null && FunChain.Positions is { Length: >= 2 })
+            {
+                Vector2[] smoothedPoints = SubdividePointsCatmullRom(FunChain.Positions, 4);
+                DrawFunChainPrimitive(smoothedPoints, 1f, Color.White);
+
+            }
         }
         #endregion
     }

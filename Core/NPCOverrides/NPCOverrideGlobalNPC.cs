@@ -25,6 +25,9 @@ namespace AbyssOverhaul.Core.NPCOverrides
             return OverrideInstance;
         }
 
+    
+           
+        
         public override void SetDefaults(NPC npc)
         {
             GetOverride(npc)?.SetDefaults(npc);

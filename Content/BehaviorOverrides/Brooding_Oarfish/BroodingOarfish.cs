@@ -7,6 +7,7 @@ using BreadLibrary.Core.SoftBodySim;
 using BreadLibrary.Core.Verlet;
 using CalamityMod.Tiles.Abyss;
 using Terraria.DataStructures;
+using Terraria.GameContent;
 using Terraria.Localization;
 
 namespace AbyssOverhaul.Content.BehaviorOverrides.Brooding_Oarfish
@@ -21,6 +22,16 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Brooding_Oarfish
         public VerletChain Body;
         private List<ExtraNPCSegment> _ExtraHitBoxes;
         public List<VerletChain> MouthThings;
+
+        public static Asset<Texture2D> BodyTex;
+        public static Asset<Texture2D> TailTex;
+
+        public override void Load()
+        {
+            string Path = this.GetPath();
+            BodyTex = ModContent.Request<Texture2D>($"{Path}_Body");
+            TailTex = ModContent.Request<Texture2D>($"{Path}_Tail");
+        }
         public override void ModifyTypeName(NPC npc, ref string typeName)
         {
             typeName = Language.GetOrRegister($"Mods.AbyssOverhaul.NPCOverrides.BroodingOarfish").Value;
@@ -133,6 +144,8 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Brooding_Oarfish
             
 
         }
+
+        #region DrawCode
         void DrawTendrils(NPC NPC, SpriteBatch spriteBatch)
         {
             if (MouthThings is null)
@@ -182,14 +195,16 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Brooding_Oarfish
 
         void DrawDebuglinesToTiles(NPC NPC, SpriteBatch spriteBatch)
         {
-            Utils.DrawLine(spriteBatch,NPC.Center, NpcBrain.Context.TargetPoint, Color.White);
+            Utils.DrawLine(spriteBatch,NPC.Center, NpcBrain.Context.FoundTileWorld, Color.White);
         }
+
         public override bool PreDraw(NPC NPC, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             if (NPC.IsABestiaryIconDummy)
                 return true;
             if (_ExtraHitBoxes is null || Body is null)
                 return false;
+
 
 
             for (int i = 0; i < _ExtraHitBoxes.Count; i++)
@@ -204,15 +219,26 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Brooding_Oarfish
 
                 Utilities.DrawLineBetter(spriteBatch, start, end, Color.White, 40);
             }
+            for (int i = 0; i < Body.Positions.Length-1; i++)
+            {
+                Vector2 DrawPos = Body.Positions[i] - Main.screenPosition;
 
-            NpcBrain.DrawContextDebug(spriteBatch, NPC.Center - screenPos);
+                var tex = i == 0 ? TextureAssets.Npc[this.NPCType].Value : BodyTex.Value;
+
+                float rotation = i == 0 ? NPC.rotation : Body.Positions[i].AngleFrom(Body.Positions[i + 1]);
+
+                Main.EntitySpriteDraw(tex, DrawPos, null, drawColor, rotation, tex.Size() / 2, NPC.scale, 0);
+            }
 
 
-            
+                //NpcBrain.DrawContextDebug(spriteBatch, NPC.Center - screenPos);
 
 
 
-            DrawTendrils(NPC, spriteBatch);
+
+
+
+                DrawTendrils(NPC, spriteBatch);
 
             DrawDetectionCone(NPC.Center - screenPos, NPC.rotation);
             DrawEggSack();
@@ -220,6 +246,7 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Brooding_Oarfish
             DrawDebuglinesToTiles(NPC, spriteBatch);
             return false;
         }
+        #endregion
     }
 #pragma warning restore CS8618 
 

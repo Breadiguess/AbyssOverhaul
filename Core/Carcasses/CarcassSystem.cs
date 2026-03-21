@@ -390,7 +390,7 @@ namespace AbyssOverhaul.Core.Carcasses
         void IDrawPixellated.DrawPixelated(SpriteBatch spriteBatch)
         {
             foreach (var carcass in Carcasses.Values)
-                DrawCarcass(spriteBatch, carcass, true);
+                DrawCarcass(spriteBatch, carcass);
         }
         public static void SyncFull(int toWho = -1, int fromWho = -1)
         {

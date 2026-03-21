@@ -1,25 +1,10 @@
-﻿using AbyssOverhaul.Content.Layers.FossilShale.Biome;
-using AbyssOverhaul.Content.Layers.FossilShale.Tiles;
+﻿using AbyssOverhaul.Content.Layers.FossilShale.Tiles;
 using AbyssOverhaul.Content.Layers.FossilShale.WorldGen;
-using AbyssOverhaul.Content.NPCs;
 using AbyssOverhaul.Core.DataStructures;
 using AbyssOverhaul.Core.Utilities;
-using CalamityMod;
-using CalamityMod.NPCs.Abyss;
 using CalamityMod.NPCs.AcidRain;
 using CalamityMod.NPCs.SulphurousSea;
-using CalamityMod.NPCs.Yharon;
 using CalamityMod.Waters;
-using Microsoft.Build.Tasks;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria.GameContent;
-using Terraria.ID;
-using static tModPorter.ProgressUpdate;
 
 namespace AbyssOverhaul.Content.Layers.FossilShale
 {
@@ -27,13 +12,13 @@ namespace AbyssOverhaul.Content.Layers.FossilShale
     {
         public override string MusicPath => "Assets/Sounds/Music/FossilShaleOst";
         public override int StartHeight => AbyssGenUtils.YAt(0.15f);
-        public override int EndHeight => AbyssGenUtils.YAt(0.3f);
+        public override int EndHeight => AbyssGenUtils.YAt(0.4f);
         public static FossilShaleLayer Instance => ModContent.GetInstance<FossilShaleLayer>();
         public override ModWaterStyle ModWaterStyle => VoidWater.Instance;
         public override void ModifyGenTasks()
         {
-         
-           
+
+
 
             AddGenTask("Generating Shale Caves", (layer, progress, config) =>
             {

@@ -3,31 +3,41 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.ModLoader;
 
 namespace AbyssOverhaul.Core.NPCOverrides
 {
+
     [Autoload(Side = ModSide.Both)]
     public sealed class NPCOverrideRegistry : ModSystem
     {
-        private static Dictionary<int, NPCBehaviorOverride> _overrides;
+        public static Dictionary<int, NPCBehaviorOverride> _overrides;
+        private static Dictionary<int, Asset<Texture2D>> _originalTextures;
 
         public static bool Loaded => _overrides is not null;
 
         public override void PostSetupContent()
         {
             BuildRegistry();
+
         }
 
         public override void Unload()
         {
+            RestoreTextures();
+
             _overrides?.Clear();
             _overrides = null;
+
+            _originalTextures?.Clear();
+            _originalTextures = null;
         }
 
         private static void BuildRegistry()
         {
             _overrides = new();
+            _originalTextures = new();
 
             Assembly asm = typeof(AbyssOverhaul).Assembly;
             Type baseType = typeof(NPCBehaviorOverride);
@@ -58,8 +68,31 @@ namespace AbyssOverhaul.Core.NPCOverrides
                     mod.Logger.Warn($"Duplicate NPC override for type {npcType}: {existing.GetType().FullName} replaced by {t.FullName}");
                 }
 
-                instance.Load(); // static/shared assets only
+                instance.Load();
+                instance.SetStaticDefaults();
+                if (!string.IsNullOrEmpty(instance.TexturePath))
+                    instance.ReplacementTexture = ModContent.Request<Texture2D>(instance.TexturePath);
                 _overrides[npcType] = instance;
+
+                if (instance.ReplacementTexture is not null)
+                {
+                    if (!_originalTextures.ContainsKey(npcType))
+                        _originalTextures[npcType] = TextureAssets.Npc[npcType];
+
+                    TextureAssets.Npc[npcType] = instance.ReplacementTexture;
+                }
+            }
+        }
+
+        private static void RestoreTextures()
+        {
+            if (_originalTextures is null)
+                return;
+
+            foreach (var pair in _originalTextures)
+            {
+                int npcType = pair.Key;
+                TextureAssets.Npc[npcType] = pair.Value;
             }
         }
 
@@ -88,5 +121,4 @@ namespace AbyssOverhaul.Core.NPCOverrides
 
         public static bool HasOverride(NPC npc) => GetPrototype(npc) is not null;
     }
-
 }
