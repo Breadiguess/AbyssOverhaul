@@ -6,3 +6,5 @@ obj/
 /.editorconfig
 /.tml-build/TML.targets
 /.tml-build/TML.targets
+/AbyssOverhaul.csproj
+/.gitignore
