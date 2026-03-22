@@ -86,4 +86,5 @@ Projectiles: {
 	BlackTideMoonProjectile.DisplayName: Black Tide Moon Projectile
 	EschatonSoulProjectile.DisplayName: Eschaton Soul Projectile
 	FishFeed.DisplayName: Fish Feed
+	AnchorageHeld.DisplayName: Anchorage Held
 }

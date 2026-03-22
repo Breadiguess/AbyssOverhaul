@@ -14,3 +14,8 @@ BlackMoonHelmet: {
 	DisplayName: Black Moon Helmet
 	Tooltip: ""
 }
+
+AnchorageItem: {
+	DisplayName: Anchorage Item
+	Tooltip: ""
+}
