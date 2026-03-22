@@ -19,6 +19,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
             Item.DamageType = DamageClass.Ranged;
             Item.rare = ItemRarityID.Green;
             Item.shoot = ModContent.ProjectileType<AnchorageHeld>();
+            Item.channel = true;
         }
 
         public override bool RangedPrefix() => true;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Terraria.GameContent;
 
 namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
 {
@@ -18,20 +19,26 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
         {
             Projectile.friendly = true;
             Projectile.hostile = false;
-            Projectile.Size = new(40);
+            Projectile.Size = new(20);
             Projectile.DamageType = DamageClass.Ranged;
 
         }
 
         public override void AI()
         {
-            
-            
+            Projectile.rotation = Projectile.velocity.ToRotation();
         }
 
         public override bool PreDraw(ref Color lightColor)
         {
-            return base.PreDraw(ref lightColor);
+            var tex = TextureAssets.Projectile[Type].Value;
+
+            Rectangle frame = tex.Frame(1, Main.projFrames[Type], 0, (int)(Main.GameUpdateCount % Main.projFrames[Type]));
+
+            Vector2 drawPos = Projectile.Center - Main.screenPosition;
+            Main.EntitySpriteDraw(tex, drawPos, frame, lightColor, Projectile.rotation - MathHelper.PiOver2, frame.Size()/2, Projectile.scale, 0);
+
+            return false;
         }
 
     }
