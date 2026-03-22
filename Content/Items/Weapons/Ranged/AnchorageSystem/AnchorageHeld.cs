@@ -1,4 +1,7 @@
-﻿using BreadLibrary.Core.Verlet;
+﻿using AbyssOverhaul.Core.Graphics;
+using BreadLibrary.Core.Graphics;
+using BreadLibrary.Core.Graphics.PixelationShit;
+using BreadLibrary.Core.Verlet;
 using CalamityMod;
 using CalamityMod.Physics;
 using CalamityMod.Projectiles.Magic;
@@ -16,7 +19,7 @@ using Terraria.GameContent.Events;
 
 namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
 {
-    internal class AnchorageHeld : ModProjectile
+    internal class AnchorageHeld : ModProjectile, IDrawPixellated
     {
         public VerletChain rope;
         public Projectile drillProjectile;
@@ -43,6 +46,8 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
         private int counter = 0;
         public const int cap = 60;
         public float chargeInterpolant => counter / (float)cap;
+
+     
 
         public bool hasChargeFinished;
 
@@ -221,10 +226,10 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
         {
             if (rope is not null)
             {
-                for (int i = 0; i< rope.Positions.Length-1; i++)
+                for (int i = 0; i < rope.Positions.Length - 1; i++)
                 {
                     Vector2 start = rope.Positions[i];
-                    Vector2 end = rope.Positions[i+1];
+                    Vector2 end = rope.Positions[i + 1];
                     Utils.DrawLine(Main.spriteBatch, start, end, Color.White);
                 }
             }
@@ -244,6 +249,61 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
 
             Vector2 drawPos = Projectile.Center - Main.screenPosition;
             Main.EntitySpriteDraw(tex, drawPos + offset.RotatedBy(Projectile.rotation), frame, lightColor, Projectile.rotation, frame.Size()/2, Projectile.scale, 0);
+        }
+
+        private BasicEffect ropeEffect;
+        private VertexPositionColorTexture[] ropeVertices;
+
+        private short[] ropeIndices;
+        private void EnsureChainEffect()
+        {
+            if (Main.dedServ)
+                return;
+
+            if (ropeEffect is null || ropeEffect.IsDisposed)
+            {
+                ropeEffect = new BasicEffect(Main.instance.GraphicsDevice)
+                {
+                    VertexColorEnabled = true,
+                    TextureEnabled = true
+                };
+
+
+                
+            }
+        }
+        PixelLayer IDrawPixellated.PixelLayer => PixelLayer.AboveProjectiles;
+        void IDrawPixellated.DrawPixelated(SpriteBatch spriteBatch)
+        {
+            if (rope is null)
+            {
+                return;
+            }
+
+
+            if (rope is not null)
+            {
+                for (int i = 0; i < rope.Positions.Length - 1; i++)
+                {
+                    Vector2 start = rope.Positions[i];
+                    Vector2 end = rope.Positions[i + 1];
+                    Utils.DrawLine(Main.spriteBatch, start, end, Color.White);
+                }
+            }
+
+            EnsureChainEffect();
+            ropeEffect.World = Matrix.Identity;
+            ropeEffect.View = Matrix.identity;
+            ropeEffect.projection  = Matrix.CreateOrthographicOffCenter(
+                0f,
+                Main.screenWidth,
+                Main.screenHeight,
+                0f,
+                0f,
+                1f
+            );
+            EasyPrimRope.DrawSimpleChainPrimitive(ropeEffect, ref ropeIndices, ref ropeVertices, EasyPrimRope.SubdividePointsCatmullRom(rope.Positions, 4), 4, Color.White, SamplerState.PointClamp);
+
         }
         #endregion
     }

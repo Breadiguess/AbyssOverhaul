@@ -1,4 +1,5 @@
-displayName = Hadopelagia
-author = Bread
+displayName = Calamity Hadopelagia
+author = Bread, Crispy
 version = 0.1
-modReferences = CalamityMod, BreadLibrary, Wayfarer, Luminance, Daybreak
+modReferences = CalamityMod, BreadLibrary, Daybreak
+dllReferences = Wayfarer
