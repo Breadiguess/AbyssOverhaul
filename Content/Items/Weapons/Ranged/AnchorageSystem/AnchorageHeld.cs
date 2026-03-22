@@ -16,6 +16,16 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
         public ref Player Owner => ref Main.player[Projectile.owner];
         public bool hasDrill;
         public static Asset<Texture2D> drillTex;
+        public enum state
+        {
+            Idle,
+            Charging,
+            Firing,
+            Recovering,
+            Rest
+        }
+
+        public state currentState;
 
         public override void Load()
         {
@@ -23,6 +33,11 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
             drillTex = ModContent.Request<Texture2D>($"{path}_Drill");
 
             base.Load();
+        }
+
+        public override void SetStaticDefaults()
+        {
+            Main.projFrames[Type] = 8;
         }
 
         public override void SetDefaults()
@@ -67,8 +82,10 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
         {
             var tex = drillTex.Value;
 
+            Rectangle frame = tex.Frame(1, Main.projFrames[ModContent.ProjectileType<AnchorageHeld_Drill>()]); 
+
             Vector2 drawPos = Projectile.Center - Main.screenPosition;
-            Main.EntitySpriteDraw(tex, drawPos + offset.RotatedBy(Projectile.rotation), null, lightColor, Projectile.rotation, tex.Size()/2, Projectile.scale, 0);
+            Main.EntitySpriteDraw(tex, drawPos + offset.RotatedBy(Projectile.rotation), frame, lightColor, Projectile.rotation, frame.Size()/2, Projectile.scale, 0);
         }
 
     }

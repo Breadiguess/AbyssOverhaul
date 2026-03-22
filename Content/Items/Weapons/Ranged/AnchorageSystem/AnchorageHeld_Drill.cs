@@ -11,7 +11,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
 
         public override void SetStaticDefaults()
         {
-            base.SetStaticDefaults();
+            Main.projFrames[Type] = 8;
         }
 
         public override void SetDefaults()
