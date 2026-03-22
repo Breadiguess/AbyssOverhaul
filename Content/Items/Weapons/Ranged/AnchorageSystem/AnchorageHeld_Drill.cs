@@ -44,6 +44,14 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
 
         public override bool PreDraw(ref Color lightColor)
         {
+            if (OwnerDrill is not null && OwnerDrill.type == ModContent.ProjectileType<AnchorageHeld>())
+            {
+                if(OwnerDrill.As<AnchorageHeld>().rope is not null)
+                {
+                    OwnerDrill.As<AnchorageHeld>().rope.Positions[^1] = Projectile.Center;
+                }
+            }
+
             var tex = TextureAssets.Projectile[Type].Value;
 
             Rectangle frame = tex.Frame(1, Main.projFrames[Type], 0, (int)(Main.GameUpdateCount % Main.projFrames[Type]));

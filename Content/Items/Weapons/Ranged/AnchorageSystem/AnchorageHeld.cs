@@ -2,6 +2,7 @@
 using CalamityMod;
 using CalamityMod.Physics;
 using CalamityMod.Projectiles.Magic;
+using CalamityMod.Tiles.Furniture.Monoliths;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
     {
         public VerletChain rope;
         public Projectile drillProjectile;
+        private bool RopeInitialized = false;
 
         public ref Player Owner => ref Main.player[Projectile.owner];
         public bool hasDrill;
@@ -67,15 +69,29 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
             CheckPlayer();
             stateMachine();
 
-            rope ??= new(20, 5, Projectile.Center);
-
             if (drillProjectile is not null)
             {
-                rope.Positions[^1] = drillProjectile.Center;
-                rope.Simulate(Vector2.Zero, Projectile.Center, 0, 0.5f, collideWithTiles: false);
-            }
+                rope ??= new(20, 5, Projectile.Center);
 
-            rope.Positions[0] = Projectile.Center;
+                if (!RopeInitialized)
+                {
+                    for (int i = 0; i < rope.Positions.Length; i++)
+                    {
+                        rope.Positions[i] = Vector2.Lerp(Projectile.Center, drillProjectile.Center, i / (float)rope.Positions.Length);
+                        rope.OldPositions[i] = rope.Positions[i];
+                    }
+                }
+
+                rope.Positions[^1] = drillProjectile.Center;
+                rope.Simulate(Vector2.Zero, Projectile.Center + Projectile.velocity, 0, 0.5f, collideWithTiles: false);
+
+                if (!drillProjectile.active)
+                {
+                    drillProjectile = null;
+                    rope = null;
+                    currentState = state.Idle;
+                }
+            }
 
             counter = Math.Min(counter, cap);
 
