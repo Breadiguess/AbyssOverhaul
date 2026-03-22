@@ -111,30 +111,7 @@ namespace AbyssOverhaul.Content.Layers.TheVeil.NPCs.VoidDreamerNPC
             NPC.lavaImmune = true;
             Tendrils.EnsureCapacity(6);
             NPC.waterMovementSpeed = 1;
-            EyeVar = Main.rand.Next(0, EyeVariationCount);
-            EyeTex = EyeVariations[EyeVar];
-
-            HeadVar = Main.rand.Next(HeadVariationCount);
-
-            if (Main.rand.NextBool(200))
-            {
-                HorseMode = true;
-
-                string Path = this.GetPath();
-                const string suffix = "/VoidDreamer";
-                if (Path.EndsWith(suffix))
-                    Path = Path[..^suffix.Length];
-                if (Main.rand.NextBool())
-
-                    HeadTex = ModContent.Request<Texture2D>($"{Path}/Heads/HorseHead");
-                else
-
-                    HeadTex = ModContent.Request<Texture2D>($"{Path}/Heads/Glooby");
-            }
-            else
-                HeadTex = HeadPieces[HeadVar];
-            SkirtVar = Main.rand.Next(SkirtVariationCount);
-            SkirtTex = Skirts[SkirtVar];
+            
 
         }
         public int HeadVar
@@ -199,7 +176,30 @@ namespace AbyssOverhaul.Content.Layers.TheVeil.NPCs.VoidDreamerNPC
             Tendrils.EnsureCapacity(6);
             for (int i = 0; i < 6; i++)
                 Tendrils.Add(new VerletChain(14, 5, NPC.Center));
+            EyeVar = Main.rand.Next(0, EyeVariationCount);
+            EyeTex = EyeVariations[EyeVar];
 
+            HeadVar = Main.rand.Next(HeadVariationCount);
+
+            if (Main.rand.NextBool(200))
+            {
+                HorseMode = true;
+
+                string Path = this.GetPath();
+                const string suffix = "/VoidDreamer";
+                if (Path.EndsWith(suffix))
+                    Path = Path[..^suffix.Length];
+                if (Main.rand.NextBool())
+
+                    HeadTex = ModContent.Request<Texture2D>($"{Path}/Heads/HorseHead");
+                else
+
+                    HeadTex = ModContent.Request<Texture2D>($"{Path}/Heads/Glooby");
+            }
+            else
+                HeadTex = HeadPieces[HeadVar];
+            SkirtVar = Main.rand.Next(SkirtVariationCount);
+            SkirtTex = Skirts[SkirtVar];
         }
 
         public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)

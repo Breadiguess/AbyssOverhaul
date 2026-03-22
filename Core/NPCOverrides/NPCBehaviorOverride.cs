@@ -1,12 +1,19 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using System.IO;
+﻿using System.IO;
 using Terraria.DataStructures;
 
 namespace AbyssOverhaul.Core.NPCOverrides
 {
     public abstract class NPCBehaviorOverride
     {
+        /// <summary>
+        /// If non-null, this texture will replace TextureAssets.Npc[NPCType].
+        /// </summary>
+        public virtual string TexturePath => null;
 
+        /// <summary>
+        /// Shared loaded replacement texture for this override prototype.
+        /// </summary>
+        public Asset<Texture2D> ReplacementTexture { get; set; }
         public virtual void ModifyTypeName(NPC npc, ref string typeName)
         {
 
@@ -25,7 +32,12 @@ namespace AbyssOverhaul.Core.NPCOverrides
         /// <summary>
         /// Runs once after the override is instantiated and registered.
         /// </summary>
-        public virtual void Load() { }
+        public virtual void Load()
+        {
+        }
+
+        public virtual void SetStaticDefaults() { }
+
 
         /// <summary>
         /// Runs from GlobalNPC.SetDefaults.
@@ -37,7 +49,7 @@ namespace AbyssOverhaul.Core.NPCOverrides
 
         }
 
-        
+
         public virtual void OnKill(NPC NPC) { }
 
         /// <summary>
@@ -54,7 +66,7 @@ namespace AbyssOverhaul.Core.NPCOverrides
         public virtual void ModifyHitPlayer(NPC npc, Player target, ref Player.HurtModifiers modifiers) { }
 
         public virtual bool ModifyCollisionData(NPC npc, Rectangle victimHitbox, ref int immunityCooldownSlot, ref MultipliableFloat damageMultiplier, ref Rectangle npcHitbox) { return false; }
-        
+
 
         #endregion
 

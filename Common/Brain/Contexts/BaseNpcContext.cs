@@ -13,6 +13,11 @@ namespace AbyssOverhaul.Common.Brain.Contexts
         public bool HasTargetPoint;
         public Vector2 TargetPoint;
 
+        public bool HasFoundTile;
+        public Point FoundTile;
+        public Vector2 FoundTileWorld;
+
+
         public NpcPathAgent PathAgent;
 
         public virtual void Update(NPC npc)

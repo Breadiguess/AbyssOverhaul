@@ -1,4 +1,5 @@
-﻿using AbyssOverhaul.Core.DataStructures;
+﻿using AbyssOverhaul.Content.NPCs.DeepSnapperNPC;
+using AbyssOverhaul.Core.DataStructures;
 using AbyssOverhaul.Core.Utilities;
 using CalamityMod.NPCs.Abyss;
 using CalamityMod.NPCs.AcidRain;
@@ -31,7 +32,7 @@ namespace AbyssOverhaul.Content.Layers.MurkyWaters
             [ModContent.NPCType<SlabCrab>()] = 1.2f,
             [ModContent.NPCType<ToxicMinnow>()] = 1.2f,
             [ModContent.NPCType<Orthocera>()] = 0.2f,
-
+            [ModContent.NPCType<DeepSnapper>()] = 0.9f,
             [ModContent.NPCType<OldDuke>()] = 0.0001f,
         };
     }

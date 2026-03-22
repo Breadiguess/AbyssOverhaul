@@ -18,8 +18,10 @@ global using Terraria.IO;
 global using Terraria.ModLoader;
 global using Terraria.WorldBuilding;
 global using static AbyssOverhaul.AbyssOverhaul;
+using System.Runtime.CompilerServices;
 using Wayfarer.API;
 
+[assembly: IgnoresAccessChecksTo("CalamityMod")]
 namespace AbyssOverhaul
 {
     public partial class AbyssOverhaul : Mod

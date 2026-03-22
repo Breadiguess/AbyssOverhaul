@@ -38,8 +38,8 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
             var tex = Assets.Textures.Extra.Smoke.Asset.Value;
 
 
-            Vector2 Scale = new Vector2(0.2f) * Utilities.InverseLerpBump(0, 5, 20, MaxTime, MaxTime - TimeLeft);
-            Color color = Color.Gray with { A = 0 } * Utilities.InverseLerpBump(0, 5, 20, MaxTime, MaxTime - TimeLeft);
+            Vector2 Scale = new Vector2(0.1f) * Utilities.InverseLerpBump(0, 5, 20, MaxTime, MaxTime - TimeLeft);
+            Color color = Color.SlateGray with { A = 0 } * Utilities.InverseLerpBump(0, 5, 20, MaxTime, MaxTime - TimeLeft);
             Main.EntitySpriteDraw(tex, Position - Main.screenPosition, null, color, Rotation, tex.Size() / 2f, Scale, 0);
         }
     }

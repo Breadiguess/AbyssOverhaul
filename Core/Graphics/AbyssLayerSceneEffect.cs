@@ -19,7 +19,7 @@ namespace AbyssOverhaul.Core.Graphics
                 return info.Layer.ModWaterStyle;
             }
         }
-        public override SceneEffectPriority Priority => SceneEffectPriority.BossLow;
+        public override SceneEffectPriority Priority => SceneEffectPriority.BossHigh;
 
         public override bool IsSceneEffectActive(Player player)
         {

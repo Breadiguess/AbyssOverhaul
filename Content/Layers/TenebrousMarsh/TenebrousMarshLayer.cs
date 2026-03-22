@@ -1,5 +1,6 @@
 ﻿using AbyssOverhaul.Content.Layers.TenebrousMarsh.Tiles;
 using AbyssOverhaul.Content.Layers.TheVeil.NPCs.VoidDreamerNPC;
+using AbyssOverhaul.Content.NPCs.DeepSnapperNPC;
 using AbyssOverhaul.Core.DataStructures;
 using AbyssOverhaul.Core.Utilities;
 using AbyssOverhaul.Core.WorldGen;
@@ -19,8 +20,8 @@ namespace AbyssOverhaul.Content.Layers.TenebrousMarsh
 {
     internal class TenebrousMarshLayer : AbyssLayer
     {
-        public override int StartHeight => AbyssGenUtils.YAt(0.3f);
-        public override int EndHeight => AbyssGenUtils.YAt(0.45f);
+        public override int StartHeight => AbyssGenUtils.YAt(0.4f);
+        public override int EndHeight => AbyssGenUtils.YAt(0.55f);
 
         public override ModWaterStyle ModWaterStyle => MiddleAbyssWater.Instance;
 
@@ -33,6 +34,7 @@ namespace AbyssOverhaul.Content.Layers.TenebrousMarsh
             [ModContent.NPCType<OarfishHead>()] = 0.7f,
             [ModContent.NPCType<Viperfish>()] = 0.8f,
             [ModContent.NPCType<VoidDreamer>()] = 0.02f,
+            [ModContent.NPCType<DeepSnapper>()] = 1.1f,
 
         };
 

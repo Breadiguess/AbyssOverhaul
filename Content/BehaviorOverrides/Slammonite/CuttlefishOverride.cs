@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
 using Terraria.DataStructures;
+using Terraria.GameContent;
 using Terraria.Localization;
 
 namespace AbyssOverhaul.Content.BehaviorOverrides.Slammonite
@@ -16,6 +17,8 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Slammonite
     internal class CuttlefishOverride : NPCBehaviorOverride
     {
         public override int NPCType => ModContent.NPCType<Cuttlefish>();
+
+        public override string TexturePath => "AbyssOverhaul/Content/BehaviorOverrides/Slammonite/Slamonite";
 
         public override void ModifyTypeName(NPC npc, ref string typeName)
         {
@@ -116,6 +119,7 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Slammonite
             if (DashCooldown > 0)
                 DashCooldown--;
 
+            
             StateTimer++;
 
             switch (CurrentState)
@@ -352,7 +356,7 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Slammonite
         }
         public override bool PreDraw(NPC NPC, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            var tex = SlamTex.Value;
+            var tex = TextureAssets.Npc[this.NPCType].Value;    
 
             if (tex == null)
                 return false;

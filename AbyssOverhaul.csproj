@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Tomat.Terraria.ModLoader.Sdk/1.0.9">
-	<Import Project="..\tModLoader.targets" />
 
 	<PropertyGroup>
 		<LangVersion>preview</LangVersion>
@@ -22,10 +21,7 @@
 			<HintPath>Lib\CalamityMod.dll</HintPath>
 			<Private>true</Private>
 		</Reference>
-		<Reference Include="Luminance">
-			<HintPath>Lib\Luminance.dll</HintPath>
-			<Private>true</Private>
-		</Reference>
+		
 	</ItemGroup>
 
 	<ItemGroup>
@@ -53,21 +49,9 @@
 		<Folder Include="Content\Layers\TheVeil\WorldGeneration\" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Krafs.Publicizer" Version="2.3.0" PrivateAssets="all" ExcludeAssets="runtime" />
-	</ItemGroup>
-
-	<Target Name="RemoveIgnoresAccessChecksToAttributeCs" AfterTargets="PublicizeAssemblies">
-		<ItemGroup>
-			<FilesToRemove Include="@(Compile)" Condition="'%(Filename)' == 'IgnoresAccessChecksToAttribute'" />
-		</ItemGroup>
-		<ItemGroup>
-			<Compile Remove="@(FilesToRemove)" />
-		</ItemGroup>
-	</Target>
+	
 
 	<ItemGroup>
-		<Publicize Include="tModLoader" IncludeCompilerGeneratedMembers="false" IncludeVirtualMembers="false" />
 		<DoNotPublicize Include="tModLoader:Terraria.Tile" />
 		<Publicize Include="CalamityMod" />
 		<Publicize Include="FNA" IncludeCompilerGeneratedMembers="false" IncludeVirtualMembers="false" />
@@ -77,4 +61,6 @@
 	<ItemGroup>
 	  <Compile Remove="Core\NPCOverrides\NPCOverrideDetourSystem.cs" />
 	</ItemGroup>
+
+	
 </Project>

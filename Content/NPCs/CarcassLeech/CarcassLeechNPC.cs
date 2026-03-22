@@ -42,12 +42,13 @@ namespace AbyssOverhaul.Content.NPCs.CarcassLeech
             NpcBrain.Modules.Add(new FollowPlayerModule()
             {
                 Score = 2,
-                MoveSpeed = 20
+                MoveSpeed = 4
             });
            
             NpcBrain.Sensors.Add(new SchoolingSensor()
             {
-                RequireLineOfSight = true
+                RequireLineOfSight = true,
+               
             });
         }
     

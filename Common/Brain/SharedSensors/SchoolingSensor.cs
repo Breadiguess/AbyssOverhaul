@@ -1,9 +1,4 @@
 ﻿using AbyssOverhaul.Common.Brain.Contexts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AbyssOverhaul.Common.Brain.SharedSensors
 {
@@ -11,7 +6,8 @@ namespace AbyssOverhaul.Common.Brain.SharedSensors
     {
         public bool SameTypeOnly { get; set; } = true;
         public bool RequireLineOfSight { get; set; } = true;
-        
+
+        public Func<NPC, NPC, bool> CanSchoolWith { get; set; }
         void INpcSensor<SchoolingNpcContext>.Update(SchoolingNpcContext context)
         {
             NPC self = context.Self;
@@ -29,22 +25,27 @@ namespace AbyssOverhaul.Common.Brain.SharedSensors
 
             int neighbors = 0;
 
-            for(int i = 0; i< Main.maxNPCs; i++)
+            for (int i = 0; i < Main.maxNPCs; i++)
             {
                 NPC other = Main.npc[i];
 
-                    if(other is null || !other.active) continue;
+                if (other is null || !other.active || other.whoAmI == self.whoAmI)
+                    continue;
 
                 if (SameTypeOnly && other.type != self.type)
                     continue;
 
-                Vector2 offset = other.Center - self.Center;
+                if (CanSchoolWith is not null && !CanSchoolWith(self, other))
+                    continue;
+
+                Vector2 offset = other.Center - selfCenter;
                 float distSq = offset.LengthSquared();
 
                 if (distSq > neighborRadiusSq || distSq < 0.0001f)
                     continue;
 
-                if (RequireLineOfSight && !Collision.CanHitLine(self.position, self.width, self.height, other.position, other.width, other.height))
+                if (RequireLineOfSight &&
+                    !Collision.CanHitLine(self.position, self.width, self.height, other.position, other.width, other.height))
                     continue;
 
                 float dist = MathF.Sqrt(distSq);
@@ -53,35 +54,31 @@ namespace AbyssOverhaul.Common.Brain.SharedSensors
                 accumulatedCenter += other.Center;
                 accumulatedVelocity += other.velocity;
 
-                if(dist < context.NearestNeighborDistance)
+                if (dist < context.NearestNeighborDistance)
                 {
                     context.NearestNeighborDistance = dist;
                     context.nearestNeighbor = other;
                 }
 
-                if(distSq <= separationRadiusSq)
+                if (distSq <= separationRadiusSq)
                 {
-                    Vector2 away = self.Center - other.Center;
+                    Vector2 away = selfCenter - other.Center;
                     if (away != Vector2.Zero)
-                        accumulatedSeparation += away / dist;
+                        accumulatedSeparation += away / Math.Max(dist, 0.001f);
                 }
-
-
             }
+
             context.NeighborCount = neighbors;
-            if (neighbors > 0)
-            {
-                context.GroupCenter = accumulatedCenter / neighbors;
-                context.AverageNeighborVelocity = accumulatedSeparation / neighbors;
 
-                context.SeparationVector = accumulatedSeparation.SafeNormalize(Vector2.Zero);
-                context.AlignmentVector = context.AverageNeighborVelocity.SafeNormalize(Vector2.Zero);
-                context.CohesionVector2 = context.GroupCenter.SafeNormalize(Vector2.Zero);
+            if (neighbors <= 0)
+                return;
 
+            context.GroupCenter = accumulatedCenter / neighbors;
+            context.AverageNeighborVelocity = accumulatedVelocity / neighbors;
 
-            }
+            context.SeparationVector = accumulatedSeparation.SafeNormalize(Vector2.Zero);
+            context.AlignmentVector = context.AverageNeighborVelocity.SafeNormalize(Vector2.Zero);
+            context.CohesionVector2 = (context.GroupCenter - selfCenter).SafeNormalize(Vector2.Zero);
         }
-
-       
     }
 }
