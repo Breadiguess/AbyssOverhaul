@@ -1,5 +1,6 @@
 ﻿using BreadLibrary.Core.Verlet;
 using CalamityMod;
+using CalamityMod.Physics;
 using CalamityMod.Projectiles.Magic;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using Terraria.Audio;
+using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.GameContent.Events;
 
@@ -146,7 +148,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
             {
                 hasDrill = false;
 
-                Projectile proj = Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity, ModContent.ProjectileType<AnchorageHeld_Drill>(), this.Projectile.damage, this.Projectile.knockBack);
+                Projectile proj = Projectile.NewProjectileDirect(new EntitySource_Parent(this.Projectile, "AnchorageDrill"), Projectile.Center, Projectile.velocity, ModContent.ProjectileType<AnchorageHeld_Drill>(), this.Projectile.damage, this.Projectile.knockBack);
                 drillProjectile = proj;
             }
         }
@@ -184,6 +186,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
 
             Vector2 offset = new(0, frame.Height / 2 + 6);
 
+            DrawRope();
             drawHead(ref lightColor, offset);
 
             Vector2 drawPos = Projectile.Center - Main.screenPosition;
@@ -196,6 +199,19 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
             Utils.DrawBorderString(Main.spriteBatch, msg, drawPos, Color.White);
 
             return false;
+        }
+
+        private void DrawRope()
+        {
+            if (rope is not null)
+            {
+                for (int i = 0; i< rope.Positions.Length-1; i++)
+                {
+                    Vector2 start = rope.Positions[i];
+                    Vector2 end = rope.Positions[i+1];
+                    Utils.DrawLine(Main.spriteBatch, start, end, Color.White);
+                }
+            }
         }
 
         private void drawHead(ref Color lightColor, Vector2 offset)

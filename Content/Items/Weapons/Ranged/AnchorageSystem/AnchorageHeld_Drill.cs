@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Terraria.DataStructures;
 using Terraria.GameContent;
 
 namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
@@ -13,6 +14,18 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
         public override void SetStaticDefaults()
         {
             Main.projFrames[Type] = 8;
+        }
+
+        private Projectile OwnerDrill;
+        public override void OnSpawn(IEntitySource source)
+        {
+            if (source.Context is not null && source.Context.Equals("AnchorageDrill"))
+            {
+                if (source is EntitySource_Parent parent && parent.Entity is not null)
+                {
+                    OwnerDrill = (Projectile)parent.Entity;
+                }
+            }
         }
 
         public override void SetDefaults()
