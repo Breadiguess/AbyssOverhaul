@@ -90,6 +90,9 @@ namespace AbyssOverhaul.Content.Items.Armor.BlackMoon.Players
                 {
                     for (int x = 0; x < black.HeadPieces.Count; x++)
                     {
+
+                        
+
                         for (int i = 0; i < black.HeadPieces[x].Positions.Length-1; i++)
                         {
                             Vector2 start = black.HeadPieces[x].Positions[i];

@@ -27,7 +27,7 @@ namespace AbyssOverhaul.Content.Items.Armor.BlackMoon
             Item.height = 18;
             Item.value = CalamityGlobalItem.RarityGreenBuyPrice;
             Item.rare = ModContent.RarityType<AbyssalRarity>();
-            Item.defense = 4; //9
+            Item.defense = 55;
         }
 
         public override void UpdateEquip(Player player)

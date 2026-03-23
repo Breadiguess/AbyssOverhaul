@@ -28,10 +28,10 @@ namespace AbyssOverhaul.Core.Graphics.ReworkedAbyssDarkness
                 // Avoid weird duplicate emission from alternating frame pieces if needed.
                 ReworkedAbyssLighting.AddTileLight(
                     i, j,
-                    scale: 1.9f,
+                    scale: 0.3f,
                     opacity: 0.9f,
                     color: new Color(255, 190, 90),
-                    lifetime: 2,
+                    lifetime: 20,
                     worldOffset: new Vector2(0f, -4f));
 
                 return true;

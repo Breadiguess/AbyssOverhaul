@@ -8,10 +8,8 @@ using BreadLibrary.Core.Sounds;
 using BreadLibrary.Core.Verlet;
 using CalamityMod;
 using CalamityMod.Cooldowns;
-using CalamityMod.Items.Armor.Hydrothermic;
 using CalamityMod.NPCs;
 using CalamityMod.Particles;
-using CalamityMod.Projectiles.Typeless;
 using System.IO;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -22,7 +20,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
     public class ImpactHammer : ModProjectile, ILocalizedModType, IDrawPixellated
     {
 
-       
+
         public override string LocalizationCategory => "Items.Weapons.Melee";
 
         #region Values
@@ -159,12 +157,13 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
             }
 
 
-            if (Owner.altFunctionUse == 2 )//&& Owner.Calamity().arsenalCooldown<=0)
+            //Arsenal Ability
+            if (Owner.altFunctionUse == 2 && Owner.Calamity().arsenalCooldown <= 0)
             {
 
-                int cooldownGiven = 60*2;
+                int cooldownGiven = 60 * 3;
 
-                Projectile.NewProjectileDirect(Projectile.GetItemSource_FromThis(), Projectile.Center, new Vector2(0, -5), ModContent.ProjectileType<ImpactBomb>(), 40, 0);
+                Projectile.NewProjectileDirect(Projectile.GetItemSource_FromThis(), Projectile.Center, new Vector2(0, -8), ModContent.ProjectileType<ImpactBomb>(), Owner.HeldItem.damage * 4,Owner.HeldItem.knockBack);
                 Owner.Calamity().arsenalCooldown = cooldownGiven;
                 Owner.AddCooldown(ArsenalPower.ID, cooldownGiven);
             }
@@ -220,7 +219,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
                         float oldCharge = ChargeInterpolant;
                         bool oldReady = HitReady;
 
-                        
+
                         ChargeInterpolant = Utilities.InverseLerp(0f, ChargeTime, Time);
 
                         if (ChargeInterpolant >= 1f)
@@ -239,10 +238,10 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
                                 HasPlayedSound = true;
                             }
 
-                            for(int i = 0; i< 2; i++)
+                            for (int i = 0; i < 2; i++)
                             {
 
-                                Vector2 Direction = (ArmJoint.Joint.AngleFrom(ArmJoint.Tip)+ i/2f*MathHelper.PiOver2 * -Projectile.direction).ToRotationVector2().RotatedByRandom(0.2f) * 10;
+                                Vector2 Direction = (ArmJoint.Joint.AngleFrom(ArmJoint.Tip) + i / 2f * MathHelper.PiOver2 * -Projectile.direction).ToRotationVector2().RotatedByRandom(0.2f) * 10;
                                 MediumMistParticle mist = new MediumMistParticle(ArmJoint.Joint, Direction,
                                  Main.rand.NextBool(3) ? Color.LightSteelBlue : Color.SteelBlue, Color.LightSlateGray, Main.rand.NextFloat(0.4f, 0.65f), 130);
                                 GeneralParticleHandler.SpawnParticle(mist);
@@ -275,21 +274,21 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
 
                 case State.Hitting:
                     Vector2 HeadPos = Projectile.Center + new Vector2(40, 0).RotatedBy(Projectile.rotation);
-                    if (!HasPlayedSound )
+                    if (!HasPlayedSound)
                     {
                         ScreenShakeSystem.ShakeAt(HeadPos, 20, 10);
                         SoundEngine.PlaySound(
-                            Assets.Sounds.Items.Melee.ImpactHammer.MechanicalImpact.Asset with { pitchVariance = 1f, volume = 0.7f},
+                            Assets.Sounds.Items.Melee.ImpactHammer.MechanicalImpact.Asset with { pitchVariance = 1f, volume = 0.7f },
                             Owner.Center
                         );
                         HasPlayedSound = true;
 
                         ImpactHammer_HitParticle Particle = new ImpactHammer_HitParticle();
                         Particle.Prepare(HeadPos, Projectile.rotation, 60);
-                        ParticleEngine.ShaderParticles.Add( Particle );
+                        ParticleEngine.ShaderParticles.Add(Particle);
                     }
 
-                    if(Time <=10)
+                    if (Time <= 10)
                     {
                         ImpactHammer_CloudParticle particle = new();
                         particle.Prepare(HeadPos, Projectile.rotation.ToRotationVector2().RotatedByRandom(1f) * 10, Main.rand.NextFloat(3), 40);
@@ -362,7 +361,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
             //Main.NewText(DamageBoost);
             // why on god's green earth would i ever do this
             //for your information, this is just huge.
-            modifiers.FinalDamage *= DamageBoost;  
+            modifiers.FinalDamage *= DamageBoost;
         }
         public override bool CanHitPlayer(Player target)
         {
@@ -509,18 +508,21 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
             other.owner = Owner.whoAmI;
             other.DamageType = DamageClass.Melee;
             other.damage = (int)(Projectile.damage * 10f);
+            if (other.type == ModContent.ProjectileType<ImpactBomb>())
+                //fuck it we ball
+                other.damage = (int)(Projectile.damage * 40);
             other.netUpdate = true;
             if (!HasMadeVisual)
             {
                 ImpactHammer_HitParticle particle = new ImpactHammer_HitParticle();
                 particle.Prepare(Projectile.Center + new Vector2(40, 0).RotatedBy(Projectile.rotation), other.velocity.ToRotation(), isAReflect: true);
                 ParticleEngine.ShaderParticles.Add(particle);
-                 HasMadeVisual = true;
+                HasMadeVisual = true;
                 ThisChargeIsFaster = true;
             }
-            
+
             other.netUpdate = true;
-            
+
             // Nice audiovisual feedback.
             SoundEngine.PlaySound(
                 Assets.Sounds.Items.Melee.ImpactHammer.Reflect.Asset with { pitchVariance = 0.2f, volume = 3 },
@@ -550,7 +552,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
             if (IsHostilePvPProjectile(other))
                 return true;
 
-           
+
             return true;
         }
         private bool IsHostilePvPProjectile(Projectile other)
@@ -650,26 +652,26 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
 
             ArmJoint.Root = Owner.MountedCenter + new Vector2(-8f * Owner.direction, 4f);
             ///fixed !!
-            Vector2 target = Owner.Calamity().mouseWorldDeltaFromPlayer+Owner.Center;
+            Vector2 target = Owner.Calamity().mouseWorldDeltaFromPlayer + Owner.Center;
             Vector2 pole = ArmJoint.Root + new Vector2(-10f * Owner.direction, 28f);
             ArmJoint.Solve(target, pole);
         }
         private void MangeVerlet()
         {
-            if(FunChain is null)
+            if (FunChain is null)
             {
                 FunChain = new VerletChain(10, 2, Projectile.Center);
             }
             FunChain.Positions[0] = Projectile.Bottom;
-            FunChain.Positions[^1] = Projectile.Center + new Vector2(Projectile.width/2, -8*Projectile.direction).RotatedBy(Projectile.rotation);
-            FunChain.Simulate(Vector2.zeroVector, Projectile.Center, 2, 0.7f, collideWithTiles: false);
+            FunChain.Positions[^1] = Projectile.Center + new Vector2(Projectile.width / 2, -8 * Projectile.direction).RotatedBy(Projectile.rotation);
+            FunChain.Simulate(Vector2.zeroVector, Projectile.Center, 2, 0.9f, collideWithTiles: false, constraintIterations:1);
 
         }
 
         private void SetPosition()
         {
 
-            Projectile.Center = ArmJoint.Joint + Main.rand.NextVector2Unit() * ChargeInterpolant*0.5f;
+            Projectile.Center = ArmJoint.Joint + Main.rand.NextVector2Unit() * ChargeInterpolant * 0.5f;
             Projectile.rotation = Projectile.rotation.AngleLerp(SyncedAimWorld.AngleFrom(Projectile.Center), 0.3f);
             Projectile.velocity = Projectile.rotation.ToRotationVector2() * 12;
 
@@ -856,7 +858,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
 
             gd.BlendState = BlendState.AlphaBlend;
             gd.DepthStencilState = DepthStencilState.None;
-            gd.RasterizerState = new RasterizerState { CullMode = CullMode.None, FillMode = FillMode.WireFrame};
+            gd.RasterizerState = new RasterizerState { CullMode = CullMode.None, FillMode = FillMode.WireFrame };
             gd.SamplerStates[0] = SamplerState.LinearClamp;
 
             foreach (EffectPass pass in ChainEffect.CurrentTechnique.Passes)
@@ -953,18 +955,14 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
 
             DrawHead(Offset, rot, lightColor, flip);
 
-            
 
-          
+
+
 
             Main.EntitySpriteDraw(tex, DrawPos, null, lightColor, rot, tex.Size() / 2 - new Vector2(-10, 0), Projectile.scale, flip);
 
-            for (int i = 0; i < FunChain.Positions.Length - 1; i++)
-            {
-                //Utils.DrawLine(Main.spriteBatch, FunChain.Positions[i], FunChain.Positions[i + 1], Color.White);
-            }
 
-            Utils.DrawRect(Main.spriteBatch, GetHammerBoundingBox(), Color.White);
+            //Utils.DrawRect(Main.spriteBatch, GetHammerBoundingBox(), Color.White);
             //Utils.DrawLine(Main.spriteBatch, Projectile.Center, Projectile.Center+ ArmJoint.Tip.AngleFrom(ArmJoint.Joint).ToRotationVector2()*100, Color.Red);
 
 

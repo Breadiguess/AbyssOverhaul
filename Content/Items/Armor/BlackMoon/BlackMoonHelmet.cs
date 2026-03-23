@@ -1,5 +1,6 @@
 ﻿using AbyssOverhaul.Content.Items.Armor.BlackMoon.Players;
 using AbyssOverhaul.Content.Rarities;
+using CalamityMod;
 using CalamityMod.Items;
 using CalamityMod.Items.Armor.OmegaBlue;
 using CalamityMod.Rarities;
@@ -24,10 +25,13 @@ namespace AbyssOverhaul.Content.Items.Armor.BlackMoon
             Item.width = 18;
             Item.height = 18;
             Item.value = CalamityGlobalItem.RarityPureGreenBuyPrice;
-            Item.defense = 19;
+            Item.defense = 50;
             Item.rare = ModContent.RarityType<AbyssalRarity>();
         }
-        public override bool IsArmorSet(Item head, Item body, Item legs) => body.type == ModContent.ItemType<BlackMoonBreastplate>() && legs.type == ModContent.ItemType<BlackMoonGreaves>();
+        public override bool IsArmorSet(Item head, Item body, Item legs) =>
+            head.type == Type &&
+            body.type == ModContent.ItemType<BlackMoonBreastplate>() 
+            && legs.type == ModContent.ItemType<BlackMoonGreaves>();
 
         public override void UpdateEquip(Player player)
         {
@@ -40,6 +44,7 @@ namespace AbyssOverhaul.Content.Items.Armor.BlackMoon
         public override void UpdateArmorSet(Player player)
         {
             player.GetModPlayer<BlackMoonPlayer>().Active = true;
+            player.Calamity().SulphWaterPoisoningLevel--;
         }
         public override void EquipFrameEffects(Player player, EquipType type)
         {

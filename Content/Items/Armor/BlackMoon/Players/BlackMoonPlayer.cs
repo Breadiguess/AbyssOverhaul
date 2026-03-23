@@ -26,11 +26,11 @@
                 black.UpdateTail(self);
             }
         }
-        public Vector2 PreTeleportLoc;
         public override void PreUpdateMovement()
         {
             if (!Active)
                 return;
+
 
             if (TeleportDelayTime > 0)
             {
@@ -65,7 +65,12 @@
 
         }
 
+        #region SetBonus
 
+
+        public bool IsOnGround;
+
+        public Vector2 PreTeleportLoc;
         public int TeleportDelayTime;
         public bool HasTeleported;
         private Vector2 TeleportLoc;
@@ -101,5 +106,6 @@
             }
 
         }
+        #endregion 
     }
 }

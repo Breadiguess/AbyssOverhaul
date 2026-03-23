@@ -91,4 +91,5 @@ Projectiles: {
 	AnchorageHeld.DisplayName: Anchorage Held
 	AnchorageHeld_Drill.DisplayName: Anchorage Held_ Drill
 	ImpactBomb.DisplayName: Impact Bomb
+	ImpactBomb_Explosion.DisplayName: Impact Bomb_ Explosion
 }

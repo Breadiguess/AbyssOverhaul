@@ -1,6 +1,7 @@
 ﻿using AbyssOverhaul.Content.Rarities;
 using CalamityMod.Items;
 using CalamityMod.Items.Materials;
+using CalamityMod.Tiles.Furniture.CraftingStations;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -39,17 +40,17 @@ namespace AbyssOverhaul.Content.Items.Armor.BlackMoon
             Item.height = 18;
             Item.value = CalamityGlobalItem.RarityGreenBuyPrice;
             Item.rare = ModContent.RarityType<AbyssalRarity>();
-            Item.defense = 5; //9
+            Item.defense = 55;
         }
 
         public override void UpdateEquip(Player player)
         {
             player.endurance += 0.15f;
-            player.GetCritChance<GenericDamageClass>() += 5;
+            player.GetCritChance<GenericDamageClass>() += 15;
             if (Collision.DrownCollision(player.position, player.width, player.height, player.gravDir))
             {
-                player.statDefense += 5;
-                player.endurance += 0.1f;
+                player.statDefense += 30;
+                player.endurance += 0.3f;
             }
         }
 
@@ -57,7 +58,7 @@ namespace AbyssOverhaul.Content.Items.Armor.BlackMoon
         {
             CreateRecipe().
                 AddIngredient<SeaRemains>(5).
-                AddTile(TileID.Anvils).
+                AddTile(ModContent.TileType<DraedonsForge>()).
                 Register();
         }
     }
