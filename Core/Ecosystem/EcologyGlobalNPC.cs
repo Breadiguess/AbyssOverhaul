@@ -32,8 +32,10 @@ namespace AbyssOverhaul.Common.Ecology
         public float PreferredSpacing = 64f;
         public override bool AppliesToEntity(NPC entity, bool lateInstantiation)
         {
-            return EcologyRegistry.HasTraits(entity.type);
+            return EcologyRegistry.HasParticipant(entity.type);
         }
+
+       
 
         public bool HasTrait(NpcTraitFlags flag) => (Traits & flag) != 0;
     }
