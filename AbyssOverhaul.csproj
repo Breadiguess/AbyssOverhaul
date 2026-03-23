@@ -1,46 +1,25 @@
 ﻿<Project Sdk="Tomat.Terraria.ModLoader.Sdk/1.0.9">
-
   <PropertyGroup>
     <LangVersion>preview</LangVersion>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>portable</DebugType>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Reference Include="Daybreak">
-      <HintPath>Lib\Daybreak.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
 
-    <Reference Include="Wayfarer">
-      <HintPath>Lib\Wayfarer.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-
-    <Reference Include="BreadLibrary">
-      <HintPath>Lib\BreadLibrary.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-
-    <Reference Include="CalamityMod">
-      <HintPath>Lib\CalamityMod.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-
+  
+  
   <ItemGroup>
     <AdditionalFiles Remove=".vs\**" />
     <AdditionalFiles Remove="Content\BehaviorOverrides\ReaperShark\**" />
-    <AdditionalFiles Remove="Properties\**" />
+
     <Compile Remove=".vs\**" />
     <Compile Remove="Content\BehaviorOverrides\ReaperShark\**" />
-    <Compile Remove="Properties\**" />
+
     <EmbeddedResource Remove=".vs\**" />
     <EmbeddedResource Remove="Content\BehaviorOverrides\ReaperShark\**" />
-    <EmbeddedResource Remove="Properties\**" />
+
     <None Remove=".vs\**" />
     <None Remove="Content\BehaviorOverrides\ReaperShark\**" />
-    <None Remove="Properties\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -60,5 +39,4 @@
     <Publicize Include="FNA" IncludeCompilerGeneratedMembers="false" IncludeVirtualMembers="false" />
     <Publicize Include="ReLogic" IncludeCompilerGeneratedMembers="false" IncludeVirtualMembers="false" />
   </ItemGroup>
-
 </Project>

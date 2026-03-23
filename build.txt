@@ -1,4 +1,4 @@
-displayName = Calamity Hadopelagia
+displayName = Calamity: Hadopelagia
 author = Bread, Crispy
 version = 0.1
 modReferences = CalamityMod, BreadLibrary, Daybreak
