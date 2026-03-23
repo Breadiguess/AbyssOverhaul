@@ -7,6 +7,7 @@ using BreadLibrary.Core.ScreenShake;
 using BreadLibrary.Core.Sounds;
 using BreadLibrary.Core.Verlet;
 using CalamityMod;
+using CalamityMod.Cooldowns;
 using CalamityMod.Items.Armor.Hydrothermic;
 using CalamityMod.NPCs;
 using CalamityMod.Particles;
@@ -137,11 +138,11 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
             ManageIK();
             if (Compression is not null)
             {
-               
+
 
                 Compression.Update(Projectile.Center, sound =>
                 {
-                    sound.Volume = 0.4f * Utilities.InverseLerpBump(0, ChargeTime/2, ChargeTime-4, ChargeTime, ChargeTime * ChargeInterpolant);
+                    sound.Volume = 0.4f * Utilities.InverseLerpBump(0, ChargeTime / 2, ChargeTime - 4, ChargeTime, ChargeTime * ChargeInterpolant);
                     sound.Pitch = 0.1f * ChargeInterpolant + ChargePitchVariance;
                 });
             }
@@ -151,11 +152,22 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
                 ChargeHeld.Update(Projectile.Center, sound =>
                 {
                     sound.Volume = 0.02f;
-                    sound.Pitch = 1+1*MathF.Sin(Time*0.1f);
+                    sound.Pitch = 1 + 1 * MathF.Sin(Time * 0.1f);
 
                 }
                 );
             }
+
+
+            if (Owner.altFunctionUse == 2)
+            {
+
+                int cooldownGiven = 60*4;
+                Owner.Calamity().arsenalCooldown = cooldownGiven;
+                Owner.AddCooldown(ArsenalPower.ID, cooldownGiven);
+            }
+
+
 
             StateMachine();
             if (HitRealeased)
@@ -335,14 +347,19 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
                 float launchPower = 30 * 1;
                 target.MoveNPC(launchVel, launchPower * 0.5f, true);
 
-                // Remove knockback resist, just like it used to
                 target.knockBackResist = 1;
 
-                // Apply tile collison damage (is boosted even further if both final bosses are gone)
                 float damageMults = 8;
                 int damage = (int)(Projectile.damage * damageMults);
-                target.GetGlobalNPC<CalamityTileCollisionHarmNPC>().ApplyCollisionDamage(target, Owner, damage, launchVel * launchPower, 5f, true);
+                target.GetGlobalNPC<CalamityTileCollisionHarmNPC>().ApplyCollisionDamage(target, Owner, damage, launchVel * launchPower, 4f, true);
             }
+        }
+        public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
+        {
+            float DamageBoost = 1 + Owner.velocity.Length();
+            //Main.NewText(DamageBoost);
+            // why on god's green earth would i ever do this
+            modifiers.FinalDamage *= DamageBoost;  
         }
         public override bool CanHitPlayer(Player target)
         {
@@ -566,8 +583,8 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
 
             Vector2 headCenter = Projectile.Center + direction * 28f;
 
-            const int width = 75;
-            const int height = 75;
+            const int width = 95;
+            const int height = 95;
 
             return new Rectangle(
                 (int)(headCenter.X - width * 0.5f),
@@ -940,7 +957,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
                 //Utils.DrawLine(Main.spriteBatch, FunChain.Positions[i], FunChain.Positions[i + 1], Color.White);
             }
 
-            //Utils.DrawRect(Main.spriteBatch, GetHammerBoundingBox(), Color.White);
+            Utils.DrawRect(Main.spriteBatch, GetHammerBoundingBox(), Color.White);
             //Utils.DrawLine(Main.spriteBatch, Projectile.Center, Projectile.Center+ ArmJoint.Tip.AngleFrom(ArmJoint.Joint).ToRotationVector2()*100, Color.Red);
 
 

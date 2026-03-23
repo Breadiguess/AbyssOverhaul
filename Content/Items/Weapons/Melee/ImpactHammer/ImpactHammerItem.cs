@@ -46,9 +46,13 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
             Item.noUseGraphic = true;
             Item.noMelee = true;
         }
-        public override bool MeleePrefix() => true;
+        public override bool MeleePrefix() => true; 
         public override void HoldItem(Player player)
         {
+            if (Main.myPlayer == player.whoAmI)
+                player.Calamity().rightClickListener = true;
+            player.Calamity().mouseWorldListener = true;
+
             if (player.whoAmI != Main.myPlayer)
                 return;
 
@@ -69,6 +73,10 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
                     player.whoAmI
                 );
             }
+        }
+        public override bool AltFunctionUse(Player player)
+        {
+            return true;
         }
 
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)

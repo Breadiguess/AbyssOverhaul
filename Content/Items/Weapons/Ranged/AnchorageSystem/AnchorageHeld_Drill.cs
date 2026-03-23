@@ -34,6 +34,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
             Projectile.hostile = false;
             Projectile.Size = new(20);
             Projectile.DamageType = DamageClass.Ranged;
+            Projectile.extraUpdates = 1;
 
         }
 

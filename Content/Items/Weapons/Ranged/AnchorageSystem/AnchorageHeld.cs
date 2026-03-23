@@ -86,22 +86,35 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
                         rope.OldPositions[i] = rope.Positions[i];
                     }
                 }
-
+                for (int i = 0; i < 5; i++)
+                {
+                    rope.Positions[i] = Vector2.Lerp(Projectile.Center + new Vector2(i, 0).RotatedBy(Projectile.rotation), rope.Positions[i], i / 5f);
+                }
                 rope.Positions[^1] = drillProjectile.Center;
                 rope.Simulate(Vector2.Zero, Projectile.Center + Projectile.velocity, 0, 0.5f, collideWithTiles: false);
-
+              
+                
                 if (!drillProjectile.active)
                 {
                     drillProjectile = null;
                     rope = null;
                     currentState = state.Idle;
+                    return;
+                }
+                if (drillProjectile.type != ModContent.ProjectileType<AnchorageHeld_Drill>())
+                {
+                    drillProjectile = null;
+                    rope = null;
+                    currentState = state.Idle;
+                    return;
                 }
             }
+          
 
-            counter = Math.Min(counter, cap);
+                counter = Math.Min(counter, cap);
 
             Projectile.Center = Owner.Center;
-            Projectile.velocity = Owner.DirectionTo(Owner.Calamity().mouseWorld) * 10;
+            Projectile.velocity = Owner.DirectionTo(Owner.Calamity().mouseWorld) * 13;
             Projectile.rotation = Projectile.velocity.ToRotation() - MathHelper.PiOver2;
         }
 
@@ -154,6 +167,8 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
                 }
             }
 
+
+
             counter++;
 
             if (counter == cap && !hasChargeFinished)
@@ -203,9 +218,9 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
         {
             var tex = TextureAssets.Projectile[Type].Value;
 
-            Rectangle frame = tex.Frame(1, Main.projFrames[Type]);
+            Rectangle frame = tex.Frame(1, Main.projFrames[Type], 0, (int)(Main.GameUpdateCount * 0.2f % Main.projFrames[Type] + Owner.whoAmI));
 
-            Vector2 offset = new(0, frame.Height / 2 + 6);
+            Vector2 offset = new(0, frame.Height / 2 + 7);
 
             DrawRope();
             drawHead(ref lightColor, offset);
@@ -222,17 +237,38 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
             return false;
         }
 
+
         private void DrawRope()
         {
+            if (rope is null)
+            {
+                return;
+            }
+
+
             if (rope is not null)
             {
                 for (int i = 0; i < rope.Positions.Length - 1; i++)
                 {
                     Vector2 start = rope.Positions[i];
                     Vector2 end = rope.Positions[i + 1];
-                    Utils.DrawLine(Main.spriteBatch, start, end, Color.White);
+                    //Utils.DrawLine(Main.spriteBatch, start, end, Color.White);
                 }
             }
+
+            EnsureChainEffect();
+            ropeEffect.World = Matrix.Identity;
+            ropeEffect.View = Main.GameViewMatrix.TransformationMatrix;
+            ropeEffect.projection = Matrix.CreateOrthographicOffCenter(
+                0f,
+                Main.screenWidth,
+                Main.screenHeight,
+                0f,
+                -1f,
+                1f
+            );
+            EasyPrimRope.DrawSimpleChainPrimitive(ropeEffect, ref ropeIndices, ref ropeVertices, EasyPrimRope.SubdividePointsCatmullRom(rope.Positions, 4), 6, Color.White, SamplerState.PointWrap, 46, useLighting:false);
+
         }
 
         private void drawHead(ref Color lightColor, Vector2 offset)
@@ -266,8 +302,9 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
                 {
                     VertexColorEnabled = true,
                     TextureEnabled = true
-                };
 
+                };
+                ropeEffect.Texture = ModContent.Request<Texture2D>(this.GetPath()+"_Chain").Value;
 
                 
             }
@@ -275,35 +312,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
         PixelLayer IDrawPixellated.PixelLayer => PixelLayer.AboveProjectiles;
         void IDrawPixellated.DrawPixelated(SpriteBatch spriteBatch)
         {
-            if (rope is null)
-            {
-                return;
-            }
-
-
-            if (rope is not null)
-            {
-                for (int i = 0; i < rope.Positions.Length - 1; i++)
-                {
-                    Vector2 start = rope.Positions[i];
-                    Vector2 end = rope.Positions[i + 1];
-                    Utils.DrawLine(Main.spriteBatch, start, end, Color.White);
-                }
-            }
-
-            EnsureChainEffect();
-            ropeEffect.World = Matrix.Identity;
-            ropeEffect.View = Matrix.identity;
-            ropeEffect.projection  = Matrix.CreateOrthographicOffCenter(
-                0f,
-                Main.screenWidth,
-                Main.screenHeight,
-                0f,
-                0f,
-                1f
-            );
-            EasyPrimRope.DrawSimpleChainPrimitive(ropeEffect, ref ropeIndices, ref ropeVertices, EasyPrimRope.SubdividePointsCatmullRom(rope.Positions, 4), 4, Color.White, SamplerState.PointClamp);
-
+           
         }
         #endregion
     }

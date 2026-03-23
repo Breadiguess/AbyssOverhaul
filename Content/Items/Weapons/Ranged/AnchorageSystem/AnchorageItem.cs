@@ -19,6 +19,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
             Item.DamageType = DamageClass.Ranged;
             Item.rare = ItemRarityID.Green;
             Item.shoot = ModContent.ProjectileType<AnchorageHeld>();
+            Item.damage = 120;
             Item.channel = true;
         }
 
@@ -29,6 +30,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
             return false;
         }
 
+        public override bool AltFunctionUse(Player player) => true;
         public override void HoldItem(Player player)
         {
             if (player.whoAmI != Main.myPlayer)
