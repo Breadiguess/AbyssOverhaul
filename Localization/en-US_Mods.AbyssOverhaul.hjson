@@ -90,4 +90,5 @@ Projectiles: {
 	ConcussiveBlast.DisplayName: Concussive Blast
 	AnchorageHeld.DisplayName: Anchorage Held
 	AnchorageHeld_Drill.DisplayName: Anchorage Held_ Drill
+	ImpactBomb.DisplayName: Impact Bomb
 }

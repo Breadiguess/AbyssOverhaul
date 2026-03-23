@@ -159,10 +159,12 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
             }
 
 
-            if (Owner.altFunctionUse == 2)
+            if (Owner.altFunctionUse == 2 )//&& Owner.Calamity().arsenalCooldown<=0)
             {
 
-                int cooldownGiven = 60*4;
+                int cooldownGiven = 60*2;
+
+                Projectile.NewProjectileDirect(Projectile.GetItemSource_FromThis(), Projectile.Center, new Vector2(0, -5), ModContent.ProjectileType<ImpactBomb>(), 40, 0);
                 Owner.Calamity().arsenalCooldown = cooldownGiven;
                 Owner.AddCooldown(ArsenalPower.ID, cooldownGiven);
             }
@@ -359,6 +361,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
             float DamageBoost = 1 + Owner.velocity.Length();
             //Main.NewText(DamageBoost);
             // why on god's green earth would i ever do this
+            //for your information, this is just huge.
             modifiers.FinalDamage *= DamageBoost;  
         }
         public override bool CanHitPlayer(Player target)
@@ -528,6 +531,10 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
         {
             if (!other.active)
                 return false;
+
+            if (other.type == ModContent.ProjectileType<ImpactBomb>())
+                return true;
+
 
             if (other.type == this.Projectile.type)
                 return false;

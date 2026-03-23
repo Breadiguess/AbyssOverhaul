@@ -13,9 +13,9 @@ using Terraria.Graphics.Effects;
 using Terraria.Graphics.Light;
 using Terraria.Graphics.Shaders;
 
-namespace AbyssOverhaul.Core.Graphics
+namespace AbyssOverhaul.Core.Graphics.ReworkedAbyssDarkness
 {
-    internal class ReworkedAbyssLighting : ModSystem
+    internal partial class ReworkedAbyssLighting : ModSystem
     {
         private static Asset<Texture2D> _defaultTexture;
         public class LightSource
@@ -106,7 +106,7 @@ namespace AbyssOverhaul.Core.Graphics
                 //This converts the light decay amount from the amount it normally is in water into the amount it normally is in air, depending on the intensity of the abyss darkness.
                 //This is to offset the abyss darkness system to make the parts that are supposed to be visible easier to see.
                 //Dividing by 0.91 brings the water back to 100% transmissiveness with the original color
-                map.LightDecayThroughWater = Vector3.Lerp(map.LightDecayThroughWater, (map.LightDecayThroughWater / VanillaWaterLightMult) * 0.98f, MathHelper.Clamp(mp.darknessIntensity, 0, 1));
+                map.LightDecayThroughWater = Vector3.Lerp(map.LightDecayThroughWater, map.LightDecayThroughWater / VanillaWaterLightMult * 0.98f, MathHelper.Clamp(mp.darknessIntensity, 0, 1));
             }
         }
 

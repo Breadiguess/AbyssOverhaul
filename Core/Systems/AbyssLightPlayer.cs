@@ -1,4 +1,4 @@
-﻿using AbyssOverhaul.Core.Graphics;
+﻿using AbyssOverhaul.Core.Graphics.ReworkedAbyssDarkness;
 using AbyssOverhaul.Core.ModPlayers;
 using CalamityMod;
 using CalamityMod.Graphics;

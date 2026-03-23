@@ -73,7 +73,7 @@ namespace AbyssOverhaul.Content.NPCs.DeepSnapperNPC
 
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[Type] = 2;
+            Main.npcFrameCount[Type] = 16;
         }
 
         public override void SetDefaults()

@@ -1,6 +1,6 @@
 ﻿using AbyssOverhaul.Common.Brain;
 using AbyssOverhaul.Common.Brain.SharedModules;
-using AbyssOverhaul.Core.Graphics;
+using AbyssOverhaul.Core.Graphics.ReworkedAbyssDarkness;
 using BreadLibrary.Core.Graphics;
 using BreadLibrary.Core.Graphics.PixelationShit;
 using BreadLibrary.Core.Sounds;
