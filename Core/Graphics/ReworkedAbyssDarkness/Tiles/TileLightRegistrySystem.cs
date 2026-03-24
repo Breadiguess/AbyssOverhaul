@@ -1,12 +1,14 @@
 ﻿using AbyssOverhaul.Content.Layers.FossilShale.Tiles.Rubble;
+using CalamityMod.Tiles.Abyss;
 using CalamityMod.Tiles.Abyss.AbyssAmbient;
+using CalamityMod.Tiles.Merges;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AbyssOverhaul.Core.Graphics.ReworkedAbyssDarkness
+namespace AbyssOverhaul.Core.Graphics.ReworkedAbyssDarkness.Tiles
 {
     internal class TileLightRegistrySystem : ModSystem
     {
@@ -62,32 +64,40 @@ namespace AbyssOverhaul.Core.Graphics.ReworkedAbyssDarkness
         {
             if (ModLoader.TryGetMod("CalamityMod", out Mod calamity))
             {
-                if (calamity.TryFind<ModTile>("AbyssTorch", out ModTile abyssTorch))
+                if (calamity.TryFind("AbyssTorch", out ModTile abyssTorch))
                 {
                     TileLightRegistry.Register(abyssTorch.Type, (i, j, type, tile) =>
                     {
                         ReworkedAbyssLighting.AddTileLight(
                             i, j,
                             scale: 2.4f,
-                            opacity: 1f,
+                            opacity: 0.4f,
                             color: new Color(90, 180, 255),
-                            lifetime: 2,
+                            lifetime: 60,
                             worldOffset: new Vector2(0f, -2f));
 
                         return true;
                     });
                 }
             }
+        
+            TileLightRegistry.Register(ModContent.TileType<ThermalVent1>(), (i, j, type, tile) =>
+            {
+                if (TileLightRegistry.IsTopLeftOfMultiTile(tile, 16, 16))
+                    ReworkedAbyssLighting.AddTileLight(i, j, ModContent.Request<Texture2D>("CalamityMod/Particles/BloomCircle").Value, 1.5f, lifetime: 30, color: Color.Red * 0.8f);
+                return true;
+            });
 
             TileLightRegistry.Register(ModContent.TileType<MediumOrbbies>(), (i, j, type, tile) =>
             {
-                ReworkedAbyssLighting.AddTileLight(i, j, ModContent.Request<Texture2D>("CalamityMod/Particles/BloomCircle").Value, 0.5f, lifetime: 60, color: Color.Thistle*0.1f);
+                if (TileLightRegistry.IsTopLeftOfMultiTile(tile, 16, 16))
+                    ReworkedAbyssLighting.AddTileLight(i, j, ModContent.Request<Texture2D>("CalamityMod/Particles/BloomCircle").Value, 1.5f, lifetime: 30, color: Color.Thistle*0.8f);
                 return true;
             });
             TileLightRegistry.Register(ModContent.TileType<XL_Orbbies>(), (i, j, type, tile) =>
             {
-               
-                ReworkedAbyssLighting.AddTileLight(i, j, ModContent.Request<Texture2D>("CalamityMod/Particles/BloomCircle").Value, 0.5f, lifetime: 60, color: Color.Thistle*0.2f);
+               if(TileLightRegistry.IsTopLeftOfMultiTile(tile, 16, 16))
+                ReworkedAbyssLighting.AddTileLight(i, j, ModContent.Request<Texture2D>("CalamityMod/Particles/BloomCircle").Value, 1.5f, lifetime: 60, color: Color.Thistle*0.8f);
                 return true;
             });
 

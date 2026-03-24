@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AbyssOverhaul.Core.Graphics.ReworkedAbyssDarkness
+namespace AbyssOverhaul.Core.Graphics.ReworkedAbyssDarkness.Tiles
 {
     internal static class TileLightRegistry
     {

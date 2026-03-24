@@ -116,7 +116,8 @@ namespace AbyssOverhaul.Core.Graphics.ReworkedAbyssDarkness
         }
 
         public override void PreUpdateEntities()
-        {
+        
+        { 
             //Every frame, the light sources are determined by what was added on that frame only. Therefore, we reset the light list every frame.
             //Lifetime is provided to smooth out things that don't run every frame consistently to prevent flickering, such as the abyss torches.
             for (var i = 0; i < lights.Count; i++)
