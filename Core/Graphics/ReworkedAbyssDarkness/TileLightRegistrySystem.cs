@@ -1,4 +1,5 @@
-﻿using CalamityMod.Tiles.Abyss.AbyssAmbient;
+﻿using AbyssOverhaul.Content.Layers.FossilShale.Tiles.Rubble;
+using CalamityMod.Tiles.Abyss.AbyssAmbient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace AbyssOverhaul.Core.Graphics.ReworkedAbyssDarkness
 
         private static void RegisterVanillaLights()
         {
+            /*
             // Example: all vanilla torches.
             TileLightRegistry.Register(TileID.Torches, (i, j, type, tile) =>
             {
@@ -34,7 +36,7 @@ namespace AbyssOverhaul.Core.Graphics.ReworkedAbyssDarkness
                     lifetime: 20,
                     worldOffset: new Vector2(0f, -4f));
 
-                return true;
+                return false;
             });
 
             // Example: campfires (3x2 multitile). Emit once from the top-left piece only.
@@ -53,7 +55,7 @@ namespace AbyssOverhaul.Core.Graphics.ReworkedAbyssDarkness
                     worldOffset: new Vector2(16f, 8f));
 
                 return true;
-            });
+            });*/
         }
 
         private static void RegisterCrossModLights()
@@ -77,7 +79,17 @@ namespace AbyssOverhaul.Core.Graphics.ReworkedAbyssDarkness
                 }
             }
 
-
+            TileLightRegistry.Register(ModContent.TileType<MediumOrbbies>(), (i, j, type, tile) =>
+            {
+                ReworkedAbyssLighting.AddTileLight(i, j, ModContent.Request<Texture2D>("CalamityMod/Particles/BloomCircle").Value, 0.5f, lifetime: 60, color: Color.Thistle*0.1f);
+                return true;
+            });
+            TileLightRegistry.Register(ModContent.TileType<XL_Orbbies>(), (i, j, type, tile) =>
+            {
+               
+                ReworkedAbyssLighting.AddTileLight(i, j, ModContent.Request<Texture2D>("CalamityMod/Particles/BloomCircle").Value, 0.5f, lifetime: 60, color: Color.Thistle*0.2f);
+                return true;
+            });
 
             TileLightRegistry.Register(ModContent.TileType<AbyssGiantKelp1>(), (i, j, type, tile) =>
             {

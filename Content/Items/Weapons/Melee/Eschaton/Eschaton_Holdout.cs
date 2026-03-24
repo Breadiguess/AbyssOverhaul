@@ -178,7 +178,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.Eschaton
                     if (time >= (int)(timeMax * 0.4f) && swingSound)
                     {
                         SoundStyle fire = new("CalamityMod/Sounds/Item/HeavySwing");
-                        SoundEngine.PlaySound(fire with { Volume = 0.8f, Pitch = -0.2f * (Owner.GetModPlayer<EschatonPlayer>().FinalityStacks / EschatonPlayer.MaxFinalityStacks), pitchVariance = 0.3f }, Projectile.Center);
+                        SoundEngine.PlaySound(fire with { Volume = 0.8f, Pitch = -0.2f * (Owner.GetModPlayer<EschatonPlayer>().FinalityStacks / EschatonPlayer.MaxFinalityStacks), PitchVariance = 0.3f }, Projectile.Center);
                         swingSound = false;
                     }
                     if (time > (int)(timeMax * 0.3f) && time < (int)(timeMax * 0.8f))

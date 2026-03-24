@@ -5,34 +5,6 @@
     <DebugType>portable</DebugType>
   </PropertyGroup>
 
-
-  
-  
-  <ItemGroup>
-    <AdditionalFiles Remove=".vs\**" />
-    <AdditionalFiles Remove="Content\BehaviorOverrides\ReaperShark\**" />
-
-    <Compile Remove=".vs\**" />
-    <Compile Remove="Content\BehaviorOverrides\ReaperShark\**" />
-
-    <EmbeddedResource Remove=".vs\**" />
-    <EmbeddedResource Remove="Content\BehaviorOverrides\ReaperShark\**" />
-
-    <None Remove=".vs\**" />
-    <None Remove="Content\BehaviorOverrides\ReaperShark\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Core\AbyssGenerationHooks.cs" />
-    <Compile Remove="Core\AbyssHookSystem.cs" />
-    <Compile Remove="Core\NPCOverrides\NPCOverrideDetourSystem.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Assets\AutoloadedEffects\" />
-    <Folder Include="Content\Layers\TheVeil\WorldGeneration\" />
-  </ItemGroup>
-
   <ItemGroup>
     <DoNotPublicize Include="tModLoader:Terraria.Tile" />
     <Publicize Include="CalamityMod" />

@@ -1,6 +1,7 @@
-namespace AbyssOverhaul.Core.Ecology;
+namespace AbyssOverhaul.Core.Ecosystem.Ecology
+{
 
-public static class EcologyRegistry
+    public static class EcologyRegistry
     {
         private static readonly HashSet<int> Participants = new();
         private static readonly Dictionary<int, IEcologyParticipant> Providers = new();
@@ -28,5 +29,6 @@ public static class EcologyRegistry
             Providers.Clear();
         }
     }
+}
 
-    
+

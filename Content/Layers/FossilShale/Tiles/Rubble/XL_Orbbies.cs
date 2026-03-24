@@ -1,31 +1,31 @@
-﻿using Terraria.ObjectData;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Terraria.ObjectData;
 
 namespace AbyssOverhaul.Content.Layers.FossilShale.Tiles.Rubble
 {
-    public class MediumOrbbies : ModTile
+    internal class XL_Orbbies:ModTile
     {
-        public override string Texture => $"{this.GetPath()}";
         public override void SetStaticDefaults()
         {
             Main.tileFrameImportant[Type] = true;
-            Main.tileSolid[Type] = false;
+            Main.tileNoAttach[Type] = true;
+            TileID.Sets.DisableSmartCursor[Type] = true;
             Main.tileLighted[Type] = true;
-            Main.tileNoFail[Type] = true;
-            Main.tileLavaDeath[Type] = true;
-            Main.tileWaterDeath[Type] = false;
 
-            TileObjectData.newTile.CopyFrom(TileObjectData.Style2x2);
-            TileObjectData.newTile.DrawYOffset = 2;
+            TileObjectData.newTile.CopyFrom(TileObjectData.Style3x4);
 
+            TileObjectData.newTile.Width = 3;
+            TileObjectData.newTile.Height = 4;
 
-
-            TileObjectData.newTile.Width = 2;
-            TileObjectData.newTile.Height = 2;
-
+            TileObjectData.newTile.Origin = new Point16(1,3);
 
             TileObjectData.newTile.CoordinateHeights = new[]
             {
-                16, 16
+                16, 16, 16, 16
             };
             TileObjectData.newTile.CoordinateWidth = 16;
             TileObjectData.newTile.CoordinatePadding = 2;
@@ -34,23 +34,14 @@ namespace AbyssOverhaul.Content.Layers.FossilShale.Tiles.Rubble
 
             TileObjectData.newTile.StyleWrapLimit = 4;
 
-            TileObjectData.newTile.RandomStyleRange = 12;
+            TileObjectData.newTile.RandomStyleRange = 16;
 
 
             TileObjectData.addTile(Type);
 
+            AddMapEntry(new Color(255,0,0));
 
-
-
-
-            AddMapEntry(new Color(162, 55, 196));
-            DustType = DustID.PurpleMoss;
-            HitSound = SoundID.Dig;
-
-            base.SetStaticDefaults();
         }
-
-
         public override void ModifyLight(int i, int j, ref float r, ref float g, ref float b)
         {
             base.ModifyLight(i, j, ref r, ref g, ref b);
@@ -59,5 +50,4 @@ namespace AbyssOverhaul.Content.Layers.FossilShale.Tiles.Rubble
             b = 1;
         }
     }
-
 }

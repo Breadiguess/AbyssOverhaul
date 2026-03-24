@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AbyssOverhaul.Core.Ecosystem.Ecology;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -20,6 +21,22 @@ namespace AbyssOverhaul.Core.NPCOverrides
         public override void PostSetupContent()
         {
             BuildRegistry();
+
+
+
+            EcologyRegistry.Clear();
+
+            foreach (ModNPC modNpc in Mod.GetContent<ModNPC>())
+            {
+                if (modNpc is IEcologyParticipant participant)
+                    EcologyRegistry.Register(modNpc.Type, participant);
+            }
+
+            foreach (NPCBehaviorOverride behaviorOverride in NPCOverrideRegistry._overrides.Values)
+            {
+                if (behaviorOverride is IEcologyParticipant participant)
+                    EcologyRegistry.Register(behaviorOverride.NPCType, participant);
+            }
 
         }
 

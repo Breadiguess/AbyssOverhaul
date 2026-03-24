@@ -1,4 +1,5 @@
 ﻿using AbyssOverhaul.Content.Layers.TenebrousMarsh.Tiles;
+using AbyssOverhaul.Content.Layers.ThermalVents.Tiles;
 using AbyssOverhaul.Content.Layers.TheVeil.NPCs.VoidDreamerNPC;
 using AbyssOverhaul.Core.DataStructures;
 using AbyssOverhaul.Core.Utilities;
@@ -51,7 +52,7 @@ namespace AbyssOverhaul.Content.Layers.ThermalVents
         private static int MoltenPyreMantleType => ModContent.TileType<PyreMantleMolten>();
         private static int ScoriaType => ModContent.TileType<ScoriaOre>();
         private static int MantleGravelType => ModContent.TileType<MantleGravel_Tile>();
-        private static int MineralSlagType => ModContent.TileType<MantleGravel_Tile>();
+        private static int MineralSlagType => ModContent.TileType<MineralSlag_Tile>();
         private static readonly int[] VentTypes =
          {
             ModContent.TileType<ThermalVent1>(),

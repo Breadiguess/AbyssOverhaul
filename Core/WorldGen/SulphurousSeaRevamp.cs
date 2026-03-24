@@ -406,7 +406,7 @@ namespace AbyssOverhaul.Core.WorldGen
             do
             {
                 WorldUtils.Find(new Point(xCheckPosition, (int)GenVars.worldSurfaceLow - 20), searchCondition, out determinedPoint);
-                xCheckPosition += Abyss.AtLeftSideOfWorld.ToDirectionInt();
+                xCheckPosition += Math.Sign(Main.dungeonX);
             }
             while (CalamityUtils.ParanoidTileRetrieval(determinedPoint.X, determinedPoint.Y).TileType == TileID.Ebonstone);
             YStart = Main.remixWorld ? (int)(Main.UnderworldLayer * 0.8f) : determinedPoint.Y;

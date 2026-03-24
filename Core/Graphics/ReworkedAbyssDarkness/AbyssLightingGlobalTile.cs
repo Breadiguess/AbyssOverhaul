@@ -10,10 +10,12 @@ namespace AbyssOverhaul.Core.Graphics.ReworkedAbyssDarkness
     {
         public override void NearbyEffects(int i, int j, int type, bool closer)
         {
-            if (Main.dedServ || !closer)
+            if (Main.dedServ) 
+                return;
+            if (Main.gamePaused)
                 return;
 
-            Tile tile = Framing.GetTileSafely(i, j);
+                Tile tile = Framing.GetTileSafely(i, j);
             if (!tile.HasTile)
                 return;
 

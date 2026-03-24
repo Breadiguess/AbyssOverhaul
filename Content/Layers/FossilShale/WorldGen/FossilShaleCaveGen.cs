@@ -1,10 +1,5 @@
 ﻿using AbyssOverhaul.Content.Layers.FossilShale.Tiles;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria.ID;
+using AbyssOverhaul.Content.Layers.FossilShale.Tiles.Rubble;
 using Terraria.Utilities;
 
 namespace AbyssOverhaul.Content.Layers.FossilShale.WorldGen
@@ -88,10 +83,159 @@ namespace AbyssOverhaul.Content.Layers.FossilShale.WorldGen
 
             for (int i = 0; i < 2; i++)
                 RunBoundaryCleanup(solidMask);
-            
+
             ApplyMaskToWorld(solidMask, minX, maxX, topY, bottomY, solidTileType, openWallType, (ushort)ModContent.TileType<CyanobacteriaSludge_Tile>(), 0.7f, 2f, 4);
+            for (int x = 0; x < tunnels.Count; x++)
+            {
+                var Tunnel = tunnels[x];
+
+                DecorateTunnel(Tunnel, rand, (ushort)ModContent.TileType<XL_Orbbies>());
+            }
+            int[] tileTypes = new int[] { ModContent.TileType<MediumOrbbies>(), ModContent.TileType<Small_Rock>(), ModContent.TileType<XL_Orbbies>() };
+            int[] TileVariations = new int[]
+            {
+                12,4,16
+            };
+            for (int k = 0; k < width / 3; k++)
+            {
+                bool success = false;
+                int attempts = 0;
+
+                while (!success)
+                {
+                    attempts++;
+                    if (attempts > 1000)
+                    {
+                        break;
+                    }
+                    int X = Terraria.WorldGen.genRand.Next(minX,maxX);
+                    int Y = Terraria.WorldGen.genRand.Next(topY, bottomY);
+                    int arand = Terraria.WorldGen.genRand.Next(0, 3);
+
+                    int tileType = tileTypes[arand];
+
+                    int placeStyle = Main.rand.Next(TileVariations[arand]);
+                    if (Main.tile[X, Y].TileType == tileType)
+                    {
+                        continue;
+                    }
+
+                    Terraria.WorldGen.PlaceTile(X, Y, tileType, mute: true, style: placeStyle);
+                    success = Main.tile[X, Y].TileType == tileType;
+                }
+            }
         }
 
+        private static void DecorateTunnel(Tunnel tunnel, UnifiedRandom rand, ushort decorationTileType, int minSpacing = 6)
+        {
+            if (tunnel.Points.Count < 3)
+                return;
+
+            int lastPlacedIndex = -9999;
+
+            for (int i = 1; i < tunnel.Points.Count - 1; i++)
+            {
+                if (i - lastPlacedIndex < minSpacing)
+                    continue;
+
+                Point prev = tunnel.Points[i - 1];
+                Point curr = tunnel.Points[i];
+                Point next = tunnel.Points[i + 1];
+
+                Vector2 p0 = prev.ToVector2();
+                Vector2 p1 = curr.ToVector2();
+                Vector2 p2 = next.ToVector2();
+
+                Vector2 tangent = p2 - p0;
+                if (tangent.LengthSquared() < 0.001f)
+                    continue;
+
+                tangent.Normalize();
+
+                Vector2 normal = new Vector2(-tangent.Y, tangent.X);
+
+                int radius = tunnel.Radius[i];
+                if (radius < 3)
+                    continue;
+
+                float decorateChance = MathHelper.Clamp(0.8f + radius * 0.01f, 0.08f, 1f);
+
+                if (rand.NextFloat() > decorateChance)
+                    continue;
+
+                Point? placement = TryFindTunnelSurfacePlacement(curr, normal, radius, rand);
+
+                if (placement.HasValue && placement is Point place)
+                {
+
+                    Terraria.WorldGen.PlaceObject(place.X - 2, place.Y - 4, decorationTileType);
+                    //Terraria.WorldGen.PlaceTile(place.X, place.Y, decorationTileType, forced:true);
+
+                    lastPlacedIndex = i;
+
+                }
+
+
+
+            }
+        }
+
+        private static Point? TryFindTunnelSurfacePlacement(Point curr, Vector2 normal, int radius, UnifiedRandom rand)
+        {
+            Vector2 c = curr.ToVector2();
+
+            Vector2[] dirs =
+            {
+                normal,
+                -normal,
+                Vector2.Normalize(normal.RotatedBy(0.45f)),
+                Vector2.Normalize(normal.RotatedBy(-0.45f)),
+                Vector2.Normalize((-normal).RotatedBy(0.45f)),
+                Vector2.Normalize((-normal).RotatedBy(-0.45f))
+            };
+
+
+            for (int attempt = 0; attempt < dirs.Length; attempt++)
+            {
+                Vector2 dir = dirs[(attempt + rand.Next(dirs.Length)) % dirs.Length];
+
+                Vector2 Probe = c + dir * (radius - 1);
+
+                for (int offset = -2; offset <= 3; offset++)
+                {
+                    Point tilePos = (Probe + dir * offset).ToTileCoordinates();
+
+                    Point? boundrary = FindAirSolidBoundrary(tilePos.X, tilePos.Y, -dir);
+                    if (boundrary.HasValue)
+                        return boundrary.Value;
+                }
+            }
+
+            return null;
+        }
+
+        private static Point? FindAirSolidBoundrary(int startX, int startY, Vector2 inwardDir)
+        {
+            Point lastAir = new Point(startX, startY);
+            for (int step = 0; step < 6; step++)
+            {
+                int x = startX + (int)MathF.Round(inwardDir.X * step);
+                int y = startY + (int)MathF.Round(inwardDir.Y * step);
+
+                if (!Terraria.WorldGen.InWorld(x, y, 10))
+                    return null;
+
+                Tile tile = Framing.GetTileSafely(x, y);
+
+                if (!tile.HasTile || Main.tileSolidTop[tile.TileType])
+                {
+                    lastAir = new Point(x, y);
+                }
+                else
+                    return lastAir;
+            }
+            return null;
+        }
         private static List<Chamber2> GenerateChambers(
             int minX,
             int maxX,
@@ -565,7 +709,7 @@ namespace AbyssOverhaul.Content.Layers.FossilShale.WorldGen
                     }
                 }
             }
-            
+
             bool[,] sludgeMask = new bool[width, height];
 
             // Random offsets so every worldgen is different.
@@ -686,7 +830,7 @@ namespace AbyssOverhaul.Content.Layers.FossilShale.WorldGen
 
             ApplyTopShalesandSprinkle(
             minX,
-            topY-1,
+            topY - 1,
             width,
             height,
             solidTileType,

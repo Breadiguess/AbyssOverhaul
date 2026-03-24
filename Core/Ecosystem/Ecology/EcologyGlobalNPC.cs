@@ -2,7 +2,7 @@ using System;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace AbyssOverhaul.Common.Ecology
+namespace AbyssOverhaul.Core.Ecosystem.Ecology
 {
     [Flags]
     public enum NpcTraitFlags
@@ -20,7 +20,7 @@ namespace AbyssOverhaul.Common.Ecology
     {
         public override bool InstancePerEntity => true;
 
-        public NpcTraitFlags Traits;
+        public NpcTraitFlags[] Traits;
         public int SchoolLeader = -1;
         
         
@@ -37,29 +37,13 @@ namespace AbyssOverhaul.Common.Ecology
 
        
 
-        public bool HasTrait(NpcTraitFlags flag) => (Traits & flag) != 0;
+        public bool HasTrait(NpcTraitFlags flag) => (Traits.Contains(flag));
     }
 
-    public static class EcologyRegistry
-    {
-        private static readonly HashSet<int> TraitNpcTypes = new();
-
-        public static void Register(int npcType)
-        {
-            TraitNpcTypes.Add(npcType);
-        }
-
-        public static bool HasTraits(int npcType)
-        {
-            return TraitNpcTypes.Contains(npcType);
-        }
-    }
-
+ 
     public static class EcologyExtensions
     {
-        public static bool HasEcology(this NPC npc) =>
-            EcologyRegistry.HasTraits(npc.type);
-
+      
         public static EcologyGlobalNPC Ecology(this NPC npc) =>
             npc.GetGlobalNPC<EcologyGlobalNPC>();
     }

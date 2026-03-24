@@ -162,7 +162,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
             {
 
                 int cooldownGiven = 60 * 3;
-
+                ThisChargeIsFaster = true;
                 Projectile.NewProjectileDirect(Projectile.GetItemSource_FromThis(), Projectile.Center, new Vector2(0, -8), ModContent.ProjectileType<ImpactBomb>(), Owner.HeldItem.damage * 4,Owner.HeldItem.knockBack);
                 Owner.Calamity().arsenalCooldown = cooldownGiven;
                 Owner.AddCooldown(ArsenalPower.ID, cooldownGiven);

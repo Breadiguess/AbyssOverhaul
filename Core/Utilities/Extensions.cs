@@ -11,7 +11,6 @@ namespace AbyssOverhaul.Core.Utilities
 {
     public static partial class AbyssUtilities
     {
-        public static GlobalFishNPC Abyss(this NPC npc) => npc.GetGlobalNPC<GlobalFishNPC>();
 
 
         public static void MergeWithNewAbyss(int type) => CalamityUtils.MergeWithSet(type, new int[] {

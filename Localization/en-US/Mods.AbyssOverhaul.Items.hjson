@@ -19,3 +19,8 @@ AnchorageItem: {
 	DisplayName: Anchorage Item
 	Tooltip: ""
 }
+
+SurveyUnit_Item: {
+	DisplayName: Survey Unit_ Item
+	Tooltip: ""
+}

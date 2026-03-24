@@ -2,6 +2,7 @@
 using AbyssOverhaul.Common.Brain.Contexts;
 using AbyssOverhaul.Common.Brain.SharedModules;
 using AbyssOverhaul.Common.Brain.SharedSensors;
+using AbyssOverhaul.Core.Ecosystem.Ecology;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,7 +18,13 @@ namespace AbyssOverhaul.Content.NPCs.DeepSnapperNPC
     internal class DeepSnapper : ModNPC
     {
         public ModularNpcBrain<SchoolingNpcContext> NpcBrain;
-
+        public void SetupEcology(NPC npc, EcologyGlobalNPC ecology)
+        {
+            ecology.Aggression = 0;
+            
+            ecology.Traits.Append(NpcTraitFlags.AmbushPredator);
+            ecology.Traits.Append(NpcTraitFlags.Schooling);
+        }
         private enum DeepSnapperState
         {
             Schooling,
@@ -516,6 +523,6 @@ namespace AbyssOverhaul.Content.NPCs.DeepSnapperNPC
 
         public override bool? CanFallThroughPlatforms() => true;
 
-        
+       
     }   
 }

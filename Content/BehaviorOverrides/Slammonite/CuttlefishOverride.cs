@@ -1,6 +1,7 @@
 ﻿using AbyssOverhaul.Common.Brain;
 using AbyssOverhaul.Common.Brain.Contexts;
 using AbyssOverhaul.Common.Brain.SharedSensors;
+using AbyssOverhaul.Core.Ecosystem.Ecology;
 using AbyssOverhaul.Core.NPCOverrides;
 using CalamityMod;
 using CalamityMod.Buffs.StatDebuffs;
@@ -14,7 +15,7 @@ using Terraria.Localization;
 
 namespace AbyssOverhaul.Content.BehaviorOverrides.Slammonite
 {
-    internal class CuttlefishOverride : NPCBehaviorOverride
+    internal class CuttlefishOverride : NPCBehaviorOverride, IEcologyParticipant
     {
         public override int NPCType => ModContent.NPCType<Cuttlefish>();
 
@@ -372,6 +373,14 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Slammonite
 
 
             return false;
+        }
+
+        public void SetupEcology(NPC npc, EcologyGlobalNPC ecology)
+        {
+            ecology.Aggression = 1;
+
+            ecology.Traits.Append(NpcTraitFlags.AmbushPredator);
+            ecology.Traits.Append(NpcTraitFlags.Prey);
         }
     }
 }

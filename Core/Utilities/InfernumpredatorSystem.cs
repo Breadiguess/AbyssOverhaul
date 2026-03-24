@@ -1,15 +1,17 @@
-﻿using Terraria.Utilities;
+﻿using AbyssOverhaul.Core.Ecosystem.Ecology;
+using Terraria.Utilities;
 namespace AbyssOverhaul.Core.Utilities
 {
     public static partial class AbyssUtilities
     {
+
         public static NPC FindClosestAbyssPredator(this NPC npc, out float distanceToClosestPredator)
         {
             NPC closestPredator = null;
             distanceToClosestPredator = 9999999f;
             for (int i = 0; i < Main.maxNPCs; i++)
             {
-                if (!Main.npc[i].active || !Main.npc[i].Abyss().IsAbyssPredator)
+                if (!Main.npc[i].active || !Main.npc[i].Ecology().Traits.Contains(NpcTraitFlags.Predator))
                     continue;
 
                 float extraDistance = (Main.npc[i].width / 2) + (Main.npc[i].height / 2);
@@ -37,7 +39,7 @@ namespace AbyssOverhaul.Core.Utilities
             }
             bool npcSearchFilter(NPC n)
             {
-                return n.Abyss().IsAbyssPrey && n.WithinRange(searcher.Center, preySearchDistance);
+                return n.Ecology().HasTrait(NpcTraitFlags.Predator) && n.WithinRange(searcher.Center, preySearchDistance);
             }
 
             NPCUtils.TargetSearchResults searchResults = NPCUtils.SearchForTarget(searcher, NPCUtils.TargetSearchFlag.All, playerSearchFilter, npcSearchFilter);

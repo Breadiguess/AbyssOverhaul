@@ -18,10 +18,10 @@ namespace AbyssOverhaul.Content.Layers.FossilShale.Tiles.Rubble
             Main.tileLavaDeath[Type] = true;
             Main.tileWaterDeath[Type] = false;
 
-            TileObjectData.newTile.CopyFrom(TileObjectData.Style3x2);
+            TileObjectData.newTile.CopyFrom(TileObjectData.Style2x2);
             TileObjectData.newTile.DrawYOffset = 2;
             TileObjectData.newTile.StyleHorizontal = true;
-
+            TileObjectData.newTile.RandomStyleRange = 4;
             TileObjectData.addTile(Type);
 
             AddMapEntry(new Color(162, 55, 196));

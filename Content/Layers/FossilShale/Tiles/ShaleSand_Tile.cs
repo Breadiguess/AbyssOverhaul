@@ -25,7 +25,7 @@ namespace AbyssOverhaul.Content.Layers.FossilShale.Tiles
             TileID.Sets.BlockMergesWithMergeAllBlock[Type] = true;
             TileID.Sets.ChecksForMerge[Type] = true;
             Main.tileMerge[Type][ModContent.TileType<CarbonShale_Tile>()] = true;
-            AddMapEntry(new Color(255, 0, 0));//179,158,158));
+            AddMapEntry(new Color(129, 158, 158));
 
             AbyssUtilities.MergeWithNewAbyss(Type);
 

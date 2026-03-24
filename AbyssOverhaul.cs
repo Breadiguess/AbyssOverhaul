@@ -17,6 +17,7 @@ global using Terraria.ID;
 global using Terraria.IO;
 global using Terraria.ModLoader;
 global using Terraria.WorldBuilding;
+global using Terraria.DataStructures;
 global using static AbyssOverhaul.AbyssOverhaul;
 using System.Runtime.CompilerServices;
 using Wayfarer.API;
