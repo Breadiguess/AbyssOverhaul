@@ -179,9 +179,9 @@ namespace AbyssOverhaul.Content.Layers.FossilShale.Tiles
             }
 
             // Vine tiles usually grow on themselves (from the tip) or on any tile they spawn from (grass tiles usually). GrowMoreVines checks that the nearby area isn't already full of vines.
-            if ((tile.TileType == ExampleVine || tile.TileType == ExampleBlock) && Terraria.WorldGen.GrowMoreVines(i, j))
+            if ((tile.TileType == ExampleVine || tile.TileType == ExampleBlock || tile.TileType == ModContent.TileType<ShaleSand_Tile>() || tile.TileType == ModContent.TileType<CyanobacteriaSludge_Tile>()) && Terraria.WorldGen.GrowMoreVines(i, j))
             {
-                int growChance = 70;
+                int growChance = 1;
                 if (tile.TileType == ExampleVine)
                 {
                     growChance = 7; // 10 times more likely to extend an existing vine than start a new vine

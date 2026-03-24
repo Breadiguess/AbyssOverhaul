@@ -192,7 +192,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
             switch (CurrentState)
             {
                 case State.Idle:
-                    if (Owner.controlUseItem)
+                    if (Owner.controlUseItem && Owner.altFunctionUse != 2)
                     {
                         Owner.StartChanneling();
 
@@ -209,7 +209,8 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
                         HitReady = false;
                         HitRealeased = false;
                         HasPlayedSound = false;
-                        Projectile.netUpdate = true;
+                        Projectile.netUpdate = true; 
+                        HasbeenFlung = false;
                     }
                     break;
 
@@ -329,6 +330,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
 
         #region Collisions And Damage
         public bool HasMadeVisual = false;
+        public bool HasbeenFlung = false;
         public override void OnHitPlayer(Player target, Player.HurtInfo info)
         {
             info.Dodgeable = false;
@@ -341,6 +343,11 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
         }
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
+            if (!HasbeenFlung)
+            {
+                Owner.velocity += target.DirectionTo(Owner.Center) * 20;
+                HasbeenFlung = true;
+            }
             if (target.CanBeMoved(true))
             {
                 target.noTileCollide = false;

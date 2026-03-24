@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AbyssOverhaul.Core.Graphics.ReworkedAbyssDarkness.Tiles;
+using CalamityMod.Tiles.Abyss;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +10,7 @@ namespace AbyssOverhaul.Core.Graphics.ReworkedAbyssDarkness
 {
     internal class AbyssLightingGlobalTile : GlobalTile
     {
+
         public override void NearbyEffects(int i, int j, int type, bool closer)
         {
             if (Main.dedServ) 

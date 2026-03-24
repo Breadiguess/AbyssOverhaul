@@ -280,7 +280,7 @@ namespace AbyssOverhaul.Core.WorldGen
             if (!Main.remixWorld)
                 LayTreesOnSurface();
 
-            SulphurSeaGenerationAfterAbyss();
+            //SulphurSeaGenerationAfterAbyss();
         }
 
         public static void SulphurSeaGenerationAfterAbyss()
@@ -414,7 +414,7 @@ namespace AbyssOverhaul.Core.WorldGen
 
         public static void GenerateSandBlock()
         {
-            int width = BiomeWidth + 4;
+            int width = BiomeWidth + 30;
             int maxDepth = BlockDepth;
             ushort blockTileType = (ushort)ModContent.TileType<SulphurousSand>();
             ushort wallID = (ushort)ModContent.WallType<UnsafeSulphurousSandWall>();
@@ -468,9 +468,9 @@ namespace AbyssOverhaul.Core.WorldGen
             for (int i = 0; i < width; i++)
             {
                 int x = GetActualX(i);
-                for (int y = YStart - 20; y < YStart + 20; y++)
+                for (int y = YStart - 50; y < YStart + 20; y++)
                 {
-                    if (!Terraria.WorldGen.InWorld(x, y, 20))
+                    if (!Terraria.WorldGen.InWorld(x, y, 10))
                         continue;
 
                     Main.tile[x, y].LiquidAmount = 0;
@@ -541,9 +541,9 @@ namespace AbyssOverhaul.Core.WorldGen
         }
         public static void GenerateSmallWaterCaverns()
         {
-            int shallowWaterCaveCount = TotalCavesInShallowWater;
+            int shallowWaterCaveCount = TotalCavesInShallowWater/2;
             int minCaveWidth = MinCaveWidth;
-            int maxCaveWidth = Math.Min(MaxCaveWidth, 17);
+            int maxCaveWidth = Math.Min(MaxCaveWidth, 27);
             ushort wallID = (ushort)ModContent.WallType<UnsafeSulphurousSandWall>();
 
             for (int i = 0; i < shallowWaterCaveCount; i++)
@@ -1722,7 +1722,7 @@ namespace AbyssOverhaul.Core.WorldGen
         // This method is an involutory function, meaning that applying it to the same number twice always yields the original number.
         public static int GetActualX(int x)
         {
-            if (!AbyssGenUtils.OnLeft)
+            if (Math.Sign(Main.dungeonX)!=1)
                 return x;
             else
 
