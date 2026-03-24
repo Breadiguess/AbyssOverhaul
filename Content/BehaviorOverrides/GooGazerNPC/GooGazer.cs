@@ -122,7 +122,7 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.GooGazerNPC
 
             NpcBrain.Update(npc);
 
-            Main.NewText($"FoodDrive:{NpcBrain.Context.FoodDrive},\nHunger:{NpcBrain.Context.Hunger}");
+            //Main.NewText($"FoodDrive:{NpcBrain.Context.FoodDrive},\nHunger:{NpcBrain.Context.Hunger}");
 
             WanderAngle = NpcBrain.Context.WanderAngle;
             LocalTimer++;

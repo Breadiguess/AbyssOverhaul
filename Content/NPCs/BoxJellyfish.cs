@@ -1,9 +1,12 @@
 ﻿using AbyssOverhaul.Common.Brain;
 using AbyssOverhaul.Common.Brain.Contexts;
+using AbyssOverhaul.Content.Items.Accessories.PetriDish;
 using BreadLibrary.Core.Verlet;
 using CalamityMod;
 using CalamityMod.BiomeManagers;
 using Microsoft.Xna.Framework.Graphics;
+using Terraria.GameContent;
+using Terraria.GameContent.ItemDropRules;
 
 namespace AbyssOverhaul.Content.NPCs
 {
@@ -201,6 +204,11 @@ namespace AbyssOverhaul.Content.NPCs
 
 
             }
+        }
+
+        public override void ModifyNPCLoot(NPCLoot npcLoot)
+        {
+            npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<PetriDishItem>(), 10, 1, 1));
         }
     }
 }

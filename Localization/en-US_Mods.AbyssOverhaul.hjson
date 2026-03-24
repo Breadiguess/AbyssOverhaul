@@ -93,4 +93,5 @@ Projectiles: {
 	ImpactBomb.DisplayName: Impact Bomb
 	ImpactBomb_Explosion.DisplayName: Impact Bomb_ Explosion
 	SurveyUnitProjectile.DisplayName: Survey Unit Projectile
+	MicrobeGlob.DisplayName: Microbe Glob
 }
