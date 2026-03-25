@@ -2,6 +2,8 @@
 using AbyssOverhaul.Core.Systems;
 using System.IO;
 using Terraria.DataStructures;
+using Terraria.Localization;
+using Terraria.WorldBuilding;
 
 namespace AbyssOverhaul.Core.ModPlayers
 {
@@ -143,7 +145,11 @@ namespace AbyssOverhaul.Core.ModPlayers
 
             if (PressureResidue >= 80f && Main.myPlayer == Player.whoAmI)
             {
-                Player.Hurt(PlayerDeathReason.ByCustomReason($"{Player.name} was crushed by the abyssal pressure."), 9999, 0, dodgeable: false);
+                var val = Main.rand.Next(0, 6);
+                var text = NetworkText.FromKey($"Mods.{Mod.Name}.DeathMessages.Pulverize{val}", Player.name);
+
+               
+                Player.Hurt(PlayerDeathReason.ByCustomReason(text), 9999, 0, dodgeable: false);
                 PressureResidue = 0f;
             }
 

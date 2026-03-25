@@ -8,6 +8,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using Terraria.GameContent;
+using Terraria.Localization;
 
 namespace AbyssOverhaul.Content.BehaviorOverrides.GooGazerNPC
 {
@@ -33,6 +34,16 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.GooGazerNPC
         }
         public PixelLayer PixelLayer => PixelLayer.AboveProjectiles;
 
+        public override void ModifyHitPlayer(Player target, ref Player.HurtModifiers modifiers)
+        {
+            var val = Main.rand.Next(0, 6);
+            var text = NetworkText.FromKey($"Mods.{Mod.Name}.DeathMessages.Pulverize{val}", target.name);
+
+            modifiers = new Player.HurtModifiers
+            {
+                DamageSource = PlayerDeathReason.ByCustomReason(text)
+            };
+        }
         public override bool PreDraw(ref Color lightColor)
         {
             // Utils.DrawRect(Main.spriteBatch, Projectile.Hitbox, Color.White);

@@ -62,7 +62,7 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.ReaperShark
 
 
 
-            return true;
+            return false;
         }
 
 
@@ -71,7 +71,7 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.ReaperShark
         {
             DrawDreadlocks(spriteBatch);
             DrawArms();
-            return false;
+            return true;
         }
         void DrawArms()
         {
