@@ -21,11 +21,11 @@ AnchorageItem: {
 }
 
 SurveyUnit_Item: {
-	DisplayName: Survey Unit_ Item
+	DisplayName: Survey Unit
 	Tooltip: ""
 }
 
 PetriDishItem: {
-	DisplayName: Petri Dish Item
-	Tooltip: ""
+	DisplayName: Petri Dish
+	Tooltip: "Ranged weapons have a 50% chance to also fire a glob of cyanobacteria."
 }
