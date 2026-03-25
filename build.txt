@@ -1,5 +1,5 @@
 displayName = Calamity: Hadopelagia
 author = Bread, Crispy
 version = 0.1
-modReferences = CalamityMod, BreadLibrary, Daybreak
+modReferences = CalamityMod, BreadLibrary, Daybreak, SubworldLibrary
 dllReferences = Wayfarer
