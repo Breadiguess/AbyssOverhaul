@@ -33,7 +33,7 @@ namespace AbyssOverhaul.Core.Subworlds
             else
             {
                // if (PlayerIntersectsTileRect(player, SubworldExitZoneTiles))
-                //        AbyssTransitionSystem.RequestExit();
+                        AbyssTransitionSystem.RequestExit();
             }
         }
 

@@ -43,14 +43,12 @@ namespace AbyssOverhaul.Core.Subworlds
                 return;
             }
 
-            // Optional: skip the map-save portion too for the next entry transition.
             c.Index -= 3;
             ILLabel afterMapSave = cc.DefineLabel();
             c.EmitDelegate(ShouldSkipEntryMapSave);
             c.Emit(OpCodes.Brtrue, afterMapSave);
             cc.MarkLabel(afterMapSave);
 
-            // Skip the actual protected file write for the next entry transition.
             ILLabel afterPlayerWrite = ccc.DefineLabel();
             cc.EmitDelegate(ShouldSkipEntryPlayerWrite);
             cc.Emit(OpCodes.Brtrue, afterPlayerWrite);
