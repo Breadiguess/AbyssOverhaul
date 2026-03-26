@@ -1,10 +1,13 @@
 ﻿using AbyssOverhaul.Core.ModPlayers;
+using AbyssOverhaul.Core.Subworlds;
+using Microsoft.Xna.Framework;
 using Terraria.DataStructures;
 
 namespace AbyssOverhaul.Content
 {
     internal class DebugPlayer : PlayerDrawLayer
     {
+
         public override Position GetDefaultPosition()
         {
             return new BeforeParent(PlayerDrawLayers.ArmOverItem);
@@ -24,9 +27,7 @@ namespace AbyssOverhaul.Content
                 msg += $"Layer: {a.CurrentLayer.FullName}\n";
 
             msg += $"";
-            //Main.NewText(player.Abyss().GlobalDepthInterpolant);
-            
-            if(a.CurrentLayer is not null)
+            if (a.CurrentLayer is not null)
             Utils.DrawBorderString(Main.spriteBatch, msg, player.Center - Main.screenPosition + Vector2.UnitY * 60, Color.White, 0.5f);
         }
     }
