@@ -2,11 +2,11 @@
 using AbyssOverhaul.Common.Brain.Contexts;
 using AbyssOverhaul.Common.Brain.SharedModules;
 using AbyssOverhaul.Common.Brain.SharedSensors;
+using AbyssOverhaul.Core.DataStructures;
+using AbyssOverhaul.Core.Graphics;
 using BreadLibrary.Core;
-using BreadLibrary.Core.SoftBodySim;
 using BreadLibrary.Core.Verlet;
 using CalamityMod.Tiles.Abyss;
-using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.Localization;
 
@@ -18,8 +18,10 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Brooding_Oarfish
         public override int NPCType => ModContent.NPCType<OarfishHead>();
 
 
+        public EvenlySpacedTrail BodyTrail;
+
         public ModularNpcBrain<CreatureNpcContext> NpcBrain;
-        public VerletChain Body;
+
         private List<ExtraNPCSegment> _ExtraHitBoxes;
         public List<VerletChain> MouthThings;
 
@@ -38,23 +40,21 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Brooding_Oarfish
         }
         private void Initialize(NPC NPC)
         {
-            Body = new VerletChain(20, 30, NPC.Center);
-
+            BodyTrail = new EvenlySpacedTrail(40, 10, 10);
+            BodyTrail.Reset(NPC.Center);
 
             _ExtraHitBoxes = new List<ExtraNPCSegment>();
-            for (int i = 0; i < Body.Positions.Length; i++)
-                _ExtraHitBoxes.Add(new ExtraNPCSegment(new(0, 0, 30, 30)));
+            int HitboxSize = 30;
+            int HitboxStride = 2;
+            for (int pointIndex = 1; pointIndex < BodyTrail.Points.Length; pointIndex += HitboxStride)
+                _ExtraHitBoxes.Add(new ExtraNPCSegment(new Rectangle(0, 0, HitboxSize, HitboxSize)));
 
-            for (int i = 0; i < Body.Positions.Length; i++)
+            MouthThings = new List<VerletChain>
             {
-                Body.Positions[i] = NPC.Center;
-                Body.OldPositions[i] = NPC.Center;
-            }
+                new VerletChain(20, 2, NPC.Center),
+                new VerletChain(20, 2, NPC.Center)
+            };
 
-            MouthThings = new List<VerletChain>();
-            MouthThings.Add(new(10, 2, NPC.Center));
-
-            MouthThings.Add(new(10, 2, NPC.Center));
 
 
             NpcBrain = new(new());
@@ -72,7 +72,7 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Brooding_Oarfish
 
             });
             NpcBrain.Sensors.Add(new CreatureVitalsSensor<CreatureNpcContext>());
-           
+
         }
         public ref List<ExtraNPCSegment> ExtraHitBoxes()
         {
@@ -89,44 +89,35 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Brooding_Oarfish
 
         public int Time(NPC npc)
         {
-            
+
             return (int)npc.ai[0];
         }
         public override bool OverrideAI(NPC NPC)
         {
-            if (Body is null || _ExtraHitBoxes is null)
+            if (BodyTrail is null || _ExtraHitBoxes is null)
             {
                 Initialize(NPC);
+
             }
 
             NPC.noGravity = NPC.wet;
             NPC.GravityMultiplier *= 0;
+            BodyTrail.Update(NPC.Center);
 
-            Body.Simulate(Vector2.zeroVector, NPC.Center, NPC.gravity, 0.95f, collideWithTiles: false);
 
-            for (int i = 0; i < _ExtraHitBoxes.Count; i++)
-            {
-                _ExtraHitBoxes[i].Hitbox.Location = (Body.Positions[i] - _ExtraHitBoxes[i].Hitbox.Size() / 2).ToPoint();
-            }
+
+
 
             NpcBrain.Update(NPC);
-            //NPC.velocity = NPC.DirectionTo(Main.MouseWorld) * 3;
+            //x1NPC.velocity = NPC.DirectionTo(Main.MouseWorld) * 3;
             NPC.rotation = NPC.velocity.ToRotation();
 
             UpdateVisuals(NPC);
 
 
 
-            NPC.ai[0]++;
 
-            if (NPC.ai[0] % 60==0)
-            {
-                Vector2 SpawnPos =
-                Body.Positions[Body.Positions.Length - 4];
-                Projectile a = Projectile.NewProjectileDirect(NPC.GetSource_FromThis(), SpawnPos, Vector2.zeroVector, ModContent.ProjectileType<FishFeed>(), 1, 0);
-                
-            }
-
+            SyncExtraHitboxes();
 
             return true;
         }
@@ -136,13 +127,27 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Brooding_Oarfish
 
             for (int i = 0; i < MouthThings.Count; i++)
             {
-                MouthThings[i].Simulate(Vector2.zeroVector, NPC.Center, 0, 0.4f, collideWithTiles: false);
-                Lighting.AddLight(MouthThings[i].Positions[^1], r:1, 0.1f, 0.1f);
+                MouthThings[i].Simulate(Vector2.zeroVector, NPC.Center + new Vector2(i % 2 * 10, -10).RotatedBy(NPC.rotation), 1, 0.4f, collideWithTiles: false);
+                Lighting.AddLight(MouthThings[i].Positions[^1], r: 1, 0.1f, 0.1f);
             }
 
 
-            
 
+
+        }
+        private void SyncExtraHitboxes()
+        {
+            int hitboxIndex = 0;
+
+            for (int pointIndex = 1; pointIndex < BodyTrail.Points.Length && hitboxIndex < _ExtraHitBoxes.Count; pointIndex += HitboxStride, hitboxIndex++)
+            {
+                _ExtraHitBoxes[hitboxIndex].Hitbox = new Rectangle(
+                    (int)(BodyTrail.Points[pointIndex].X - HitboxSize * 0.5f),
+                    (int)(BodyTrail.Points[pointIndex].Y - HitboxSize * 0.5f),
+                    HitboxSize,
+                    HitboxSize
+                );
+            }
         }
 
         #region DrawCode
@@ -163,7 +168,7 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Brooding_Oarfish
 
 
                     Color t = Color.Azure;
-                    Utilities.DrawLineBetter(spriteBatch, start, end, t, 12);
+                    Utilities.DrawLineBetter(spriteBatch, start, end, t, 3);
                 }
 
             }
@@ -177,76 +182,113 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Brooding_Oarfish
 
         }
 
-        void DrawEggSack()
-        {
-            if (Body is null)
-                return;
 
-
-            Texture2D tex = ModContent.Request<Texture2D>("AbyssOverhaul/Content/BehaviorOverrides/Brooding_Oarfish/BroodingOarfish_Sack").Value;
-            Vector2 DrawPos =
-                Body.Positions[Body.Positions.Length - 4] - Main.screenPosition;
-            float rot =
-                Body.Positions[Body.Positions.Length - 4].AngleTo(
-                Body.Positions[Body.Positions.Length - 3]);
-            Main.EntitySpriteDraw(tex, DrawPos, null, Color.White, rot, tex.Size() / 2, 1, 0);
-
-        }
 
         void DrawDebuglinesToTiles(NPC NPC, SpriteBatch spriteBatch)
         {
-            Utils.DrawLine(spriteBatch,NPC.Center, NpcBrain.Context.FoundTileWorld, Color.White);
+            Utils.DrawLine(spriteBatch, NPC.Center, NpcBrain.Context.FoundTileWorld, Color.White);
         }
+
+        BasicEffect ropeEffect;
+        VertexPositionColorTexture[] vertex;
+        short[] Thing;
+        private int HitboxStride = 2;
+        private int HitboxSize = 30;
 
         public override bool PreDraw(NPC NPC, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             if (NPC.IsABestiaryIconDummy)
                 return true;
-            if (_ExtraHitBoxes is null || Body is null)
+            if (_ExtraHitBoxes is null || BodyTrail is null)
                 return false;
 
-
+            for (int i = 0; i < BodyTrail.Points.Length - 1; i++)
+            {
+                //Utilities.DrawLineBetter(spriteBatch, BodyTrail.Points[i], BodyTrail.Points[i + 1], drawColor, 4);
+            }
 
             for (int i = 0; i < _ExtraHitBoxes.Count; i++)
             {
-                Utils.DrawRect(spriteBatch, _ExtraHitBoxes[i].Hitbox, Color.White);
+                //Utils.DrawRect(spriteBatch, _ExtraHitBoxes[i].Hitbox, Color.White);
             }
 
-            for (int i = 0; i < Body.Positions.Length - 1; i++)
+
+            var thing = MouthThings[0];
+
+            for (int i = 0; i < thing.Positions.Length - 1; i++)
             {
-                Vector2 start = Body.Positions[i];
-                Vector2 end = Body.Positions[i + 1];
 
-                Utilities.DrawLineBetter(spriteBatch, start, end, Color.White, 40);
+                Vector2 start = thing.Positions[i];
+                Vector2 end = thing.Positions[i + 1];
+
+
+                Color t = Color.Azure;
+                Utilities.DrawLineBetter(spriteBatch, start, end, t, 3);
             }
-            for (int i = 0; i < Body.Positions.Length-1; i++)
+
+            EnsureChainEffect();
+            ropeEffect.World = Matrix.Identity;
+            ropeEffect.View = Main.GameViewMatrix.TransformationMatrix;
+            ropeEffect.projection = Matrix.CreateOrthographicOffCenter(
+                0f,
+                Main.screenWidth,
+                Main.screenHeight,
+                0f,
+                -1f, 1);
+
+            Vector2[] Pos = (Vector2[])BodyTrail.Points.Clone();
+
+            EasyPrimRope.DrawSimpleChainPrimitive(ropeEffect, ref Thing, ref vertex, EasyPrimRope.SubdividePointsCatmullRom(Pos, 12), ropeEffect.Texture.Height, drawColor, SamplerState.PointWrap, ropeEffect.Texture.Width, useLighting:true);
+
+            var TailTex = ModContent.Request<Texture2D>(this.GetPath() + "_Tail").Value;
+            float angle = Pos[Pos.Length - 1].AngleFrom(Pos[Pos.Length - 2]) - MathHelper.PiOver2;
+            Main.EntitySpriteDraw(TailTex, BodyTrail.Points[^1] - screenPos + new Vector2(-5, TailTex.Height / 2).RotatedBy(angle), null, drawColor, angle, TailTex.Size() / 2f, 1, 0);
+
+
+
+
+            var tex = TextureAssets.Npc[this.NPCType].Value;
+            Main.EntitySpriteDraw(tex, NPC.Center - screenPos - new Vector2(0, 4).RotatedBy(NPC.rotation), null, drawColor, NPC.rotation + MathHelper.PiOver2, tex.Size() / 2f, 1, SpriteEffects.None);
+
+            var thing2 = MouthThings[1];
+
+            for (int i = 0; i < thing.Positions.Length - 1; i++)
             {
-                Vector2 DrawPos = Body.Positions[i] - Main.screenPosition;
 
-                var tex = i == 0 ? TextureAssets.Npc[this.NPCType].Value : BodyTex.Value;
+                Vector2 start = thing.Positions[i];
+                Vector2 end = thing.Positions[i + 1];
 
-                float rotation = i == 0 ? NPC.rotation : Body.Positions[i].AngleFrom(Body.Positions[i + 1]) ;
 
-                Main.EntitySpriteDraw(tex, DrawPos, null, drawColor, rotation + MathHelper.PiOver2, tex.Size() / 2, NPC.scale, 0);
+                Color t = Color.Azure;
+                Utilities.DrawLineBetter(spriteBatch, start, end, t, 3);
             }
-            Main.EntitySpriteDraw(TailTex.Value, Body.Positions[^1] - Main.screenPosition, null, drawColor, Body.Positions[^1].AngleFrom(Body.Positions[Body.Positions.Length - 2]) - MathHelper.PiOver2, TailTex.Value.Size()/2f, 1, 0);
+
+            DrawDetectionCone(NPC.Center - screenPos + new Vector2(10, 0).RotatedBy(NPC.rotation), NPC.rotation);
 
 
-                //NpcBrain.DrawContextDebug(spriteBatch, NPC.Center - screenPos);
-
-
-
-
-
-
-                DrawTendrils(NPC, spriteBatch);
-
-            DrawDetectionCone(NPC.Center - screenPos, NPC.rotation);
-            DrawEggSack();
-
-            DrawDebuglinesToTiles(NPC, spriteBatch);
+            // DrawDebuglinesToTiles(NPC, spriteBatch);
             return false;
         }
+
+        private void EnsureChainEffect()
+        {
+            if (Main.dedServ)
+                return;
+
+            if (ropeEffect is null || ropeEffect.IsDisposed)
+            {
+                ropeEffect = new BasicEffect(Main.instance.GraphicsDevice)
+                {
+                    VertexColorEnabled = true,
+                    TextureEnabled = true
+
+                };
+                ropeEffect.Texture = ModContent.Request<Texture2D>(this.GetPath() + "_Body").Value;
+
+
+            }
+        }
+
         #endregion
     }
 #pragma warning restore CS8618 

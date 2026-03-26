@@ -11,7 +11,11 @@ namespace AbyssOverhaul.Core.Utilities
             distanceToClosestPredator = 9999999f;
             for (int i = 0; i < Main.maxNPCs; i++)
             {
-                if (!Main.npc[i].active || !Main.npc[i].Ecology().Traits.Contains(NpcTraitFlags.Predator))
+                if (!Main.npc[i].active)
+                    
+                    continue;
+
+                if (!EcologyRegistry.HasParticipant(npc.type))
                     continue;
 
                 float extraDistance = (Main.npc[i].width / 2) + (Main.npc[i].height / 2);

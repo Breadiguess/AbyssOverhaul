@@ -17,3 +17,5 @@ VoidstoneMantle_Item: {
 	DisplayName: Voidstone Mantle_ Item
 	Tooltip: ""
 }
+
+SmoothedBrineCrystal.MapEntry: Smoothed Brine Crystal

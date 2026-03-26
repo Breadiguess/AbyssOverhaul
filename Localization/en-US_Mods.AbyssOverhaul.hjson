@@ -73,6 +73,7 @@ NPCs: {
 	BoxJellyfish.DisplayName: Box Jellyfish
 	CarcassLeechNPC.DisplayName: Carcass Leech
 	HagFish.DisplayName: Hag Fish
+	SeaBunny.DisplayName: Sea Bunny
 }
 
 Buffs: {

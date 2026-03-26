@@ -42,7 +42,7 @@ namespace AbyssOverhaul.Content.Layers.TenebrousMarsh
         private static int PlantyMush => ModContent.TileType<PlantyMush>();
         private static int MantleGravelType => ModContent.TileType<PyreMantle>();
         private static int TenebrisType => ModContent.TileType<Tenebris_Tile>();
-        private static int BrineCrystalTile => ModContent.TileType<BrineCrystal_Tile>();
+        private static int BrineCrystalTile => ModContent.TileType<SmoothedBrineCrystal>();
         private static int BaroRoot => TileID.LivingMahogany;
 
         private enum ShelfAnchor
