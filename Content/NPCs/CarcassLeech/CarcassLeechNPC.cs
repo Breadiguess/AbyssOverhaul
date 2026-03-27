@@ -7,7 +7,7 @@ using CalamityMod;
 
 namespace AbyssOverhaul.Content.NPCs.CarcassLeech
 {
-    internal class CarcassLeechNPC : ModNPC
+    internal class CarcassLeechNPC : ModNPC, IEcologyParticipant
     {
         public ModularNpcBrain<SchoolingNpcContext> NpcBrain;
         public override void SetStaticDefaults()
@@ -190,6 +190,11 @@ namespace AbyssOverhaul.Content.NPCs.CarcassLeech
         public override void FindFrame(int frameHeight)
         {
             base.FindFrame(frameHeight);
+        }
+
+        public void SetupEcology(NPC npc, EcologyGlobalNPC ecology)
+        {
+            ecology.Traits.Append(NpcTraitFlags.Scavager);
         }
     }
 }

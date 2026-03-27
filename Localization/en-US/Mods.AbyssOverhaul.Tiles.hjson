@@ -19,3 +19,13 @@ VoidstoneMantle_Item: {
 }
 
 SmoothedBrineCrystal.MapEntry: Smoothed Brine Crystal
+
+SmoothedBrineCrystal_Item: {
+	DisplayName: Smoothed Brine Crystal_ Item
+	Tooltip: ""
+}
+
+Tenebris_Item: {
+	DisplayName: Tenebris_ Item
+	Tooltip: ""
+}

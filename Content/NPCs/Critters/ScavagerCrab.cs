@@ -10,7 +10,7 @@ using Wayfarer.Data;
 
 namespace AbyssOverhaul.Content.NPCs.Critters
 {
-    internal class ScavagerCrab : ModNPC
+    internal class ScavagerCrab : ModNPC, IEcologyParticipant
     {
         public ModularNpcBrain<NpcContext> Brain;
         public NpcPathAgent PathAgent;
@@ -113,15 +113,7 @@ namespace AbyssOverhaul.Content.NPCs.Critters
             NPC.spriteDirection = NPC.velocity.X >= 0f ? 1 : -1;
 
         }
-
-
-        private static Point GetNavGroundTile(NPC npc)
-        {
-            return new Point(
-                npc.Center.ToTileCoordinates().X,
-                (int)((npc.Bottom.Y + 2f) / 16f)
-            );
-        }
+        
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
 
@@ -133,6 +125,11 @@ namespace AbyssOverhaul.Content.NPCs.Critters
             WayfarerAPI.DebugRenderNavMesh(PathAgent.Handle, spriteBatch);
 
             return base.PreDraw(spriteBatch, screenPos, drawColor);
+        }
+
+        public void SetupEcology(NPC npc, EcologyGlobalNPC ecology)
+        {
+            ecology.Traits.Append(NpcTraitFlags.Scavager);
         }
     }
 }

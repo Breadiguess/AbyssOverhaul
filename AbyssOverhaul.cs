@@ -19,6 +19,7 @@ global using Terraria.ModLoader;
 global using Terraria.WorldBuilding;
 global using Terraria.DataStructures;
 global using static AbyssOverhaul.AbyssOverhaul;
+global using AbyssOverhaul.Core.Ecosystem.Ecology;
 using System.Runtime.CompilerServices;
 using Wayfarer.API;
 

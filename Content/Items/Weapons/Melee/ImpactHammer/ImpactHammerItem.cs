@@ -89,6 +89,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
             CreateRecipe()
                 .AddIngredient<MysteriousCircuitry>(12)
                 .AddIngredient<DubiousPlating>(12)
+                .AddIngredient<PerennialBar>(18)
                 //.AddIngredient(ItemID. TIER-APPROPRIATE MATERIAL ,12)
                 //.AddCondition(ArsenalTierGatedRecipe.ConstructRecipeCondition( THE NEW TIER THAT WE MIGHT ADD, out Func<bool> condition), condition)
                 .AddTile(TileID.MythrilAnvil);

@@ -22,7 +22,6 @@ namespace AbyssOverhaul.Content.NPCs.DeepSnapperNPC
         {
             ecology.Aggression = 0;
             
-            ecology.Traits.Append(NpcTraitFlags.AmbushPredator);
             ecology.Traits.Append(NpcTraitFlags.Schooling);
         }
         private enum DeepSnapperState

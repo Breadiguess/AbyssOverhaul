@@ -8,30 +8,39 @@ namespace AbyssOverhaul.Core.Utilities
         public static NPC FindClosestAbyssPredator(this NPC npc, out float distanceToClosestPredator)
         {
             NPC closestPredator = null;
-            distanceToClosestPredator = 9999999f;
+            float closestDistSq = float.MaxValue;
+
             for (int i = 0; i < Main.maxNPCs; i++)
             {
-                if (!Main.npc[i].active)
-                    
+                NPC other = Main.npc[i];
+
+                if (!other.active || other.whoAmI == npc.whoAmI)
                     continue;
 
-                if (!EcologyRegistry.HasParticipant(npc.type))
+                if (!EcologyRegistry.HasParticipant(other.type))
                     continue;
 
-                float extraDistance = (Main.npc[i].width / 2) + (Main.npc[i].height / 2);
-                extraDistance *= extraDistance;
+                var eco = other.Ecology();
+                if (!eco.HasTrait(NpcTraitFlags.Predator))
+                    continue;
 
-                bool canHit = Collision.CanHit(npc.Center, 1, 1, Main.npc[i].Center, 1, 1);
-                if (Vector2.DistanceSquared(npc.Center, Main.npc[i].Center) < (distanceToClosestPredator + extraDistance) && canHit)
-                {
-                    distanceToClosestPredator = Vector2.DistanceSquared(npc.Center, Main.npc[i].Center);
-                    closestPredator = Main.npc[i];
-                }
+                float extraDistance = (other.width * 0.5f) + (other.height * 0.5f);
+                float allowedDistSqPadding = extraDistance * extraDistance;
+
+                Vector2 diff = other.Center - npc.Center;
+                float distSq = diff.LengthSquared();
+
+                if (distSq >= closestDistSq + allowedDistSqPadding)
+                    continue;
+
+                if (!Collision.CanHit(npc.Center, 1, 1, other.Center, 1, 1))
+                    continue;
+
+                closestDistSq = distSq;
+                closestPredator = other;
             }
 
-            // Apply a square root on the squared distance.
-            distanceToClosestPredator = MathF.Sqrt(distanceToClosestPredator);
-
+            distanceToClosestPredator = closestPredator is null ? float.MaxValue : MathF.Sqrt(closestDistSq);
             return closestPredator;
         }
 

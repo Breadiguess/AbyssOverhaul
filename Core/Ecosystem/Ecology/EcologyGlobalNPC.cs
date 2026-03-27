@@ -12,7 +12,8 @@ namespace AbyssOverhaul.Core.Ecosystem.Ecology
         Prey = 1 << 1,
         Schooling = 1 << 2,
         AmbushPredator = 1 << 3,
-        Territorial = 1 << 4
+        Territorial = 1 << 4,
+        Scavager = 1 << 5,
     }
 //god help me i am writing this on my phone
 

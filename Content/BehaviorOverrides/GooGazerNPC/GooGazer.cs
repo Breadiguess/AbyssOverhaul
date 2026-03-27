@@ -16,8 +16,12 @@ using Terraria.Localization;
 
 namespace AbyssOverhaul.Content.BehaviorOverrides.GooGazerNPC
 {
-    internal class GooGazer : NPCBehaviorOverride
+    internal class GooGazer : NPCBehaviorOverride, IEcologyParticipant
     {
+        public void SetupEcology(NPC npc, EcologyGlobalNPC ecology)
+        {
+            ecology.Traits.Append(NpcTraitFlags.Prey);
+        }
         public override int NPCType => ModContent.NPCType<Laserfish>();
         public override string TexturePath => this.GetPath();
 
@@ -303,6 +307,7 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.GooGazerNPC
          
             return false;
         }
+
     }
     public sealed class FleeThreatModule : INpcModule<GooGazerContext>
     {
