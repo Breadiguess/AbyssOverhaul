@@ -24,3 +24,8 @@ SurveyUnit_Item: {
 	DisplayName: Survey Unit_ Item
 	Tooltip: ""
 }
+
+DebugSubworldEntrance: {
+	DisplayName: Debug Subworld Entrance
+	Tooltip: ""
+}

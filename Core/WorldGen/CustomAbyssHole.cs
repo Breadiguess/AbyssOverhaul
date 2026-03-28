@@ -117,7 +117,41 @@ namespace CalamityMod.World
             Polish(abyssMinX, abyssMaxX, abyssTopY, abyssBottomY, settings);
             ApplyAbyssMaterials(abyssMinX, abyssMaxX, abyssTopY, abyssBottomY);
         }
+        public static void PlaceAbyssFromCurrentBounds()
+        {
+            PlaceAbyssFromCurrentBounds(new TrenchSettings()
+            {
+                SideWallThickness = 10,
+                EntryRadius = 20,
+                MidRadius = 34,
+                BottomRadius = 56,
+                SmoothTiles = true,
+                RemoveSmallIslands = true
+            });
+        }
 
+        public static void PlaceAbyssFromCurrentBounds(TrenchSettings settings)
+        {
+            if (!AbyssGenUtils.Initialized)
+                throw new InvalidOperationException("AbyssGenUtils must be initialized before calling PlaceAbyssFromCurrentBounds.");
+
+            int abyssMinX = AbyssGenUtils.MinX;
+            int abyssMaxX = AbyssGenUtils.MaxX;
+            int abyssTopY = AbyssGenUtils.TopY;
+            int abyssBottomY = AbyssGenUtils.BottomY;
+            int abyssChasmX = AbyssGenUtils.ChasmX;
+
+            AtLeftSideOfWorld = AbyssGenUtils.OnLeft;
+            AbyssWidth = abyssMaxX - abyssMinX;
+            AbyssChasmBottom = abyssBottomY;
+
+            FillContainer(abyssMinX, abyssMaxX, abyssTopY, abyssBottomY, settings);
+            CarveMainTrench(abyssMinX, abyssMaxX, abyssTopY, abyssBottomY, abyssChasmX, settings);
+            FloodOpenSpace(abyssMinX, abyssMaxX, abyssTopY, abyssBottomY);
+            RemoveSmallRoof(abyssTopY, abyssMinX, abyssMaxX);
+            Polish(abyssMinX, abyssMaxX, abyssTopY, abyssBottomY, settings);
+            ApplyAbyssMaterials(abyssMinX, abyssMaxX, abyssTopY, abyssBottomY);
+        }
         private static void RemoveSmallRoof(int abyssTopY, int abyssMinX, int abyssMaxX)
         {
             Point Center = new Vector2(AbyssGenUtils.ChasmX, abyssTopY).ToPoint();

@@ -1,4 +1,7 @@
 ﻿using AbyssOverhaul.Core.Subworlds.TransitionScreen;
+using AbyssOverhaul.Core.Utilities;
+using AbyssOverhaul.Core.WorldGen;
+using CalamityMod.World;
 using Microsoft.Xna.Framework;
 using SubworldLibrary;
 using Terraria;
@@ -7,21 +10,31 @@ using Terraria.ID;
 using Terraria.IO;
 using Terraria.ModLoader;
 using Terraria.WorldBuilding;
+using static CalamityMod.World.CustomAbyssHole;
 
 namespace AbyssOverhaul.Core.Subworlds
 {
     internal class AbyssSubworld : Subworld
     {
-        public override int Width => 2400;
-        public override int Height => 1400;
+        public override int Width => 1000;
+        public override int Height => 2400;
 
         public override bool ShouldSave => true;
 
+        public override void Load()
+        {
+            On_WorldGen.oceanDepths += FixOceanWaterTakingPriority;
+          
+        }
+        private bool FixOceanWaterTakingPriority(On_WorldGen.orig_oceanDepths orig, int x, int y) =>
+            orig(x, y) && !SubworldSystem.IsActive<AbyssSubworld>();
         // Usually what you want for subworlds.
         // No loading text at all.
 
         public override void DrawMenu(GameTime gameTime)
         {
+
+            base.DrawMenu(gameTime);
             Player source = Main.LocalPlayer;
             if (source is null || !source.active || !MenuSwimCloneSystem.Initialized)
                 return;
@@ -104,9 +117,8 @@ namespace AbyssOverhaul.Core.Subworlds
             return true;       // suppress vanilla music choice
         }
 
-        // This is the fixed landing point inside the subworld.
-        // Put it in your entrance chamber / staging pocket.
-        public const int EntryTileX =2400/2;
+        // This is the fixed landing point inside the subworld.x
+        public const int EntryTileX = 1000 / 2;
         public const int EntryTileY = 90;
         private float _swimTime;
         private double _bodyFrameCounter;
@@ -116,12 +128,48 @@ namespace AbyssOverhaul.Core.Subworlds
 
         public static Vector2 EntryWorld => new(EntryTileX * 16f, EntryTileY * 16f);
 
-        public override List<GenPass> Tasks => new()
+        public override List<GenPass> Tasks => BuildAbyssTasks();
+
+        private static List<GenPass> BuildAbyssTasks()
         {
-            new AbyssBootstrapPass(),
-            // Put your real abyss generation passes here.
-            // Do NOT keep the old "fill everything with dirt" demo pass.
-        };
+            List<GenPass> tasks = new()
+            {
+                new AbyssBootstrapPass(),
+                new AbyssSubworldBoundsPass(),
+                new AbyssSubworldAbyssPass()
+            };
+
+            foreach (var layer in AbyssLayerRegistry.Layers)
+            {
+                layer.Tasks.Clear();
+                layer.ModifyGenTasks();
+
+                foreach (var entry in layer.Tasks)
+                {
+                    string passName = $"{layer.GetType().Name}: {entry.Key}";
+
+                    tasks.Add(new PassLegacy(
+                        passName,
+                        (progress, config) => entry.Value(layer, progress, config)
+                    ));
+                }
+            }
+
+            tasks.Add(new PassLegacy("Flood The Sea", (progress, config) =>
+            {
+                progress.Message = "Flooding the abyss";
+                AbyssWorldGenHelper.FloodOpenSpace(
+                    AbyssGenUtils.AbyssWorldMinX,
+                    AbyssGenUtils.AbyssWorldMaxX,
+                    AbyssGenUtils.TopY,
+                    AbyssGenUtils.BottomY
+                );
+            }));
+
+            tasks.Add(new AbyssEntryPocketPass());
+
+            return tasks;
+        }
 
         public override void OnLoad()
         {
@@ -142,18 +190,79 @@ namespace AbyssOverhaul.Core.Subworlds
         protected override void ApplyPass(GenerationProgress progress, GameConfiguration configuration)
         {
             progress.Message = "Stabilizing abyss entrance";
-
-            // Set the world spawn so first entry lands somewhere intentional.
             Main.spawnTileX = AbyssSubworld.EntryTileX;
             Main.spawnTileY = AbyssSubworld.EntryTileY;
-
-            // Minimal bootstrap only.
-            // Replace this with your real gen later.
-            // The important part is: no giant full-world fill loop here.
         }
     }
 
-    // Keep your subworld-only updates separate if you need them.
+    internal sealed class AbyssSubworldBoundsPass : GenPass
+    {
+        public AbyssSubworldBoundsPass() : base("Abyss bounds", 1f) { }
+
+        protected override void ApplyPass(GenerationProgress progress, GameConfiguration configuration)
+        {
+            progress.Message = "Defining abyss bounds";
+
+            const int sidePadding = 10;
+            const int topPadding = 10;
+            const int bottomPadding = 14;
+
+            int minX = sidePadding;
+            int maxX = Main.maxTilesX - 1 - sidePadding;
+            int topY = topPadding;
+            int bottomY = Main.maxTilesY - 1 - bottomPadding;
+            int chasmX = Main.maxTilesX / 2;
+
+            AbyssGenUtils.SetBounds(
+                minX,
+                maxX,
+                topY,
+                bottomY,
+                chasmX,
+                false,
+                ModContent.GetInstance<AbyssOverhaul>()
+            );
+        }
+    }
+
+    internal sealed class AbyssSubworldAbyssPass : GenPass
+    {
+        public AbyssSubworldAbyssPass() : base("Abyss", 10f) { }
+
+        protected override void ApplyPass(GenerationProgress progress, GameConfiguration configuration)
+        {
+            progress.Message = "Generating abyss";
+            CustomAbyssHole.PlaceAbyssFromCurrentBounds();
+        }
+    }
+
+    internal sealed class AbyssEntryPocketPass : GenPass
+    {
+        public AbyssEntryPocketPass() : base("Entry pocket", 1f) { }
+
+        protected override void ApplyPass(GenerationProgress progress, GameConfiguration configuration)
+        {
+            progress.Message = "Opening entry pocket";
+
+            int x = AbyssSubworld.EntryTileX;
+            int y = AbyssSubworld.EntryTileY;
+
+            AbyssWorldGenHelper.CarveBlob(x, y, 44, 20, 0.35f, true);
+
+            AbyssWorldGenHelper.CarveTunnelBlobLineSmooth(
+                new Vector2(x, y + 10),
+                new Vector2(AbyssGenUtils.ChasmX, AbyssGenUtils.TopY + 24),
+                12,
+                16,
+                0.2f,
+                true
+            );
+
+            AbyssWorldGenHelper.FloodOpenSpace(x - 60, x + 60, y - 30, y + 45);
+            AbyssWorldGenHelper.ReframeArea(x - 65, x + 65, y - 35, y + 50);
+        }
+    }
+
     internal sealed class AbyssSubworldUpdateSystem : ModSystem
     {
         public override void PreUpdateWorld()

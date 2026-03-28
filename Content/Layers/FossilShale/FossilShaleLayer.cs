@@ -32,8 +32,8 @@ namespace AbyssOverhaul.Content.Layers.FossilShale
                     bottomY = Instance.EndY,
                     (ushort)ModContent.TileType<CarbonShale_Tile>(),
                     (ushort)ModContent.WallType<CarbonShale_Wall>(),
-                    mainChamberCount: 4,
-                    extraChamberCount: 13
+                    mainChamberCount: 12,
+                    extraChamberCount: 33
                 );
 
             });

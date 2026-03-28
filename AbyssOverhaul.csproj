@@ -11,4 +11,12 @@
     <Publicize Include="FNA" IncludeCompilerGeneratedMembers="false" IncludeVirtualMembers="false" />
     <Publicize Include="ReLogic" IncludeCompilerGeneratedMembers="false" IncludeVirtualMembers="false" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Content\Items\debug\DebugSubworldEntrance.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Content\Items\debug\DebugSubworldEntrance.cs" />
+  </ItemGroup>
 </Project>
