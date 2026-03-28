@@ -23,17 +23,17 @@ namespace AbyssOverhaul.Core.Subworlds
                 if(player.GetModPlayer<PressurePlayer>().InPressureZone)//if (PlayerIntersectsTileRect(player, ))
                 {
 
-                    AbyssEntrySaveSkipSystem.SkipNextEntryPlayerBackup = true;
+                   // AbyssEntrySaveSkipSystem.SkipNextEntryPlayerBackup = true;
                     bool success = SubworldSystem.Enter<AbyssSubworld>();
 
-                    if (!success)
-                        AbyssEntrySaveSkipSystem.SkipNextEntryPlayerBackup = false;
+                    //if (!success)
+                    //    AbyssEntrySaveSkipSystem.SkipNextEntryPlayerBackup = false;
                 }
             }
             else
             {
                // if (PlayerIntersectsTileRect(player, SubworldExitZoneTiles))
-                        AbyssTransitionSystem.RequestExit();
+                      //  AbyssTransitionSystem.RequestExit();
             }
         }
 

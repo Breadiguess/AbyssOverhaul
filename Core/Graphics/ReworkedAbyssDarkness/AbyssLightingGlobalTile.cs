@@ -11,8 +11,10 @@ namespace AbyssOverhaul.Core.Graphics.ReworkedAbyssDarkness
     internal class AbyssLightingGlobalTile : GlobalTile
     {
 
+
         public override void NearbyEffects(int i, int j, int type, bool closer)
         {
+            return;
             if (Main.dedServ) 
                 return;
             if (Main.gamePaused)

@@ -39,3 +39,8 @@ ChainLinker: {
 	DisplayName: Chain Linker
 	Tooltip: ""
 }
+
+DebugSubworldEntrance: {
+	DisplayName: Debug Subworld Entrance
+	Tooltip: ""
+}
