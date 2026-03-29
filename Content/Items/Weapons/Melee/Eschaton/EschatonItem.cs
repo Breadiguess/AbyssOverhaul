@@ -7,10 +7,10 @@ using ReLogic.Content;
 
 namespace AbyssOverhaul.Content.Items.Weapons.Melee.Eschaton
 {
-    public class EschatonItem : CustomUseProjItem, ILocalizedModType
+    public class EschatonItem : CustomUseProjItem
     {
         public static string Path => ModContent.GetInstance<EschatonItem>().GetPath();
-        public new string LocalizationCategory => "Items.Weapons.Melee";
+        public override string LocalizationCategory => "Items.Weapons.Melee";
         public static Asset<Texture2D> GlowTex;
         public override void Load()
         {

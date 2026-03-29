@@ -23,10 +23,10 @@ using Terraria.ModLoader;
 
 namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
 {
-    public class ImpactHammerItem : ModItem, ILocalizedModType
+    public class ImpactHammerItem : ModItem
     {
         public static string Path => ModContent.GetInstance<ImpactHammerItem>().GetPath();
-        public new string LocalizationCategory => "Items.Weapons.Melee";
+        public override string LocalizationCategory => "Items.Weapons.Melee";
         public override void SetDefaults()
         {
             Item.width = 52;

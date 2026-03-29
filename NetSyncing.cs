@@ -17,6 +17,7 @@ namespace AbyssOverhaul
             SyncPressurePlayer,
 
             Carcass,
+            SyncBrigandsCallingPlayer
         }
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {
@@ -44,6 +45,26 @@ namespace AbyssOverhaul
 
                     CarcassSystem.HandlePacket(reader, whoAmI);
                     break;
+
+                case AbyssOverhaulMessageType.SyncBrigandsCallingPlayer:
+                    {
+                        byte playerIndex = reader.ReadByte();
+                        if (playerIndex < 0 || playerIndex >= Main.maxPlayers)
+                            return;
+
+                        Player player = Main.player[playerIndex];
+                        if (player is null || !player.active)
+                            return;
+
+                        var modPlayer = player.GetModPlayer<Content.Items.Weapons.Ranged.BrigandsCalling.BrigandsCalling_Player>();
+                        modPlayer.ReceiveSync(reader);
+
+                        // Relay client -> server -> everyone else.
+                        if (Main.netMode == NetmodeID.Server)
+                            modPlayer.SendSync(-1, whoAmI);
+
+                        break;
+                    }   
             }
 
         }

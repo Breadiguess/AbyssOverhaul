@@ -74,12 +74,18 @@ NPCs: {
 	CarcassLeechNPC.DisplayName: Carcass Leech
 	HagFish.DisplayName: Hag Fish
 	SeaBunny.DisplayName: Sea Bunny
+	Craghead.DisplayName: Craghead
 }
 
 Buffs: {
 	LunacyDebuff: {
 		DisplayName: Lunacy
 		Description: Mods.AbyssOverhaul.Buffs.LunacyDebuff.Description
+	}
+
+	BrigandsCalling_Buff: {
+		DisplayName: Brigands Calling_ Buff
+		Description: Mods.AbyssOverhaul.Buffs.BrigandsCalling_Buff.Description
 	}
 }
 
@@ -95,4 +101,6 @@ Projectiles: {
 	ImpactBomb_Explosion.DisplayName: Impact Bomb_ Explosion
 	SurveyUnitProjectile.DisplayName: Survey Unit Projectile
 	MicrobeGlob.DisplayName: Microbe Glob
+	BrigandsCalling_Held.DisplayName: Brigands Calling_ Held
+	BrigandsCalling_WaterSpout.DisplayName: Brigands Calling_ Water Spout
 }

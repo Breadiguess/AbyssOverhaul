@@ -9,9 +9,8 @@ using Terraria.Graphics.Renderers;
 
 namespace AbyssOverhaul.Content.Items.Accessories.BlackTide
 {
-    internal class BlackTideHitParticle : BaseParticle
+    internal class BlackTideHitParticle : BaseParticle<BlackTideHitParticle>
     {
-        public static ParticlePool<BlackTideHitParticle> pool = new(500, GetNewParticle<BlackTideHitParticle>);
 
         public Vector2 Center;
         public int MaxTime = 60;

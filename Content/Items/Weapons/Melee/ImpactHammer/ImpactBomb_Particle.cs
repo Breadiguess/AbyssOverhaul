@@ -4,10 +4,8 @@ using Terraria.Graphics.Renderers;
 
 namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
 {
-    internal class ImpactBomb_Particle : BaseParticle
+    internal class ImpactBomb_Particle : BaseParticle<ImpactBomb_Particle>
     {
-        public static ParticlePool<ImpactBomb_Particle> pool = new(500, GetNewParticle<ImpactBomb_Particle>);
-
         public Vector2 Position;
         public int TimeLeft;
         public float MaxTime;

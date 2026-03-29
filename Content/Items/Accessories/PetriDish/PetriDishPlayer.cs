@@ -17,6 +17,7 @@ namespace AbyssOverhaul.Content.Items.Accessories.PetriDish
 
         public override bool Shoot(Item item, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
+            if(Active)
             if (item.DamageType == DamageClass.Ranged && Main.rand.NextBool())
             {
                 Projectile.NewProjectile(source, position, velocity.RotatedByRandom(0.2f), ModContent.ProjectileType<MicrobeGlob>(), damage / 4, 1, Player.whoAmI);

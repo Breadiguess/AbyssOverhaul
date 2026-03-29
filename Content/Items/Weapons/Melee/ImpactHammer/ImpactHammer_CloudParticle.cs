@@ -8,9 +8,8 @@ using Terraria.Graphics.Renderers;
 
 namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
 {
-    internal class ImpactHammer_CloudParticle : BaseParticle
+    internal class ImpactHammer_CloudParticle : BaseParticle<ImpactHammer_CloudParticle>
     {
-        public static ParticlePool<ImpactHammer_CloudParticle> pool = new(500, GetNewParticle<ImpactHammer_CloudParticle>);
 
         public Vector2 Position;
         public Vector2 Velocity;

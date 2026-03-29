@@ -9,9 +9,8 @@ using Terraria.Graphics.Renderers;
 
 namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
 {
-    internal class ImpactHammer_HitParticle: BaseParticle
+    internal class ImpactHammer_HitParticle: BaseParticle<ImpactHammer_HitParticle>
     {
-        public static ParticlePool<ImpactHammer_HitParticle> pool = new(500, GetNewParticle<ImpactHammer_HitParticle>);
 
         public Vector2 Position;
         public float Rotation;
