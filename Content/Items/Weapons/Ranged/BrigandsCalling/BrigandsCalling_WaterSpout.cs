@@ -43,13 +43,18 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
             Projectile.height = 100;
 
             Projectile.timeLeft = 1200;
+            Projectile.penetrate = -1;
+            Projectile.usesLocalNPCImmunity = true;
+            Projectile.localNPCHitCooldown = 10;
         }
+
 
         public override bool? CanDamage() => Active;
         public override bool? CanCutTiles() => Active;
 
         public override void AI()
         {
+            Projectile.Opacity = float.Lerp(Projectile.Opacity, 1, 0.1f);
             if (!Active)
             {
 
@@ -77,7 +82,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
                 );
                 Projectile.ai[2] = MathF.Sin(AdjTime);
 
-                Projectile.Center = Owner.Center + orbitOffset;
+                Projectile.Center = Vector2.Lerp(Projectile.Center, Owner.Center + orbitOffset, 0.4f);
 
 
 
@@ -110,9 +115,12 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
             Texture2D Tex = TextureAssets.Projectile[Type].Value;
 
             Vector2 drawPos = Projectile.Center - Main.screenPosition;
-            Rectangle Frame = Tex.Frame(1, 4, 0, (int)(Main.GlobalTimeWrappedHourly*10.1f % 4));
+            Rectangle Frame = Tex.Frame(1, 4, 0, (int)((Main.GlobalTimeWrappedHourly*15.1f + Projectile.whoAmI) % 4));
 
-            Main.EntitySpriteDraw(Tex, drawPos, Frame, lightColor, 0, Frame.Size() / 2, 1, 0);
+
+            Color adjust = Color.Lerp(Color.White, Color.Blue, MathF.Sin(Main.GlobalTimeWrappedHourly * 15.1f + Projectile.whoAmI));
+            adjust.MultiplyRGB(lightColor);
+            Main.EntitySpriteDraw(Tex, drawPos, Frame, adjust*Projectile.Opacity, 0, Frame.Size() / 2, 1, 0);
 
             return false;
         }

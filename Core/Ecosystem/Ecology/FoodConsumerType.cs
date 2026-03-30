@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AbyssOverhaul.Core.Ecosystem
+namespace AbyssOverhaul.Core.Ecosystem.Ecology
 {
     [Flags]
     public enum FoodConsumerType

@@ -4,36 +4,28 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AbyssOverhaul.Content.NPCs
+namespace AbyssOverhaul.Content.NPCs.GrumpfishNPC
 {
-    internal class HagFish : ModNPC, IEcologyParticipant
+    internal class GrumpFish : ModNPC, IEcologyParticipant
     {
         public void SetupEcology(NPC npc, EcologyGlobalNPC ecology)
         {
-            ecology.SpeciesTraits.Append(NpcTraitFlags.Scavager);
+            ecology.SpeciesTraits.Add(NpcTraitFlags.Prey);
         }
 
-        public enum state
+        public override void SetStaticDefaults()
         {
-
+            Main.npcFrameCount[Type] = 24;
         }
-        public override void SetDefaults()
-        {
-            NPC.lifeMax = 60_000;
-            
-
-        }
-
         public override void AI()
         {
             
         }
 
+
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-
-
-            return false;
+            return base.PreDraw(spriteBatch, screenPos, drawColor);
         }
     }
 }

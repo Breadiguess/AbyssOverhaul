@@ -1,8 +1,6 @@
-﻿using BreadLibrary.Common.IK;
-using BreadLibrary.Core.Verlet;
+﻿using BreadLibrary.Core.Verlet;
 using CalamityMod;
 using System.IO;
-using Terraria;
 using Terraria.GameContent;
 
 namespace AbyssOverhaul.Content.Items.Weapons.Summoner
@@ -52,7 +50,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Summoner
         private float BodyRotationLerp = 0.10f;
 
         private float WingLength = 20f;
-        private  float ThrusterLength = 8f;
+        private float ThrusterLength = 8f;
         private const float ExhaustVisualLength = 16f;
 
         public VerletChain Antennae;
@@ -74,16 +72,23 @@ namespace AbyssOverhaul.Content.Items.Weapons.Summoner
         }
         private struct ManipulatorArm
         {
-            public IKSkeletonJacobian IKSkeleton;
+            public IKSkeleton IKSkeleton;
 
-            public ManipulatorArm(IKSkeletonJacobian _skeleton)
+            public ManipulatorArm(IKSkeleton _skeleton)
             {
                 IKSkeleton = _skeleton;
             }
         }
 
 
-        private ManipulatorArm[] _Arms;
+        private List<ManipulatorArm> _Arms;
+
+        public List<Vector2> ArmTargets;
+        public int CurrentArmAmount;
+
+
+
+
         #endregion
         public override void SetDefaults()
         {
@@ -102,15 +107,23 @@ namespace AbyssOverhaul.Content.Items.Weapons.Summoner
         {
             Projectile.timeLeft = 2;
 
-            if(Antennae is null)
+            if (Antennae is null)
             {
                 Antennae = new(5, 6, Projectile.Center);
             }
 
-            if(_Arms is null)
+            if (_Arms is null)
             {
-                _Arms = new ManipulatorArm[1];
-                _Arms[0] = new(new(Projectile.Center, 10, 3));
+                _Arms = new List<ManipulatorArm>();
+                ArmTargets = new List<Vector2>();
+                IKSkeleton.JointSetup[] b = new IKSkeleton.JointSetup[]
+               {
+                    new(20,0, 180),
+                    new(20,0, 60)
+               };
+
+                _Arms.Add(new(new(b)));
+                ArmTargets.Add(Projectile.Center);
 
             }
 
@@ -129,7 +142,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Summoner
 
             StateMachine();
 
-
+            UpdateArmTargeting();
             UpdateIK();
             UpdateMovement();
             UpdateVisuals();
@@ -139,8 +152,11 @@ namespace AbyssOverhaul.Content.Items.Weapons.Summoner
         {
             switch (CurrentState)
             {
+                case State.Debug:
+                    CurrentState = State.Idle;
+                    break;
                 case State.Idle:
-
+                    TargetLocation = Owner.Center + new Vector2(40 * Owner.direction, -40);
                     break;
 
 
@@ -161,20 +177,49 @@ namespace AbyssOverhaul.Content.Items.Weapons.Summoner
 
         #endregion
 
+
+
+        public void UpdateArmTargeting()
+        {
+            for (int i = 0; i < ArmTargets.Count; i++)
+            {
+                var t = ArmTargets[i];
+
+                t = Projectile.Center + Projectile.AngleTo(Main.MouseWorld).ToRotationVector2() * 40;
+
+                ArmTargets[i] = t;
+            }
+        }
+
+        public void AddArm()
+        {
+
+            IKSkeleton.JointSetup[] b = new IKSkeleton.JointSetup[]
+            {
+                new(30,0, 0),
+                new(40,0, 0)
+            };
+
+
+            _Arms.Append(new(new(b)));
+            ArmTargets.Append(Projectile.Center);
+        }
+
+
+
+
         private void UpdateIK()
         {
-            if (_Arms is null)
+            if (_Arms is null || ArmTargets is null)
                 return;
 
-            for(int i = 0; i< _Arms.Length; i++)
+            for (int i = 0; i < _Arms.Count; i++)
             {
                 var Arm = _Arms[i];
-
-                Arm.IKSkeleton.Root = Projectile.Bottom;
-                Arm.IKSkeleton.Solve(Projectile.Bottom + new Vector2(0, 20), alpha: 1);
+                Arm.IKSkeleton.Update(Projectile.Bottom, ArmTargets[i]);
                 _Arms[i] = Arm;
             }
-          
+
         }
 
         private void SetTarget(Vector2 newTarget)
@@ -244,6 +289,8 @@ namespace AbyssOverhaul.Content.Items.Weapons.Summoner
 
             if (_visualForceRequest.LengthSquared() < 0.0001f)
                 _visualForceRequest = -Vector2.UnitY;
+
+            Projectile.velocity += Vector2.UnitY * MathF.Sin(Main.GameUpdateCount * 0.05f) * 0.2f;
         }
 
         private void UpdateBodyRotation(Vector2 steering)
@@ -316,16 +363,16 @@ namespace AbyssOverhaul.Content.Items.Weapons.Summoner
 
 
                 Vector2 start = (_wings[i].Anchor + _wings[i].Tip) / 2f;
-                Point? DustPos = LineAlgorithm.RaycastTo(start, start - Vector2.UnitX.RotatedBy(_wings[i].ForceDirection.ToRotation()) *100, debug:false);
+                Point? DustPos = LineAlgorithm.RaycastTo(start, start - Vector2.UnitX.RotatedBy(_wings[i].ForceDirection.ToRotation()) * 100, debug: false);
                 if (DustPos.HasValue)
                 {
                     float EndLength = -start.Distance(DustPos.Value.ToWorldCoordinates());
-                    if (Main.rand.NextBool((int)Math.Abs(EndLength)/5+1))
+                    if (Main.rand.NextBool((int)Math.Abs(EndLength) / 5 + 1))
                     {
                         Dust a = Dust.NewDustPerfect(start + Vector2.UnitX.RotatedBy(_wings[i].ForceDirection.ToRotation()) * EndLength, DustID.Cloud, _wings[i].ForceDirection.RotatedByRandom(0.3f) * Main.rand.NextFloat(0.4f, 1f));
                         a.fadeIn = -0.4f;
                     }
-                  
+
                 }
             }
         }
@@ -382,7 +429,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Summoner
             }
             Main.EntitySpriteDraw(
              bodyTexture,
-             Projectile.Center - Main.screenPosition- new Vector2(0,3   ),
+             Projectile.Center - Main.screenPosition - new Vector2(0, 3),
              null,
              lightColor,
              Projectile.rotation,
@@ -393,25 +440,25 @@ namespace AbyssOverhaul.Content.Items.Weapons.Summoner
          );
 
 
-          
-            if(_Arms is not null)
+
+            if (_Arms is not null)
             {
-                for(int x = 0; x< _Arms.Length; x++)
+                for (int x = 0; x < _Arms.Count; x++)
                 {
                     var Arm = _Arms[x];
 
-                    if(Arm.IKSkeleton is not null)
-                    for(int i = 0; i< Arm.IKSkeleton.JointCount; i++)
-                    {
-                            Utils.DrawLine(spriteBatch, Arm.IKSkeleton.JointPositions[i], Arm.IKSkeleton.JointPositions[i + 1], Color.White);
+                    if (Arm.IKSkeleton is not null)
+                        for (int i = 0; i < Arm.IKSkeleton.JointCount; i++)
+                        {
+                            Utils.DrawLine(spriteBatch, Arm.IKSkeleton.Position(i), Arm.IKSkeleton.Position(i + 1), Color.White);
                             //DrawLine(spriteBatch, Arm.IKSkeleton.JointPositions[i],, Color.White, 12);
-                    }
+                        }
                 }
             }
 
 
 
-           // Main.EntitySpriteDraw(Eyetex, Projectile.Center- new Vector2(0,-10)+ EyeDir- Main.screenPosition, null, Color.White, 0, Eyetex.Size() / 2f, 1, 0);
+            // Main.EntitySpriteDraw(Eyetex, Projectile.Center- new Vector2(0,-10)+ EyeDir- Main.screenPosition, null, Color.White, 0, Eyetex.Size() / 2f, 1, 0);
             return false;
         }
 
@@ -433,10 +480,10 @@ namespace AbyssOverhaul.Content.Items.Weapons.Summoner
 
                 Rectangle Frame = FanTex.Frame(1, 8, 0, (int)(Main.GameUpdateCount % 8));
                 SpriteEffects FanFlip = isRightWing ? SpriteEffects.None : SpriteEffects.FlipHorizontally | SpriteEffects.FlipVertically;
-                Main.EntitySpriteDraw(FanTex, thrusterEnd - Main.screenPosition, Frame, lightColor, wing.WingRotation - Projectile.rotation*(sideSign), Frame.Size() / 2f, 1, FanFlip);
+                Main.EntitySpriteDraw(FanTex, thrusterEnd - Main.screenPosition, Frame, lightColor, wing.WingRotation - Projectile.rotation * (sideSign), Frame.Size() / 2f, 1, FanFlip);
 
                 Main.EntitySpriteDraw(WingTex, Projectile.Center - Main.screenPosition, null, lightColor, wing.WingRotation + Projectile.rotation, new Vector2(-4, WingTex.Height / 2f), 2, Flip);
-               
+
 
 
 

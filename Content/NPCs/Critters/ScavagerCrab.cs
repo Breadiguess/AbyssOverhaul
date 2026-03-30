@@ -129,7 +129,7 @@ namespace AbyssOverhaul.Content.NPCs.Critters
 
         public void SetupEcology(NPC npc, EcologyGlobalNPC ecology)
         {
-            ecology.Traits.Append(NpcTraitFlags.Scavager);
+            ecology.SpeciesTraits.Append(NpcTraitFlags.Scavager);
         }
     }
 }

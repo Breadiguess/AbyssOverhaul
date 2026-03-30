@@ -8,7 +8,7 @@ namespace AbyssOverhaul.Content.NPCs.CragheadNPC
 
         public void SetupEcology(NPC npc, EcologyGlobalNPC ecology)
         {
-            ecology.Traits.Append(NpcTraitFlags.Territorial);
+            ecology.SpeciesTraits.Add(NpcTraitFlags.Territorial);
         }
         #region OreType
         public enum OreType
@@ -100,7 +100,7 @@ namespace AbyssOverhaul.Content.NPCs.CragheadNPC
                 case OreType.Iron:
                     break;
                 case OreType.Scoria:
-                    Vector2 SpawnPos = new Vector2(NPC.width *0.5f * NPC.spriteDirection, 0) + NPC.Center;
+                    Vector2 SpawnPos = new Vector2(NPC.width *0.5f * -NPC.spriteDirection, 0) + NPC.Center;
                     Vector2 Direction = new Vector2();
                     MediumMistParticle mist = new MediumMistParticle(SpawnPos, Direction,
                     Main.rand.NextBool(3) ? Color.LightSteelBlue : Color.SteelBlue, Color.LightSlateGray, Main.rand.NextFloat(0.4f, 0.65f), 130);

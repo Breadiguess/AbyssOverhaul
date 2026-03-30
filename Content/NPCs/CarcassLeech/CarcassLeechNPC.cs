@@ -194,7 +194,7 @@ namespace AbyssOverhaul.Content.NPCs.CarcassLeech
 
         public void SetupEcology(NPC npc, EcologyGlobalNPC ecology)
         {
-            ecology.Traits.Append(NpcTraitFlags.Scavager);
+            ecology.SpeciesTraits.Append(NpcTraitFlags.Scavager);
         }
     }
 }

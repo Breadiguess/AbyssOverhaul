@@ -75,6 +75,7 @@ NPCs: {
 	HagFish.DisplayName: Hag Fish
 	SeaBunny.DisplayName: Sea Bunny
 	Craghead.DisplayName: Craghead
+	Karkinos.DisplayName: Karkinos
 }
 
 Buffs: {

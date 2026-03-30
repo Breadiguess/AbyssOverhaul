@@ -20,7 +20,7 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.GooGazerNPC
     {
         public void SetupEcology(NPC npc, EcologyGlobalNPC ecology)
         {
-            ecology.Traits.Append(NpcTraitFlags.Prey);
+            ecology.SpeciesTraits.Append(NpcTraitFlags.Prey);
         }
         public override int NPCType => ModContent.NPCType<Laserfish>();
         public override string TexturePath => this.GetPath();

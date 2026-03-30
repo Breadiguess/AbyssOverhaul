@@ -11,4 +11,9 @@
     <Publicize Include="FNA" IncludeCompilerGeneratedMembers="false" IncludeVirtualMembers="false" />
     <Publicize Include="ReLogic" IncludeCompilerGeneratedMembers="false" IncludeVirtualMembers="false" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Content\NPCs\GrumpfishNPC\" />
+    <Folder Include="Core\Ecosystem\FoodSystem\" />
+  </ItemGroup>
 </Project>

@@ -32,7 +32,7 @@ namespace AbyssOverhaul.Common.Brain.SharedSensors
 
             SensePlayers(self, ref bestThreatScore, ref bestThreatPosition);
             SenseProjectiles(self, ref bestThreatScore, ref bestThreatPosition);
-            SenseLargeHostileNpcs(self, ref bestThreatScore, ref bestThreatPosition);
+            //SenseLargeHostileNpcs(self, ref bestThreatScore, ref bestThreatPosition);
             SenseDisturbance(context, self);
 
             if (bestThreatScore > 0f)
@@ -133,7 +133,9 @@ namespace AbyssOverhaul.Common.Brain.SharedSensors
             NPC threat = AbyssUtilities.FindClosestAbyssPredator(self, out float dist);
             if(threat is not null)
             bestThreatPosition = threat.Center;
-            
+            else
+                bestThreatPosition = Vector2.Zero;
+
         }
 
         private void SenseDisturbance(TContext context, NPC self)

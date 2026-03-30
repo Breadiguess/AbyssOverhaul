@@ -8,7 +8,7 @@ namespace AbyssOverhaul.Content.BehaviorOverrides
     {
         public void SetupEcology(NPC npc, EcologyGlobalNPC ecology)
         {
-            ecology.Traits.Append(NpcTraitFlags.None);
+            ecology.SpeciesTraits.Append(NpcTraitFlags.None);
         }
         public override int NPCType => ModContent.NPCType<CalamityMod.NPCs.Abyss.LuminousCorvina>();
 

@@ -4,28 +4,32 @@ using Terraria.ModLoader;
 
 namespace AbyssOverhaul.Core.Ecosystem.Ecology
 {
-    [Flags]
-    public enum NpcTraitFlags
-    {
-        None = 0,
-        Predator = 1 << 0,
-        Prey = 1 << 1,
-        Schooling = 1 << 2,
-        AmbushPredator = 1 << 3,
-        Territorial = 1 << 4,
-        Scavager = 1 << 5,
-    }
-//god help me i am writing this on my phone
+  
+
 
     public sealed class EcologyGlobalNPC : GlobalNPC
     {
         public override bool InstancePerEntity => true;
 
-        public NpcTraitFlags[] Traits;
+
+        /// <summary>
+        /// Stores the entire species' dietary classification, which can be used to determine what other NPCs it interacts with and how. 
+        /// This is separate from traits because it's more fundamental to the NPC's role in the ecosystem, 
+        /// while traits can be more variable and individual.
+        /// </summary>
+        public static FoodConsumerType FoodConsumer;
+
+        /// <summary>
+        /// Speices wide traits.
+        /// </summary>
+        public List<NpcTraitFlags> SpeciesTraits;
+        public List<NpcTraitFlags> IndividualTraits;
         public int SchoolLeader = -1;
-        
-        
-        
+
+
+
+        public int Hunger;
+
         public float Aggression;
         public float Fear;
         public float Curiosity;
@@ -36,9 +40,23 @@ namespace AbyssOverhaul.Core.Ecosystem.Ecology
             return EcologyRegistry.HasParticipant(entity.type);
         }
 
-       
 
-        public bool HasTrait(NpcTraitFlags flag) => (Traits.Contains(flag));
+        public override void OnSpawn(NPC npc, IEntitySource source)
+        {
+            npc.Ecology().IndividualTraits = SpeciesTraits.ToList();
+            base.OnSpawn(npc, source);
+
+        }
+
+
+
+        public void UpdateNPC(NPC npc)
+        {
+
+        }
+
+
+        public bool HasTrait(NpcTraitFlags flag) => (SpeciesTraits.Contains(flag));
     }
 
  

@@ -379,8 +379,8 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Slammonite
         {
             ecology.Aggression = 1;
 
-            ecology.Traits.Append(NpcTraitFlags.AmbushPredator);
-            ecology.Traits.Append(NpcTraitFlags.Prey);
+            ecology.SpeciesTraits.Add(NpcTraitFlags.AmbushPredator);
+            ecology.SpeciesTraits.Add(NpcTraitFlags.Prey);
         }
     }
 }

@@ -68,7 +68,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
 
         public float Rotation => BaseRotation + Recoil * -0.42f * Projectile.direction + Dip * -Projectile.direction * 0.08f;
 
-        public Vector2 aimDirection => (Brigands.target is not null && Brigands.ForceuseItemTime > 0) ? Owner.MountedCenter.DirectionTo(Brigands.target.Center) : Owner.MountedCenter.DirectionTo(Owner.Calamity().mouseWorld);
+        public Vector2 aimDirection => (Brigands.ForcedTarget is not null && Brigands.ForceuseItemTime > 0) ? Owner.MountedCenter.DirectionTo(Brigands.ForcedTarget.Center) : Owner.MountedCenter.DirectionTo(Owner.Calamity().mouseWorld);
         public override void AI()
         {
             Time++;
@@ -79,9 +79,9 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
             Projectile.direction = Owner.direction;
             Owner.direction = aimDirection.X.DirectionalSign();
 
-            Projectile.rotation = (Brigands.target is not null && Brigands.ForceuseItemTime > 0) ? Projectile.AngleTo(Brigands.target.Center) :aimDirection.ToRotation();
+            Projectile.rotation = aimDirection.ToRotation();
             Projectile.velocity = aimDirection * (IsLeftHand ? 12f : 16f);
-
+            Projectile.CritChance = Owner.HeldItem.crit;
             UpdateHeldPosition();
             UpdateFiring();
             UpdateRecoilVisuals();
@@ -183,6 +183,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
             particle.Prepare(spawnPos+shotVelocity, shotVelocity.ToRotation(), 15, Projectile.direction);
             ParticleEngine.ShaderParticles.Add(particle);
 
+            Lighting.AddLight(spawnPos + shotVelocity, TorchID.Ice);
             int proj = Projectile.NewProjectile(
                 Projectile.GetSource_FromThis($"BrigandsCalling" + (Brigands.ForceuseItemTime > 0 ? "SuperHome" :"")),
                 spawnPos,

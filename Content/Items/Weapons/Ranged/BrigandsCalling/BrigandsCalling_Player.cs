@@ -82,7 +82,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
         private const int MAX_WATER_SPOUTS = 6;
         private const int FLIP_DASH_TIME = 40;
         private const int FLIP_DASH_COOLDOWN = 10 * 60;
-        private const float FLIP_DASH_SPEED = 28f;
+        private const float FLIP_DASH_SPEED = 38f;
         private const float FLIP_BOUNCE_SPEED = 14f;
         private const float FLIP_DASH_DAMAGE_MULT = 2.35f;
         private const int FLIP_RPM_GAIN = 200;
@@ -143,9 +143,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
             if (!Active)
                 return;
 
-            if (Main.netMode == NetmodeID.MultiplayerClient)
-                return;
-
+            
             if (proj.GetGlobalProjectile<_BrigandsCallingProjectile>().IsBrigandsCallingProjectile)
                 HitCount++;
         }
@@ -160,11 +158,16 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
                 ForcedTargetIndex = -1;
 
             if (HitCount > 0 &&
-                HitCount % HitCountForWaterSpout == 0 &&
-                Main.netMode != NetmodeID.MultiplayerClient)
+                HitCount % HitCountForWaterSpout == 0)
             {
                 SpawnWaterSpout();
                 HitCount++;
+            }
+
+            if (ForceuseItemTime < 1)
+            {
+                if (RPMBoost - FLIP_RPM_GAIN > 0)
+                    RPMBoost -= FLIP_RPM_GAIN;
             }
 
             if (ForceuseItemTime < 1 && !Player.HasBuff(ModContent.BuffType<BrigandsCalling_Buff>()))
@@ -208,7 +211,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
             direction = direction.SafeNormalize(new Vector2(Player.direction, 1f));
 
             // Force the dash into the lower 180-degree arc.
-            direction.Y = System.MathF.Max(direction.Y, 0.18f);
+            direction.Y = System.MathF.Max(direction.Y, 0.48f);
 
             return direction.SafeNormalize(new Vector2(Player.direction, 1f));
         }
@@ -281,7 +284,6 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
             IsFlipDashing = false;
             FlipDashTimer = 0;
             Player.fullRotation = 0f;
-
             if (startCooldown)
                 FlipDashCooldown = FLIP_DASH_COOLDOWN;
         }
@@ -320,6 +322,14 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
             Player.maxFallSpeed = FLIP_DASH_SPEED;
             Player.fallStart = (int)(Player.position.Y / 16f);
 
+            Point? raycast = LineAlgorithm.RaycastTo(Player.Center, Player.Center + Player.velocity*4, debug: true);
+
+            if (raycast.HasValue)
+            {
+                Player.velocity.X *= 0.2f;
+                if (raycast.Value.ToWorldCoordinates().Distance(Player.Bottom) < 20)
+                    StopFlipDash(false);
+            }
             Player.immune = true;
             Player.immuneNoBlink = true;
             if (Player.immuneTime < 2)
@@ -329,19 +339,53 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
 
             FlipDashTimer--;
         }
-
         public void SpawnWaterSpout()
         {
-            Vector2 SpawnPos = Player.Center + Main.rand.NextVector2CircularEdge(130, 130);
+            const int maxAttempts = 30;
+            const float spawnRadius = 130f;
+
+            int spoutType = SpoutType;
+
+            // These help us avoid spawning the projectile inside solid tiles.
+            int projWidth = ProjectileID.Sets.TrailCacheLength[spoutType] > 0
+                ? 16
+                : 16;
+
+            int projHeight = 16;
 
 
+            for (int i = 0; i < maxAttempts; i++)
+            {
+                Vector2 spawnPos = Player.Center + Main.rand.NextVector2CircularEdge(spawnRadius, spawnRadius);
 
-            Projectile spout = Projectile.NewProjectileDirect(Player.GetSource_FromThis(), SpawnPos, Vector2.zeroVector, SpoutType, 100, 0);
+                // Reject positions inside solid tiles.
+                if (Collision.SolidCollision(spawnPos - new Vector2(projWidth * 0.5f, projHeight * 0.5f), projWidth, projHeight))
+                    continue;
 
-            if (_waterSpouts.Count < MAX_WATER_SPOUTS)
-                _waterSpouts.Add(spout.whoAmI);
+                // Require direct line of sight from the spawn point to the player.
+                if (!Collision.CanHitLine(spawnPos, 1, 1, Player.Center, 1, 1))
+                    continue;
+
+                Projectile spout = Projectile.NewProjectileDirect(
+                    Player.GetSource_FromThis(),
+                    spawnPos,
+                    Vector2.Zero,
+                    spoutType,
+                    100,
+                    0f,
+                    Player.whoAmI
+                );
+
+                spout.Opacity = 0f;
+
+                if (_waterSpouts.Count < MAX_WATER_SPOUTS)
+                    _waterSpouts.Add(spout.whoAmI);
+
+                return;
+            }
+
+            // Optional fallback: spawn near the player if no valid spot was found.
         }
-
 
 
         public override void SyncPlayer(int toWho, int fromWho, bool newPlayer)
