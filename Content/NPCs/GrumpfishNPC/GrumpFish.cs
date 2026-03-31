@@ -8,9 +8,14 @@ namespace AbyssOverhaul.Content.NPCs.GrumpfishNPC
 {
     internal class GrumpFish : ModNPC, IEcologyParticipant
     {
-        public void SetupEcology(NPC npc, EcologyGlobalNPC ecology)
+        public void SetSpeciesEcology(SpeciesEcologyDefinition definition)
         {
-            ecology.SpeciesTraits.Add(NpcTraitFlags.Prey);
+           
+        }
+
+        public void SetupIndividualEcology(NPC npc, EcologyGlobalNPC ecology)
+        {
+
         }
 
         public override void SetStaticDefaults()
@@ -27,5 +32,7 @@ namespace AbyssOverhaul.Content.NPCs.GrumpfishNPC
         {
             return base.PreDraw(spriteBatch, screenPos, drawColor);
         }
+
+   
     }
 }

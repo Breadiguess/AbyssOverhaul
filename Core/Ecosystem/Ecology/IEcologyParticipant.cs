@@ -8,6 +8,7 @@ namespace AbyssOverhaul.Core.Ecosystem.Ecology
 {
     public interface IEcologyParticipant
     {
-        public void SetupEcology(NPC npc, EcologyGlobalNPC ecology);
+        public void SetSpeciesEcology(SpeciesEcologyDefinition definition);
+        public void SetupIndividualEcology(NPC npc, EcologyGlobalNPC ecology);
     }
 }

@@ -12,6 +12,14 @@ namespace AbyssOverhaul.Content.NPCs.Critters
 {
     internal class ScavagerCrab : ModNPC, IEcologyParticipant
     {
+        public void SetSpeciesEcology(SpeciesEcologyDefinition definition)
+        {
+            definition.AddTraits(NpcTraitFlags.Scavager);
+        }
+
+        public void SetupIndividualEcology(NPC npc, EcologyGlobalNPC ecology)
+        {
+        }
         public ModularNpcBrain<NpcContext> Brain;
         public NpcPathAgent PathAgent;
 
@@ -127,9 +135,6 @@ namespace AbyssOverhaul.Content.NPCs.Critters
             return base.PreDraw(spriteBatch, screenPos, drawColor);
         }
 
-        public void SetupEcology(NPC npc, EcologyGlobalNPC ecology)
-        {
-            ecology.SpeciesTraits.Append(NpcTraitFlags.Scavager);
-        }
+    
     }
 }

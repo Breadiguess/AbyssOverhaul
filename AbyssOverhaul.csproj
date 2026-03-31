@@ -14,6 +14,5 @@
 
   <ItemGroup>
     <Folder Include="Content\NPCs\GrumpfishNPC\" />
-    <Folder Include="Core\Ecosystem\FoodSystem\" />
   </ItemGroup>
 </Project>

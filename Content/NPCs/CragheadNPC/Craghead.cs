@@ -6,10 +6,19 @@ namespace AbyssOverhaul.Content.NPCs.CragheadNPC
     {
         #region Values
 
-        public void SetupEcology(NPC npc, EcologyGlobalNPC ecology)
+        public void SetSpeciesEcology(SpeciesEcologyDefinition definition)
         {
-            ecology.SpeciesTraits.Add(NpcTraitFlags.Territorial);
+            definition.AddTraits(NpcTraitFlags.Territorial);
+            definition.FoodConsumer = FoodConsumerType.Omnivore;
+
+            definition.BaseMaxHunger = 70;
         }
+
+        public void SetupIndividualEcology(NPC npc, EcologyGlobalNPC ecology)
+        {
+            ecology.HungerModifier = Main.rand.Next(-10, 11);
+        }
+     
         #region OreType
         public enum OreType
         {
@@ -69,6 +78,16 @@ namespace AbyssOverhaul.Content.NPCs.CragheadNPC
         }
         public override void AI()
         {
+            if (!NPC.wet)
+            {
+                if (Math.Abs(NPC.velocity.Y) < 0.45f)
+                {
+                    NPC.velocity.X *= 0.95f;
+                    NPC.rotation = NPC.rotation.AngleLerp(0f, 0.15f).AngleTowards(0f, 0.15f);
+                }
+                NPC.noGravity = false;
+                return;
+            }
 
         }
 
@@ -83,6 +102,7 @@ namespace AbyssOverhaul.Content.NPCs.CragheadNPC
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
 
+            
             Utils.DrawBorderString(spriteBatch, HeadMaterial.ToString(), NPC.Center - screenPos, drawColor);
             return base.PreDraw(spriteBatch, screenPos, drawColor);
         }
@@ -100,8 +120,8 @@ namespace AbyssOverhaul.Content.NPCs.CragheadNPC
                 case OreType.Iron:
                     break;
                 case OreType.Scoria:
-                    Vector2 SpawnPos = new Vector2(NPC.width *0.5f * -NPC.spriteDirection, 0) + NPC.Center;
-                    Vector2 Direction = new Vector2();
+                    Vector2 SpawnPos = new Vector2(NPC.width *0.5f * -NPC.spriteDirection, -10) + NPC.Center;
+                    Vector2 Direction = new Vector2(0,-4);
                     MediumMistParticle mist = new MediumMistParticle(SpawnPos, Direction,
                     Main.rand.NextBool(3) ? Color.LightSteelBlue : Color.SteelBlue, Color.LightSlateGray, Main.rand.NextFloat(0.4f, 0.65f), 130);
                     GeneralParticleHandler.SpawnParticle(mist);
@@ -117,7 +137,8 @@ namespace AbyssOverhaul.Content.NPCs.CragheadNPC
 
         }
 
-    
+
+
 
         #endregion
     }

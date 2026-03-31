@@ -6,10 +6,16 @@ namespace AbyssOverhaul.Content.BehaviorOverrides
 {
     public sealed class VoidstoneScreamer : NPCBehaviorOverride, IEcologyParticipant
     {
-        public void SetupEcology(NPC npc, EcologyGlobalNPC ecology)
+        public void SetSpeciesEcology(SpeciesEcologyDefinition definition)
         {
-            ecology.SpeciesTraits.Append(NpcTraitFlags.None);
+            definition.AddTraits(NpcTraitFlags.None);
         }
+
+        public void SetupIndividualEcology(NPC npc, EcologyGlobalNPC ecology)
+        {
+
+        }
+        public override string TexturePath => this.GetPath();
         public override int NPCType => ModContent.NPCType<CalamityMod.NPCs.Abyss.LuminousCorvina>();
 
 
@@ -99,7 +105,6 @@ namespace AbyssOverhaul.Content.BehaviorOverrides
             return false;
         }
 
-
-
+      
     }
 }

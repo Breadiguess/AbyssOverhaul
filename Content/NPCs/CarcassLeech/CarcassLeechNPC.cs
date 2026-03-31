@@ -192,9 +192,16 @@ namespace AbyssOverhaul.Content.NPCs.CarcassLeech
             base.FindFrame(frameHeight);
         }
 
-        public void SetupEcology(NPC npc, EcologyGlobalNPC ecology)
+  
+
+        void IEcologyParticipant.SetSpeciesEcology(SpeciesEcologyDefinition definition)
         {
-            ecology.SpeciesTraits.Append(NpcTraitFlags.Scavager);
+            definition.AddTraits(NpcTraitFlags.Scavager);
+        }
+
+        void IEcologyParticipant.SetupIndividualEcology(NPC npc, EcologyGlobalNPC ecology)
+        {
+
         }
     }
 }

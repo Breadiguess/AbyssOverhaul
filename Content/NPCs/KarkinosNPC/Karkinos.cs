@@ -20,9 +20,14 @@ namespace AbyssOverhaul.Content.NPCs.KarkinosNPC
 
 
         public Territory territory;
-        public void SetupEcology(NPC npc, EcologyGlobalNPC ecology)
+        void IEcologyParticipant.SetSpeciesEcology(SpeciesEcologyDefinition definition)
         {
-            ecology.SpeciesTraits.Append(NpcTraitFlags.Territorial);
+            definition.AddTraits(NpcTraitFlags.Territorial);
+        }
+
+        void IEcologyParticipant.SetupIndividualEcology(NPC npc, EcologyGlobalNPC ecology)
+        {
+
         }
         ModularNpcBrain<CreatureNpcContext> NPCBrain;
         public override void SetDefaults()

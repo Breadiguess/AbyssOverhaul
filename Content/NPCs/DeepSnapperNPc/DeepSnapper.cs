@@ -15,14 +15,17 @@ using Terraria.DataStructures;
 
 namespace AbyssOverhaul.Content.NPCs.DeepSnapperNPC
 {
-    internal class DeepSnapper : ModNPC
+    internal class DeepSnapper : ModNPC, IEcologyParticipant
     {
         public ModularNpcBrain<SchoolingNpcContext> NpcBrain;
-        public void SetupEcology(NPC npc, EcologyGlobalNPC ecology)
+        public void SetSpeciesEcology(SpeciesEcologyDefinition definition)
         {
-            ecology.Aggression = 0;
-            
-            ecology.SpeciesTraits.Append(NpcTraitFlags.Schooling);
+            definition.AddTraits(NpcTraitFlags.Schooling);
+        }
+
+        public void SetupIndividualEcology(NPC npc, EcologyGlobalNPC ecology)
+        {
+
         }
         private enum DeepSnapperState
         {
@@ -522,6 +525,6 @@ namespace AbyssOverhaul.Content.NPCs.DeepSnapperNPC
 
         public override bool? CanFallThroughPlatforms() => true;
 
-       
+      
     }   
 }

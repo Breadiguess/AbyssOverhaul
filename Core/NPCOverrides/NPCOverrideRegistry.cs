@@ -21,7 +21,7 @@ namespace AbyssOverhaul.Core.NPCOverrides
         public override void PostSetupContent()
         {
             BuildRegistry();
-
+            
 
 
             EcologyRegistry.Clear();
@@ -29,7 +29,11 @@ namespace AbyssOverhaul.Core.NPCOverrides
             foreach (ModNPC modNpc in Mod.GetContent<ModNPC>())
             {
                 if (modNpc is IEcologyParticipant participant)
+                {
+
                     EcologyRegistry.Register(modNpc.Type, participant);
+                   
+                }
             }
 
             foreach (NPCBehaviorOverride behaviorOverride in NPCOverrideRegistry._overrides.Values)

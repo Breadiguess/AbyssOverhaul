@@ -378,9 +378,17 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Slammonite
         public void SetupEcology(NPC npc, EcologyGlobalNPC ecology)
         {
             ecology.Aggression = 1;
+            
+        }
 
-            ecology.SpeciesTraits.Add(NpcTraitFlags.AmbushPredator);
-            ecology.SpeciesTraits.Add(NpcTraitFlags.Prey);
+        public void SetSpeciesEcology(SpeciesEcologyDefinition definition)
+        {
+            definition.AddTraits(NpcTraitFlags.AmbushPredator);
+        }
+
+        public void SetupIndividualEcology(NPC npc, EcologyGlobalNPC ecology)
+        {
+            
         }
     }
 }
