@@ -29,3 +29,8 @@ PetriDishItem: {
 	DisplayName: Petri Dish
 	Tooltip: Ranged weapons have a 50% chance to also fire a glob of cyanobacteria.
 }
+
+EcologyDebugOverlayItem: {
+	DisplayName: Ecology Debug Overlay Item
+	Tooltip: ""
+}

@@ -1,8 +1,7 @@
 using AbyssOverhaul.Core.Ecosystem.FoodSystem;
-using System;
+using AbyssOverhaul.Core.Ecosystem.Simulation;
+using AbyssOverhaul.Core.Ecosystem.Simulation.AbyssOverhaul.Core.Ecosystem.Persistence;
 using System.Reflection;
-using Terraria;
-using Terraria.ModLoader;
 
 namespace AbyssOverhaul.Core.Ecosystem.Ecology
 {
@@ -14,9 +13,12 @@ namespace AbyssOverhaul.Core.Ecosystem.Ecology
 
         public MetabolismState Metabolism;
 
-
         // Species baseline for this npc's type.
         public SpeciesEcologyDefinition SpeciesDefinition;
+
+        // Persistent actor link.
+        public long ActorID = -1;
+        public bool SpawnedFromActor;
 
         // Per-instance state.
         public NpcTraitFlags IndividualTraitOverrides;
@@ -55,6 +57,44 @@ namespace AbyssOverhaul.Core.Ecosystem.Ecology
             if (SpeciesDefinition is null)
                 return;
 
+            if (SpawnedFromActor &&
+                ActorID >= 0 &&
+                EcologySystem.Instance is not null &&
+                EcologySystem.Instance.Actors.TryGetValue(ActorID, out EcologyActor actor))
+            {
+                EcologyActorBridge.CopyActorToNpc(actor, npc, this);
+
+                actor.IsLoaded = true;
+                actor.LoadedNpcWhoAmI = npc.whoAmI;
+                actor.LastKnownWorldPosition = npc.Center;
+                actor.CellCoord = EcologyMath.WorldToCell(npc.Center);
+                actor.LastSimulatedTime = Main.GameUpdateCount;
+
+                return;
+            }
+
+            InitializeFromSpecies(npc);
+
+            if (ActorID < 0 && EcologySystem.Instance is not null)
+                ActorID = EcologySystem.Instance.RegisterFreshLoadedNpc(npc, this);
+        }
+
+        public override void OnKill(NPC npc)
+        {
+
+            if (
+                EcologySystem.Instance is not null &&
+                EcologySystem.Instance.Actors.TryGetValue(ActorID, out EcologyActor actor))
+            {
+                EcologyActorBridge.CopyNpcToActor(npc, this, actor);
+                actor.IsLoaded = false;
+                actor.Alive = false;
+            }
+
+        }
+
+        private void InitializeFromSpecies(NPC npc)
+        {
             MaxHungerSpecies = SpeciesDefinition.BaseMaxHunger;
             Aggression = SpeciesDefinition.BaseAggression;
             Fear = SpeciesDefinition.BaseFear;
@@ -69,27 +109,33 @@ namespace AbyssOverhaul.Core.Ecosystem.Ecology
             EcologyRegistry.ApplyIndividualSetup(npc, this);
         }
 
-
-
-
-
-        public override bool PreAI(NPC npc)
-        {
-            return base.PreAI(npc);
-        }
-
-
         public override void AI(NPC npc)
         {
-
-            if (SpeciesDefinition is null || Metabolism is null)
+            if (SpeciesDefinition is null)
                 return;
 
-            if (Main.GameUpdateCount % 15 == 0)
+            Metabolism ??= new MetabolismState();
+
+            if (Main.GameUpdateCount % 15 <= 1)
                 UpdateMetabolism(npc, 0.25f);
 
             ApplyMetabolicEffectsToEcology(npc);
+
+            if (ActorID >= 0 &&
+                EcologySystem.Instance is not null &&
+                EcologySystem.Instance.Actors.TryGetValue(ActorID, out EcologyActor actor))
+            {
+                EcologyActorBridge.CopyNpcToActor(npc, this, actor);
+                actor.IsLoaded = true;
+                actor.LoadedNpcWhoAmI = npc.whoAmI;
+                actor.LastKnownWorldPosition = npc.Center;
+                actor.LastSimulatedTime = Main.GameUpdateCount;
+                actor.Alive = npc.life > 0;
+
+                EcologySystem.Instance.MoveActorToCell(actor, EcologyMath.WorldToCell(npc.Center));
+            }
         }
+
         private void UpdateMetabolism(NPC npc, float dt)
         {
             MetabolismDefinition def = SpeciesDefinition.Metabolism;
@@ -132,6 +178,7 @@ namespace AbyssOverhaul.Core.Ecosystem.Ecology
 
             Hunger = (int)Metabolism.Hunger;
         }
+
         private void ApplyMetabolicEffectsToEcology(NPC npc)
         {
             float hungerRatio = MaxHungerSpecies <= 0 ? 0f : Metabolism.Hunger / MaxHungerSpecies;
@@ -164,8 +211,6 @@ namespace AbyssOverhaul.Core.Ecosystem.Ecology
             }
         }
 
-
-
         public bool HasTrait(NpcTraitFlags flag)
         {
             if (SpeciesDefinition is null)
@@ -190,6 +235,7 @@ namespace AbyssOverhaul.Core.Ecosystem.Ecology
             displayDebugInfo = false;
             return base.PreDraw(npc, spriteBatch, screenPos, drawColor);
         }
+
         private static string BuildContextDebugText(object context)
         {
             StringBuilder sb = new();
@@ -197,7 +243,6 @@ namespace AbyssOverhaul.Core.Ecosystem.Ecology
 
             sb.AppendLine(type.Name);
 
-            // Public instance fields
             FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
             foreach (FieldInfo field in fields)
             {
@@ -205,7 +250,6 @@ namespace AbyssOverhaul.Core.Ecosystem.Ecology
                 sb.AppendLine($"{field.Name}: {FormatDebugValue(value)}");
             }
 
-            // Public instance properties with getters and no index parameters
             PropertyInfo[] properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
             foreach (PropertyInfo prop in properties)
             {
@@ -254,12 +298,15 @@ namespace AbyssOverhaul.Core.Ecosystem.Ecology
                     return value.ToString();
             }
         }
+
         private string BuildDebugText(NPC npc)
         {
             StringBuilder sb = new();
 
             sb.AppendLine($"NPC: {npc.GivenOrTypeName}");
             sb.AppendLine($"Type: {npc.type}");
+            sb.AppendLine($"ActorID: {ActorID}");
+            sb.AppendLine($"Loaded: true");
 
             if (SpeciesDefinition is not null)
             {
@@ -274,6 +321,14 @@ namespace AbyssOverhaul.Core.Ecosystem.Ecology
             sb.AppendLine($"PreferredDepth: {PreferredDepth:0.00}");
             sb.AppendLine($"PreferredSpacing: {PreferredSpacing:0.00}");
 
+            if (Metabolism is not null)
+            {
+                sb.AppendLine($"Energy: {Metabolism.Energy:0.00}");
+                sb.AppendLine($"Stomach: {Metabolism.StomachContent:0.00}");
+                sb.AppendLine($"Condition: {Metabolism.BodyCondition:0.00}");
+                sb.AppendLine($"Fatigue: {Metabolism.Fatigue:0.00}");
+            }
+
             return sb.ToString();
         }
     }
@@ -283,8 +338,4 @@ namespace AbyssOverhaul.Core.Ecosystem.Ecology
         public static EcologyGlobalNPC Ecology(this NPC npc) =>
             npc.GetGlobalNPC<EcologyGlobalNPC>();
     }
-
-
-
-
 }

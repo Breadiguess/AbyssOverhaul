@@ -8,14 +8,17 @@ namespace AbyssOverhaul.Content.BehaviorOverrides
     {
         public void SetSpeciesEcology(SpeciesEcologyDefinition definition)
         {
-            definition.AddTraits(NpcTraitFlags.None);
+            definition.AddTraits(NpcTraitFlags.Prey);
+            definition.BaseCuriosity = 4;
+            definition.BaseFear = 0.8f;
+            definition.BaseMaxHunger = 60;
+            definition.FoodConsumer = FoodConsumerType.Scavenger;
         }
 
         public void SetupIndividualEcology(NPC npc, EcologyGlobalNPC ecology)
         {
 
         }
-        public override string TexturePath => this.GetPath();
         public override int NPCType => ModContent.NPCType<CalamityMod.NPCs.Abyss.LuminousCorvina>();
 
 
@@ -31,7 +34,7 @@ namespace AbyssOverhaul.Content.BehaviorOverrides
 
             Scream
         }
-        //public override string TexturePath => $"{this.GetPath}";
+        public override string TexturePath => $"AbyssOverhaul/Content/BehaviorOverrides/VoidstoneScreamerNPC/VoidstoneScreamer";
 
         public LoopedSoundInstance? ScreamLoop;
         public override void SetDefaults(NPC npc)

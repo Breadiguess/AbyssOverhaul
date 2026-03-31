@@ -18,6 +18,9 @@ namespace AbyssOverhaul.Core.Ecosystem.Ecology
         public float BaseAggression;
         public float BaseFear;
         public float BaseCuriosity;
+        public float BaseCowardice;
+
+
         public float BasePreferredDepth;
         public float BasePreferredSpacing = 64f;
 

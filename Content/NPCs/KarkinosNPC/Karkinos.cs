@@ -23,6 +23,10 @@ namespace AbyssOverhaul.Content.NPCs.KarkinosNPC
         void IEcologyParticipant.SetSpeciesEcology(SpeciesEcologyDefinition definition)
         {
             definition.AddTraits(NpcTraitFlags.Territorial);
+            definition.BaseMaxHunger = 100;
+
+            definition.BaseAggression = 0.3f;
+            definition.BaseFear = -0.4f;
         }
 
         void IEcologyParticipant.SetupIndividualEcology(NPC npc, EcologyGlobalNPC ecology)

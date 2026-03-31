@@ -181,7 +181,7 @@ namespace AbyssOverhaul.Content.Layers.TheVeil.NPCs.VoidDreamerNPC
 
             HeadVar = Main.rand.Next(HeadVariationCount);
 
-            if (Main.rand.NextBool(200))
+            if (Main.rand.NextBool())
             {
                 HorseMode = true;
 

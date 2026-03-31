@@ -47,7 +47,6 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
 
         public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
         {
-            overPlayers.Add(index);
         }
         public override void SetDefaults()
         {
@@ -56,6 +55,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
             Projectile.friendly = true;
             Projectile.hostile = false;
             Projectile.timeLeft = 2;
+            Projectile.Size = new(10);
         }
 
         public override bool PreAI()

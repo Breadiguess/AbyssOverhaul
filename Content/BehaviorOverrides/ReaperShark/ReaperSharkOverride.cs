@@ -1,18 +1,24 @@
-﻿using AbyssOverhaul.Core.NPCOverrides;
-using BreadLibrary.Core;
-using BreadLibrary.Core.Verlet;
-using CalamityMod.NPCs.Abyss;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BreadLibrary.Core.Verlet;
 
 namespace AbyssOverhaul.Content.BehaviorOverrides.ReaperShark
 {
-    internal class ReaperSharkOverride : NPCBehaviorOverride
+    internal class ReaperSharkOverride : NPCBehaviorOverride, IEcologyParticipant
     {
+        public void SetSpeciesEcology(SpeciesEcologyDefinition definition)
+        {
+            definition.Metabolism.DigestiveRate = 1f;
+            definition.AddTraits(NpcTraitFlags.Predator);
+            definition.AddTraits(NpcTraitFlags.AmbushPredator);
+            definition.BaseAggression = 0.9f;
+            definition.BaseCuriosity = 0.3f;
+            definition.BaseFear = 0.1f;
+            definition.BaseMaxHunger = 200;
+            definition.FoodConsumer = FoodConsumerType.Carnivore;
+        }
+
+        public void SetupIndividualEcology(NPC npc, EcologyGlobalNPC ecology)
+        {
+        }
         public override int NPCType => ModContent.NPCType<CalamityMod.NPCs.Abyss.ReaperShark>();
 
 
@@ -28,8 +34,8 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.ReaperShark
             NPC.lifeMax = 4000;
             NPC.defense = 4000;
             Dreadlocks = new List<VerletChain>();
-            for(int i = 0; i< 7; i++)
-            Dreadlocks.Add(new(20, 4, NPC.Center));
+            for (int i = 0; i < 7; i++)
+                Dreadlocks.Add(new(20, 4, NPC.Center));
 
             var a = new IKSkeleton.JointSetup(40, 0, MathHelper.TwoPi);
             IKSkeleton skeleton = new IKSkeleton(a);
@@ -44,20 +50,20 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.ReaperShark
         {
 
 
-            for(int i = 0; i< arms.Length; i++)
+            for (int i = 0; i < arms.Length; i++)
             {
                 var a = arms[i];
-                
+
                 a.Skeleton.Update(NPC.Center, Main.MouseWorld);
                 arms[i] = a;
             }
 
 
-            for(int i = 0; i< Dreadlocks.Count; i++)
+            for (int i = 0; i < Dreadlocks.Count; i++)
             {
                 var t = Dreadlocks[i];
-                Vector2 Velocity = new Vector2(0,-1).RotatedBy(MathF.Cos(i+Main.GameUpdateCount*0.005f));
-                t.Simulate(Velocity, NPC.Center + new Vector2(Dreadlocks.Count-i,0)*10, -1, 0.7f);
+                Vector2 Velocity = new Vector2(0, -1).RotatedBy(MathF.Cos(i + Main.GameUpdateCount * 0.005f));
+                t.Simulate(Velocity, NPC.Center + new Vector2(Dreadlocks.Count - i, 0) * 10, -1, 0.7f);
             }
 
 
@@ -75,35 +81,35 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.ReaperShark
         }
         void DrawArms()
         {
-            if(arms is not null)
+            if (arms is not null)
             {
-                for(int i = 0; i < arms.Length; i++)
+                for (int i = 0; i < arms.Length; i++)
                 {
                     var t = arms[i].Skeleton;
 
-                    for(int x = 0; x< t.PositionCount; x++)
+                    for (int x = 0; x < t.PositionCount; x++)
                     {
                         Vector2 start = t.Position(x);
                         Vector2 end = t.Position(x + 1);
 
                         Utils.DrawLine(Main.spriteBatch, start, end, Color.Black, Color.Black, 10);
                     }
-                  
+
                 }
             }
         }
 
         void DrawDreadlocks(SpriteBatch spriteBatch)
         {
-            if(Dreadlocks is not null)
+            if (Dreadlocks is not null)
             {
-                for(int x = 0; x< Dreadlocks.Count; x++)
+                for (int x = 0; x < Dreadlocks.Count; x++)
                 {
                     var t = Dreadlocks[x];
-                    for(int i = 0; i< t.Positions.Length-1; i++)
+                    for (int i = 0; i < t.Positions.Length - 1; i++)
                     {
                         Vector2 start = t.Positions[i];
-                        Vector2 end = t.Positions[i+1];
+                        Vector2 end = t.Positions[i + 1];
 
                         Utils.DrawLine(spriteBatch, start, end, Color.Black, Color.Black, 10);
                         //Utilities.DrawLineBetter(spriteBatch, start, end, Color.Black, 10);
@@ -111,5 +117,7 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.ReaperShark
                 }
             }
         }
+
+
     }
 }

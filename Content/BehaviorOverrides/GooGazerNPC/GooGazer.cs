@@ -21,6 +21,9 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.GooGazerNPC
         public void SetSpeciesEcology(SpeciesEcologyDefinition definition)
         {
            definition.AddTraits(NpcTraitFlags.Prey);
+            definition.BaseMaxHunger = 40;
+            definition.BaseFear = 0.7f;
+            definition.FoodConsumer = FoodConsumerType.Herbivore;
         }
 
         public void SetupIndividualEcology(NPC npc, EcologyGlobalNPC ecology)

@@ -21,6 +21,11 @@ namespace AbyssOverhaul.Content.NPCs.DeepSnapperNPC
         public void SetSpeciesEcology(SpeciesEcologyDefinition definition)
         {
             definition.AddTraits(NpcTraitFlags.Schooling);
+            definition.BaseMaxHunger = 40;
+            definition.FoodConsumer = FoodConsumerType.Omnivore;
+            definition.BaseCuriosity = 1;
+            
+            definition.Metabolism.DesperationThreshold = 0.1f;
         }
 
         public void SetupIndividualEcology(NPC npc, EcologyGlobalNPC ecology)
@@ -106,6 +111,10 @@ namespace AbyssOverhaul.Content.NPCs.DeepSnapperNPC
         #region Spawn A School
         public override void OnSpawn(IEntitySource source)
         {
+            if (NPC.Ecology().SpawnedFromActor)
+                return;
+
+
             if (source is EntitySource_Parent parentSource &&
                 parentSource.Entity is NPC parentNpc &&
                 parentNpc.active &&

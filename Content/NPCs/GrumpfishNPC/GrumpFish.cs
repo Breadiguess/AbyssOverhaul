@@ -10,7 +10,10 @@ namespace AbyssOverhaul.Content.NPCs.GrumpfishNPC
     {
         public void SetSpeciesEcology(SpeciesEcologyDefinition definition)
         {
-           
+            definition.AddTraits(NpcTraitFlags.Prey);
+            definition.AddTraits(NpcTraitFlags.Schooling);
+            definition.BaseAggression = 0.7f;
+            definition.BaseCowardice = 1;
         }
 
         public void SetupIndividualEcology(NPC npc, EcologyGlobalNPC ecology)

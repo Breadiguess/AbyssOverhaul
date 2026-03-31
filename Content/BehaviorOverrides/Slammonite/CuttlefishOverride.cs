@@ -17,6 +17,18 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Slammonite
 {
     internal class CuttlefishOverride : NPCBehaviorOverride, IEcologyParticipant
     {
+        public void SetSpeciesEcology(SpeciesEcologyDefinition definition)
+        {
+            definition.AddTraits(NpcTraitFlags.AmbushPredator);
+            definition.FoodConsumer = FoodConsumerType.Omnivore;
+            definition.BaseCuriosity = 0.4f;
+            definition.BaseMaxHunger = 50;
+        }
+
+        public void SetupIndividualEcology(NPC npc, EcologyGlobalNPC ecology)
+        {
+
+        }
         public override int NPCType => ModContent.NPCType<Cuttlefish>();
 
         public override string TexturePath => "AbyssOverhaul/Content/BehaviorOverrides/Slammonite/Slamonite";
@@ -381,14 +393,6 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Slammonite
             
         }
 
-        public void SetSpeciesEcology(SpeciesEcologyDefinition definition)
-        {
-            definition.AddTraits(NpcTraitFlags.AmbushPredator);
-        }
-
-        public void SetupIndividualEcology(NPC npc, EcologyGlobalNPC ecology)
-        {
-            
-        }
+      
     }
 }
