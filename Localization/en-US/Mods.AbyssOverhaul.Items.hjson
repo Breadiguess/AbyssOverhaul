@@ -44,3 +44,8 @@ DebugSubworldEntrance: {
 	DisplayName: Debug Subworld Entrance
 	Tooltip: ""
 }
+
+DebugSubworldEntrance: {
+	DisplayName: Debug Subworld Entrance
+	Tooltip: ""
+}
