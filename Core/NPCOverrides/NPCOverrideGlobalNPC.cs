@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System.IO;
 using Terraria;
 using Terraria.DataStructures;
+using Terraria.GameContent.Bestiary;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
@@ -33,9 +34,14 @@ namespace AbyssOverhaul.Core.NPCOverrides
             OverrideInstance = NPCOverrideRegistry.CreateFor(NPCLoader.npcs[npcType].NPC);
             return OverrideInstance;
         }
-    
-           
-        
+
+
+
+        public override void SetBestiary(NPC npc, BestiaryDatabase database, BestiaryEntry bestiaryEntry)
+        {
+            // Important: use the prototype, not the per-entity instance.
+            NPCOverrideRegistry.GetPrototype(npc)?.SetBestiary(npc, database, bestiaryEntry);
+        }
         public override void SetDefaults(NPC npc)
         {
             GetOverride(npc)?.SetDefaults(npc);
@@ -45,7 +51,6 @@ namespace AbyssOverhaul.Core.NPCOverrides
         {
             GetOverride(npc)?.OnSpawn(npc, source);
         }
-
 
         public override void SpawnNPC(int npc, int tileX, int tileY)
         {

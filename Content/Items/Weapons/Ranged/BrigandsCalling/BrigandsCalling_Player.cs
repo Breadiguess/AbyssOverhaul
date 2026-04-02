@@ -374,7 +374,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
                     spawnPos,
                     Vector2.Zero,
                     spoutType,
-                    100,
+                    Player.HeldItem.damage,
                     0f,
                     Player.whoAmI
                 );

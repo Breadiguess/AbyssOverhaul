@@ -13,8 +13,19 @@ using Terraria.Localization;
 namespace AbyssOverhaul.Content.BehaviorOverrides.Brooding_Oarfish
 {
 #pragma warning disable CS8618 
-    public class BroodingOarfish : NPCBehaviorOverride, IMultiSegmentNPC
+    public class BroodingOarfish : NPCBehaviorOverride, IMultiSegmentNPC, IEcologyParticipant
     {
+        public void SetSpeciesEcology(SpeciesEcologyDefinition definition)
+        {
+            definition.AddTraits(NpcTraitFlags.None);
+            definition.FoodConsumer = FoodConsumerType.Herbivore;
+            definition.BaseAggression = -2f;
+        }
+
+        public void SetupIndividualEcology(NPC npc, EcologyGlobalNPC ecology)
+        {
+
+        }
         public override int NPCType => ModContent.NPCType<OarfishHead>();
 
 
@@ -288,6 +299,8 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Brooding_Oarfish
 
             }
         }
+
+     
 
         #endregion
     }

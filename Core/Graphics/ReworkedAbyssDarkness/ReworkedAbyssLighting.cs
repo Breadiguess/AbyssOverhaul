@@ -31,6 +31,7 @@ namespace AbyssOverhaul.Core.Graphics.ReworkedAbyssDarkness
             public int lifetime = 1;
             public Rectangle? frame = null;
             public Vector2 Origin;
+            public SpriteEffects spriteEffects = SpriteEffects.None;
             public LightSource() { }
 
             // This constructor only gives the most common arguments. Frame, Color, lifetime, etc. must be set in curly braces afterwards to prevent this constructor getting too unwieldy.
@@ -77,7 +78,7 @@ namespace AbyssOverhaul.Core.Graphics.ReworkedAbyssDarkness
                 Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.Default, Main.Rasterizer, null, Matrix.Identity);
                 foreach (var item in lights)
                 {
-                    Main.spriteBatch.Draw(item.texture, item.center - Main.screenPosition, item.frame, item.color * item.opacity, item.rotation, item.Origin == default? item.frame is null ? item.texture.Size() * 0.5f : item.frame.Value.Size() : item.Origin, item.vectorScale * item.scale, SpriteEffects.None, 0);
+                    Main.spriteBatch.Draw(item.texture, item.center - Main.screenPosition, item.frame, item.color * item.opacity, item.rotation, item.Origin == default? item.frame is null ? item.texture.Size() * 0.5f : item.frame.Value.Size() : item.Origin, item.vectorScale * item.scale, item.spriteEffects, 0);
                 }
                 Main.spriteBatch.End();
             }

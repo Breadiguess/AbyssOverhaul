@@ -3,8 +3,11 @@ using AbyssOverhaul.Core.Systems;
 using AbyssOverhaul.Core.Utilities;
 using AbyssOverhaul.Core.WorldGen;
 using CalamityMod;
+using CalamityMod.Buffs.StatDebuffs;
 using CalamityMod.CalPlayer;
 using CalamityMod.Graphics;
+using CalamityMod.Items.Accessories;
+using CalamityMod.Items.Potions;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
@@ -79,6 +82,24 @@ namespace AbyssOverhaul.Core.ModPlayers
         /// </summary>
         public AbyssRegion Region;
 
+        
+        /// <summary>
+        /// Returns the range at which an abyss enemy can detect the player
+        /// </summary>
+        /// <param name="range">The default detection range</param>
+        /// <returns></returns>
+        public float GetAbyssAggro(float range)
+        {
+
+            range *= Player.Calamity().fishAlert ? 3f : 1f;
+            range *= Player.Calamity().eidolonSnailPet ? 0.85f : 1f;
+            range *= Player.Calamity().anechoicCoating ? 0.5f : 1f;
+            range *= Player.Calamity().anechoicPlating ? 0.5f : 1f;
+            range *= Player.Calamity().abyssalMirror ? 0.65f : 1f;
+            range *= Player.Calamity().eclipseMirror ? 0.3f : 1f;
+            range *= Player.Calamity().reaverExplore ? 0.9f : 1f;
+            return range;
+        }
 
 
 
@@ -215,6 +236,9 @@ namespace AbyssOverhaul.Core.ModPlayers
 
             darknessIntensity = MathHelper.Clamp(finalDarkness, 0f, 1f);
         }
+
+
+
     }
 
 

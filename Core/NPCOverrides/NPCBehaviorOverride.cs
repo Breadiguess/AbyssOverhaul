@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using Terraria.DataStructures;
+using Terraria.GameContent.Bestiary;
 
 namespace AbyssOverhaul.Core.NPCOverrides
 {
@@ -40,6 +41,7 @@ namespace AbyssOverhaul.Core.NPCOverrides
         }
 
         public virtual void SetStaticDefaults() { }
+        public virtual void SetBestiary(NPC npc, BestiaryDatabase database, BestiaryEntry bestiaryEntry) { }
 
         #region Defaults and AI
 
@@ -115,6 +117,8 @@ namespace AbyssOverhaul.Core.NPCOverrides
         public virtual void SendExtraAI(NPC NPC, BinaryWriter writer) { }
 
         public virtual void ReceiveExtraAI(NPC NPC, BinaryReader reader) { }
+
+       
         #endregion
     }
 }
