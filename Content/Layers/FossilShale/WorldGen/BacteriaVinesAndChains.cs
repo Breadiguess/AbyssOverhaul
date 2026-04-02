@@ -111,7 +111,7 @@ namespace AbyssOverhaul.Content.Layers.FossilShale.WorldGen
                     continue;
 
                 float widthFactor = MathHelper.Clamp((radius - 4f) / 10f, 0f, 1f);
-                float placeChance = MathHelper.Lerp(0.16f, 0.72f, widthFactor);
+                float placeChance = MathHelper.Lerp(0.4f, 0.8f, widthFactor);
 
                 if (rand.NextFloat() > placeChance)
                     continue;
@@ -121,7 +121,7 @@ namespace AbyssOverhaul.Content.Layers.FossilShale.WorldGen
                     lastPlacedIndex = i;
 
                     // Pre-sag it a bit so it doesn't begin as a perfectly straight line.
-                    SeedChainSag(chain, rand.NextFloat(6f, 16f));
+                    SeedChainSag(chain, rand.NextFloat(1f, 6f));
                 }
             }
         }

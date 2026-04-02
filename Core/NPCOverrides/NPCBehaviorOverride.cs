@@ -5,6 +5,12 @@ namespace AbyssOverhaul.Core.NPCOverrides
 {
     public abstract class NPCBehaviorOverride
     {
+        #region ImportantStuff
+        /// <summary>
+        /// The vanilla/modded NPC type this override is for.
+        /// </summary>
+        public abstract int NPCType { get; }
+
         /// <summary>
         /// If non-null, this texture will replace TextureAssets.Npc[NPCType].
         /// </summary>
@@ -18,10 +24,6 @@ namespace AbyssOverhaul.Core.NPCOverrides
         {
 
         }
-        /// <summary>
-        /// The vanilla/modded NPC type this override is for.
-        /// </summary>
-        public abstract int NPCType { get; }
 
         /// <summary>
         /// Extra condition beyond NPC.type.
@@ -29,6 +31,7 @@ namespace AbyssOverhaul.Core.NPCOverrides
         /// </summary>
         public virtual bool ShouldOverride(NPC NPC) => NPC.type == NPCType;
 
+        #endregion
         /// <summary>
         /// Runs once after the override is instantiated and registered.
         /// </summary>
@@ -38,11 +41,20 @@ namespace AbyssOverhaul.Core.NPCOverrides
 
         public virtual void SetStaticDefaults() { }
 
+        #region Defaults and AI
 
         /// <summary>
         /// Runs from GlobalNPC.SetDefaults.
         /// </summary>
         public virtual void SetDefaults(NPC NPC) { }
+
+        /// <summary>
+        /// Hard AI replacement. Return true if you handled AI and want to suppress orig.
+        /// </summary>
+        public virtual bool OverrideAI(NPC NPC) => false;
+        #endregion
+
+        #region SpawnStuff
 
         public virtual void OnSpawn(NPC NPC, IEntitySource source)
         {
@@ -50,14 +62,21 @@ namespace AbyssOverhaul.Core.NPCOverrides
         }
 
 
+        public virtual void SpawnNPC(int npc, int tileX, int tileY)
+        {
+
+        }
+        #endregion
+
+        #region Kill Stuff
+
+        public virtual bool CheckActive(NPC NPC) => true;
         public virtual void OnKill(NPC NPC) { }
 
-        /// <summary>
-        /// Hard AI replacement. Return true if you handled AI and want to suppress orig.
-        /// </summary>
-        public virtual bool OverrideAI(NPC NPC) => false;
+        public virtual bool CheckDead(NPC NPC) => true;
 
-
+        #endregion
+      
         #region Collision, onhit, etc.
         public virtual void OnHitPlayer(NPC npc, Player target, Player.HurtInfo hurtInfo)
         {
@@ -70,6 +89,7 @@ namespace AbyssOverhaul.Core.NPCOverrides
 
         #endregion
 
+        #region DrawCode
         /// <summary>
         /// Hard FindFrame replacement. Return true if you handled framing and want to suppress orig.
         /// </summary>
@@ -87,12 +107,14 @@ namespace AbyssOverhaul.Core.NPCOverrides
         /// </summary>
         public virtual bool DrawDirect(NPC NPC, SpriteBatch spriteBatch, Vector2 screenPos, bool behindTiles) => false;
 
-        public virtual bool CheckDead(NPC NPC) => true;
+        #endregion
 
         public virtual void BossHeadSlot(NPC NPC, ref int index) { }
 
+        #region NetSyncing
         public virtual void SendExtraAI(NPC NPC, BinaryWriter writer) { }
 
         public virtual void ReceiveExtraAI(NPC NPC, BinaryReader reader) { }
+        #endregion
     }
 }

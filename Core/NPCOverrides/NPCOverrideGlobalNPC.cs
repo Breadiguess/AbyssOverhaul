@@ -25,6 +25,14 @@ namespace AbyssOverhaul.Core.NPCOverrides
             return OverrideInstance;
         }
 
+        public NPCBehaviorOverride GetOverride(int npcType)
+        {
+            if (OverrideInstance is not null)
+                return OverrideInstance;
+
+            OverrideInstance = NPCOverrideRegistry.CreateFor(NPCLoader.npcs[npcType].NPC);
+            return OverrideInstance;
+        }
     
            
         
@@ -38,6 +46,21 @@ namespace AbyssOverhaul.Core.NPCOverrides
             GetOverride(npc)?.OnSpawn(npc, source);
         }
 
+
+        public override void SpawnNPC(int npc, int tileX, int tileY)
+        {
+            GetOverride(npc)?.SpawnNPC(npc, tileX, tileY);
+        }
+
+        public override bool CheckActive(NPC npc)
+        {
+            bool result = base.CheckActive(npc);
+            if ((GetOverride(npc)?.CheckActive(npc)).HasValue)
+            {
+                result = (GetOverride(npc)?.CheckActive(npc)).Value;
+            }
+            return result;
+        }
         public override bool CheckDead(NPC npc)
         {
             NPCBehaviorOverride ov = GetOverride(npc);

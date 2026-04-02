@@ -81,6 +81,8 @@ namespace AbyssOverhaul.Core.ModPlayers
 
 
 
+
+
         public override void ResetEffects()
         {
             // These are recalculated every tick.
