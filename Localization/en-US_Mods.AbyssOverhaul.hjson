@@ -105,4 +105,5 @@ Projectiles: {
 	MicrobeGlob.DisplayName: Microbe Glob
 	BrigandsCalling_Held.DisplayName: Brigands Calling_ Held
 	BrigandsCalling_WaterSpout.DisplayName: Brigands Calling_ Water Spout
+	DebugProjectile.DisplayName: Debug Projectile
 }

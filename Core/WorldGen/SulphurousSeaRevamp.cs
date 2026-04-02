@@ -1722,7 +1722,7 @@ namespace AbyssOverhaul.Core.WorldGen
         // This method is an involutory function, meaning that applying it to the same number twice always yields the original number.
         public static int GetActualX(int x)
         {
-            if (Math.Sign(Main.dungeonX)!=1)
+            if (Math.Sign(Main.dungeonX - Main.maxTilesX)!=1)
                 return x;
             else
 

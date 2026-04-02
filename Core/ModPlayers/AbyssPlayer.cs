@@ -274,13 +274,13 @@ namespace AbyssOverhaul.Core.ModPlayers
                 ap.abyssPlayerGlowMultiplier += 0.2f;
 
             if (mp.babyGhostBell && underwater)
-                ap.abyssDarkness -= 0.1f;
+                ap.abyssDarkness -= 0.05f;
 
             if (mp.sirenPet && underwater)
-                ap.abyssDarkness -= 0.2f;
+                ap.abyssDarkness -= 0.1f;
 
             if (mp.littleLightPet)
-                ap.abyssDarkness -= 0.1f;
+                ap.abyssDarkness -= 0.05f;
 
         }
     }

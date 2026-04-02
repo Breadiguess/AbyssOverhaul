@@ -1,4 +1,6 @@
-﻿using AbyssOverhaul.Core.Carcasses;
+﻿using AbyssOverhaul.Content.Items.Debug;
+using AbyssOverhaul.Content.Layers.FossilShale.Systems;
+using AbyssOverhaul.Core.Carcasses;
 using AbyssOverhaul.Core.ModPlayers;
 using System;
 using System.Collections.Generic;
@@ -17,7 +19,9 @@ namespace AbyssOverhaul
             SyncPressurePlayer,
 
             Carcass,
-            SyncBrigandsCallingPlayer
+            SyncBrigandsCallingPlayer,
+
+            CreateChain,
         }
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {
@@ -64,7 +68,60 @@ namespace AbyssOverhaul
                             modPlayer.SendSync(-1, whoAmI);
 
                         break;
-                    }   
+                    }
+
+
+                case AbyssOverhaulMessageType.CreateChain:
+                    {
+                        Point16 start = new Point16(reader.ReadInt16(), reader.ReadInt16());
+                        Point16 end = new Point16(reader.ReadInt16(), reader.ReadInt16());
+
+                        if (!TileToTileChainSystem.IsValidAnchorTile(start) || !TileToTileChainSystem.IsValidAnchorTile(end))
+                            return;
+
+                        if (Main.netMode == NetmodeID.Server)
+                        {
+                            TileToTileChainSystem.AddChain(
+                                start,
+                                end,
+                                ChainLinker.DefaultPixelsPerSegment,
+                                ChainLinker.DefaultGravity,
+                                ChainLinker.DefaultDamping,
+                                ChainLinker.DefaultSimulateIterations,
+                                ChainLinker.DefaultAnchorIterations,
+                                ChainLinker.DefaultCollideWithTiles,
+                                ChainLinker.DefaultCollisionRadius,
+                                Vector2.Zero,
+                                Vector2.Zero,
+                                ChainLinker.DefaultThickness);
+
+                            ModPacket packet = GetPacket();
+                            packet.Write((byte)AbyssOverhaulMessageType.CreateChain);
+                            packet.Write((short)start.X);
+                            packet.Write((short)start.Y);
+                            packet.Write((short)end.X);
+                            packet.Write((short)end.Y);
+                            packet.Send(-1, whoAmI);
+                        }
+                        else
+                        {
+                            TileToTileChainSystem.AddChain(
+                                start,
+                                end,
+                                ChainLinker.DefaultPixelsPerSegment,
+                                ChainLinker.DefaultGravity,
+                                ChainLinker.DefaultDamping,
+                                ChainLinker.DefaultSimulateIterations,
+                                ChainLinker.DefaultAnchorIterations,
+                                ChainLinker.DefaultCollideWithTiles,
+                                ChainLinker.DefaultCollisionRadius,
+                                Vector2.Zero,
+                                Vector2.Zero,
+                                ChainLinker.DefaultThickness);
+                        }
+
+                        break;
+                    }
             }
 
         }

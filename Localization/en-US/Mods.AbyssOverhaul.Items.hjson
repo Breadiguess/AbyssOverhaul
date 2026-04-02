@@ -34,3 +34,8 @@ EcologyDebugOverlayItem: {
 	DisplayName: Ecology Debug Overlay Item
 	Tooltip: ""
 }
+
+ChainLinker: {
+	DisplayName: Chain Linker
+	Tooltip: ""
+}

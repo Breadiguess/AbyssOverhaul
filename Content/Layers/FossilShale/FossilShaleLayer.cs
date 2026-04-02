@@ -25,7 +25,7 @@ namespace AbyssOverhaul.Content.Layers.FossilShale
 
                 int topY = layer.StartHeight;
                 int bottomY = layer.EndHeight;
-                FossilShaleCaveGen.GenerateFossilShaleCaves(progress, config,
+                FossilShaleGen.GenerateFossilShaleCaves_Overhauled(progress, config,
                     AbyssGenUtils.MinX,
                     AbyssGenUtils.MaxX,
                     topY = Instance.StartY,
@@ -48,6 +48,8 @@ namespace AbyssOverhaul.Content.Layers.FossilShale
                 FossilShaleGen.SeedCyanobacteriaVines(minX, maxX, topY, bottomY);
                 FossilShaleGen.GrowCyanobacteriaVines(minX, maxX, topY, bottomY);
             });
+
+           
         }
 
 

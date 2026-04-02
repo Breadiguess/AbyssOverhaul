@@ -4,9 +4,14 @@ using Terraria.Utilities;
 
 namespace AbyssOverhaul.Content.Layers.FossilShale.WorldGen
 {
-    public static class FossilShaleCaveGen
+    public static partial class FossilShaleGen
     {
-        private struct Tunnel
+
+        public static int MicrobialSlate => ModContent.TileType<MicrobialSlate>();
+        public static int Sludge => ModContent.TileType<CyanobacteriaSludge_Tile>();
+        public static int CarbonShale => ModContent.TileType<CarbonShale_Tile>();
+        public static int ShaleSand => ModContent.TileType<ShaleSand_Tile>();
+        internal struct Tunnel
         {
             public List<Point> Points;
             public int[] Radius;
@@ -28,7 +33,7 @@ namespace AbyssOverhaul.Content.Layers.FossilShale.WorldGen
             }
         }
 
-        private struct Chamber2
+        internal struct Chamber2
         {
             public Point Center;
 

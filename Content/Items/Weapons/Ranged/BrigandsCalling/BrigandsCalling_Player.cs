@@ -100,6 +100,9 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
             public bool SuperHome = false;
             public override void OnSpawn(Projectile projectile, IEntitySource source)
             {
+
+                var Player = Main.player[projectile.owner];
+                if(Player.GetModPlayer<BrigandsCalling_Player>().Active)
                 if (source.Context is not null && source.Context.ToString().Contains("BrigandsCalling"))
                 {
                     IsBrigandsCallingProjectile = true;
