@@ -7,7 +7,20 @@ namespace AbyssOverhaul.Core.Subworlds
 {
     internal sealed class AbyssTransitionSystem : ModSystem
     {
-        internal static bool SuppressPlayerSaving;
+
+
+        public override void Load()
+        {
+            On_Main.DrawInterface += DrawFade;
+        }
+
+        private void DrawFade(On_Main.orig_DrawInterface orig, Main self, GameTime gameTime)
+        {
+            orig(self, gameTime);
+
+
+            
+        }
 
         private enum TransitionPhase
         {
@@ -49,8 +62,6 @@ namespace AbyssOverhaul.Core.Subworlds
 
 
 
-            // Disable player saving only for the expensive entry handoff.
-            SuppressPlayerSaving = true;
 
             _pending = new PendingTransition
             {
@@ -152,8 +163,6 @@ namespace AbyssOverhaul.Core.Subworlds
 
                     ApplyArrival(player, destination, _pending.SavedVelocity, _pending.SavedDirection);
 
-                    // We are fully inside now. Re-enable normal player saving.
-                    SuppressPlayerSaving = false;
 
                     _pending.Phase = TransitionPhase.FadingIn;
                     break;
@@ -186,14 +195,10 @@ namespace AbyssOverhaul.Core.Subworlds
                 HasSavedReturnPoint = hadReturn
             };
 
-            // Safety: never leave this stuck on.
-            SuppressPlayerSaving = false;
         }
 
         public override void OnWorldUnload()
         {
-            // Extra safety for failed transitions or menu returns.
-            SuppressPlayerSaving = false;
         }
     }
 }

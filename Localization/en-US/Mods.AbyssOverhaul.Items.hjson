@@ -45,7 +45,7 @@ DebugSubworldEntrance: {
 	Tooltip: ""
 }
 
-DebugSubworldEntrance: {
-	DisplayName: Debug Subworld Entrance
+AbyssPortalItem: {
+	DisplayName: Abyss Portal Item
 	Tooltip: ""
 }

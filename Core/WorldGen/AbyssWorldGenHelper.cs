@@ -1,4 +1,5 @@
 ﻿using AbyssOverhaul.Core.Utilities;
+using CalamityMod;
 using Terraria.ID;
 
 namespace AbyssOverhaul.Core.WorldGen
@@ -70,7 +71,7 @@ namespace AbyssOverhaul.Core.WorldGen
         {
             for (int y = startY; y <= endY; y++)
             {
-                if (!Terraria.WorldGen.InWorld(x, y, 20))
+                if(!CalamityUtils.ParanoidTileRetrieval(x, y).HasTile)
                     continue;
 
                 Tile tile = Main.tile[x, y];

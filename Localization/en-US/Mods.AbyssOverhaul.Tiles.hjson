@@ -29,3 +29,5 @@ Tenebris_Item: {
 	DisplayName: Tenebris_ Item
 	Tooltip: ""
 }
+
+AbyssPortalTile.MapEntry: Abyss Portal Tile

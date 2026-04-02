@@ -2,13 +2,9 @@
 using AbyssOverhaul.Content.Layers.FossilShale.Systems;
 using AbyssOverhaul.Core.Carcasses;
 using AbyssOverhaul.Core.ModPlayers;
-using System;
-using System.Collections.Generic;
+using AbyssOverhaul.Core.Subworlds;
+using SubworldLibrary;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria.ID;
 
 namespace AbyssOverhaul
 {
@@ -22,6 +18,8 @@ namespace AbyssOverhaul
             SyncBrigandsCallingPlayer,
 
             CreateChain,
+            RequestEnterAbyss,
+            ApproveEnterAbyss
         }
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {
@@ -122,8 +120,40 @@ namespace AbyssOverhaul
 
                         break;
                     }
-            }
+                case AbyssOverhaulMessageType.RequestEnterAbyss:
+                    {
+                        if (Main.netMode != NetmodeID.Server)
+                            return;
 
+                        Player player = Main.player[whoAmI];
+                        if (player is null || !player.active || player.dead)
+                            return;
+
+                        if (SubworldSystem.IsActive<AbyssSubworld>())
+                            return;
+
+                        // Put any real gatekeeping here later.
+                        // For now, the tile itself is the gate.
+
+                        ModPacket approve = GetPacket();
+                        approve.Write((byte)AbyssOverhaulMessageType.ApproveEnterAbyss);
+                        approve.Send(whoAmI);
+                        break;
+                    }
+
+                case AbyssOverhaulMessageType.ApproveEnterAbyss:
+                    {
+                        if (Main.netMode != NetmodeID.MultiplayerClient)
+                            return;
+
+                        if (!SubworldSystem.IsActive<AbyssSubworld>())
+                            SubworldSystem.Enter<AbyssSubworld>();
+
+                        break;
+                    }
+            }
         }
+
     }
 }
+

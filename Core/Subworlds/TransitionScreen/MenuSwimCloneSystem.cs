@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Input;
+using SubworldLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,12 +28,13 @@ namespace AbyssOverhaul.Core.Subworlds.TransitionScreen
         }
         public override void Load()
         {
-            On_Main.Draw += UpdateMenuPlayer;
+            //On_Main.DrawMenu += On_Main_DrawMenu;
         }
 
-        private void UpdateMenuPlayer(On_Main.orig_Draw orig, Main self, GameTime gameTime)
+        private void On_Main_DrawMenu(On_Main.orig_DrawMenu orig, Main self, GameTime gameTime)
         {
             orig(self, gameTime);
+
 
             Player p = Main.LocalPlayer;
             if (p is null || !p.active)
@@ -121,8 +123,12 @@ namespace AbyssOverhaul.Core.Subworlds.TransitionScreen
 
             // Example edge detection if you need it later:
             bool justPressedSpace = k.IsKeyDown(Keys.Space) && !old.IsKeyDown(Keys.Space);
-        
+
         }
+
+        //laggy as shit, move somehwere else
+
+   
 
         public override void PostUpdatePlayers()
         {

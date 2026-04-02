@@ -64,7 +64,7 @@ namespace AbyssOverhaul.Core.Ecosystem.Simulation
                 MaterializeNearbyActors();
 
                 UpdateLoadedActors();
-                SimulateOffscreenCells();
+                //SimulateOffscreenCells();
             }
 
             public long RegisterFreshLoadedNpc(NPC npc, EcologyGlobalNPC eco)
