@@ -137,6 +137,7 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.GooGazerNPC
 
             NpcBrain.Update(npc);
 
+            npc.noGravity = npc.wet;
            // Main.NewText($"FoodDrive:{NpcBrain.Context.FoodDrive},\nHunger:{NpcBrain.Context.Hunger}");
 
             WanderAngle = NpcBrain.Context.WanderAngle;

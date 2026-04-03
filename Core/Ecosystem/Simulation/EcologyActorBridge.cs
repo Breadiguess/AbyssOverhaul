@@ -14,7 +14,6 @@ namespace AbyssOverhaul.Core.Ecosystem.Simulation
         {
             actor.SpeciesID = npc.type;
             actor.LastKnownWorldPosition = npc.Center;
-            actor.CellCoord = EcologyMath.WorldToCell(npc.Center);
 
             actor.IndividualTraitOverrides = eco.IndividualTraitOverrides;
             actor.MaxHungerSpecies = eco.MaxHungerSpecies;

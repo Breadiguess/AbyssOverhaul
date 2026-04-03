@@ -2,6 +2,7 @@
 using AbyssOverhaul.Common.Brain.Contexts;
 using AbyssOverhaul.Common.Brain.SharedModules;
 using AbyssOverhaul.Common.Brain.SharedSensors;
+using AbyssOverhaul.Content.BehaviorOverrides.GooGazerNPC;
 using AbyssOverhaul.Core.Ecosystem.Ecology;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ namespace AbyssOverhaul.Content.NPCs.DeepSnapperNPC
         public ModularNpcBrain<SchoolingNpcContext> NpcBrain;
         public void SetSpeciesEcology(SpeciesEcologyDefinition definition)
         {
-            definition.AddTraits(NpcTraitFlags.Schooling);
+            definition.AddTraits(NpcTraitFlags.Schooling, NpcTraitFlags.Prey);
             definition.BaseMaxHunger = 40;
             definition.FoodConsumer = FoodConsumerType.Omnivore;
             definition.BaseCuriosity = 1;
@@ -59,7 +60,7 @@ namespace AbyssOverhaul.Content.NPCs.DeepSnapperNPC
             RoamTarget = reader.ReadVector2();
             RoamRetargetTime = reader.ReadInt32();
         }
-        private ref float VariantFlag => ref NPC.ai[0];   // 0 = normal, 1 = infected
+        private ref float VariantFlag => ref NPC.ai[0];  
         private ref float StateTimer => ref NPC.ai[1];
         private ref float AttackCooldown => ref NPC.ai[2];
         private ref float HomeX => ref NPC.ai[3];
@@ -215,6 +216,8 @@ namespace AbyssOverhaul.Content.NPCs.DeepSnapperNPC
                 }
             });
 
+            NpcBrain.Sensors.Add(new ThreatAwarenessSensor<SchoolingNpcContext>());
+
             NpcBrain.Modules.Add(new AvoidSameTypeModule
             {
                 AvoidanceRadius = 34f,
@@ -246,7 +249,7 @@ namespace AbyssOverhaul.Content.NPCs.DeepSnapperNPC
         public override bool PreAI()
         {
             InitializeAnythingMissing();
-            NPC.noGravity = true;
+            NPC.noGravity = NPC.wet;
             return true;
         }
 
@@ -255,6 +258,7 @@ namespace AbyssOverhaul.Content.NPCs.DeepSnapperNPC
             AttackCooldown = Math.Max(0f, AttackCooldown - 1f);
             StateTimer++;
 
+            
             Player target = TargetPlayer;
 
             switch (CurrentState)
@@ -509,6 +513,7 @@ namespace AbyssOverhaul.Content.NPCs.DeepSnapperNPC
         public override void FindFrame(int frameHeight)
         {
             NPC.frame.Y = ShouldLookInfected ? frameHeight : 0;
+
         }
         private static bool IsInfected(NPC npc)
         {

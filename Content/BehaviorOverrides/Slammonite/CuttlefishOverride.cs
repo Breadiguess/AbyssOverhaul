@@ -114,6 +114,7 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.Slammonite
             NPC.noGravity = NPC.wet;
 
             // Update brain FIRST.
+        if(NpcBrain is not null)
            NpcBrain.Update(NPC);
 
             Player target = Main.player[NPC.target];

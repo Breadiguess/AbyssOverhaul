@@ -12,32 +12,5 @@
     <Publicize Include="ReLogic" IncludeCompilerGeneratedMembers="false" IncludeVirtualMembers="false" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Content\Layers\FossilShale\Tiles\Special\" />
-    <Folder Include="Content\NPCs\GrumpfishNPC\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Content\Layers\FossilShale\Tiles\NewFolder\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Remove="Content\Layers\FossilShale\Tiles\NewFolder\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Content\Layers\FossilShale\Tiles\NewFolder\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <LocalizationCompile Remove="Content\Layers\FossilShale\Tiles\NewFolder\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <AdditionalFiles Remove="Content\Layers\FossilShale\Tiles\NewFolder\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ShaderCompile Remove="Content\Layers\FossilShale\Tiles\NewFolder\**" />
-  </ItemGroup>
+ 
 </Project>

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AbyssOverhaul.Common.Brain.Contexts
 {
-    internal class SchoolingNpcContext : NpcContext
+    internal class SchoolingNpcContext : CreatureNpcContext
     {
         public int NeighborCount;
         public NPC nearestNeighbor;

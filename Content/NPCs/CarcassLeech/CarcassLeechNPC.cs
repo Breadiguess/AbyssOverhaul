@@ -9,6 +9,15 @@ namespace AbyssOverhaul.Content.NPCs.CarcassLeech
 {
     internal class CarcassLeechNPC : ModNPC, IEcologyParticipant
     {
+        void IEcologyParticipant.SetSpeciesEcology(SpeciesEcologyDefinition definition)
+        {
+            definition.AddTraits(NpcTraitFlags.Scavager);
+        }
+
+        void IEcologyParticipant.SetupIndividualEcology(NPC npc, EcologyGlobalNPC ecology)
+        {
+
+        }
         public ModularNpcBrain<SchoolingNpcContext> NpcBrain;
         public override void SetStaticDefaults()
         {
@@ -194,14 +203,6 @@ namespace AbyssOverhaul.Content.NPCs.CarcassLeech
 
   
 
-        void IEcologyParticipant.SetSpeciesEcology(SpeciesEcologyDefinition definition)
-        {
-            definition.AddTraits(NpcTraitFlags.Scavager);
-        }
-
-        void IEcologyParticipant.SetupIndividualEcology(NPC npc, EcologyGlobalNPC ecology)
-        {
-
-        }
+      
     }
 }

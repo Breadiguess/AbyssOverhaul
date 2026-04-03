@@ -29,7 +29,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
         public float Depth => Projectile.ai[2];
         public override void SetStaticDefaults()
         {
-            Main.projFrames[Type] =4;
+            Main.projFrames[Type] =8;
         }
         public override void SetDefaults()
         {
@@ -40,7 +40,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
             Projectile.ignoreWater = true;
 
             Projectile.width = 60;
-            Projectile.height = 100;
+            Projectile.height = 90;
 
             Projectile.timeLeft = 1200;
             Projectile.penetrate = -1;
@@ -72,10 +72,11 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
             else
             {
 
+                //Dust.NewDust(Projectile.Bottom, 10, 2, DustID.Cloud);
                 float RadiusX = 90;
                 float RadiusY = 10;
                
-                float AdjTime = Main.GameUpdateCount *0.05f+BrigandsCalling_Player.WaterSpouts.FindIndex(a => a.Equals(Projectile)); 
+                float AdjTime = Main.GameUpdateCount *0.05f + BrigandsCalling_Player.WaterSpouts.FindIndex(a => a.Equals(Projectile)); 
                 Vector2 orbitOffset = new(
                     MathF.Cos(AdjTime) * RadiusX,
                     MathF.Sin(AdjTime) * RadiusY
@@ -102,6 +103,13 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
         }
 
 
+        public override void OnKill(int timeLeft)
+        {
+            for(int i = 0; i< 10; i++)
+            {
+                Dust.NewDust(Projectile.Center, 10, 10, DustID.Water);
+            }
+        }
         public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
         {
             if(Depth>0)
@@ -115,10 +123,15 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
             Texture2D Tex = TextureAssets.Projectile[Type].Value;
 
             Vector2 drawPos = Projectile.Center - Main.screenPosition;
-            Rectangle Frame = Tex.Frame(1, 4, 0, (int)((Main.GlobalTimeWrappedHourly*15.1f + Projectile.whoAmI) % 4));
+
+            int Offset = 0;
+            if (CurrentState == State.AttackNearbyEnemies)
+                Offset = 4;
+            int CurrentFrame = (int)((Main.GlobalTimeWrappedHourly * 15.1f + Projectile.whoAmI) % (4));
+            Rectangle Frame = Tex.Frame(1, 8, 0, CurrentFrame + Offset);
 
 
-            Color adjust = Color.Lerp(Color.White, Color.Blue, MathF.Sin(Main.GlobalTimeWrappedHourly * 15.1f + Projectile.whoAmI));
+            Color adjust = Color.Lerp(Color.White, Color.AliceBlue, MathF.Sin(Main.GlobalTimeWrappedHourly * 15.1f + Projectile.whoAmI));
             adjust.MultiplyRGB(lightColor);
             Main.EntitySpriteDraw(Tex, drawPos, Frame, adjust*Projectile.Opacity, 0, Frame.Size() / 2, 1, 0);
 

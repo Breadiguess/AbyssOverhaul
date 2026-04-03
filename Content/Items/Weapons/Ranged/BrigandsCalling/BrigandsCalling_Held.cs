@@ -15,7 +15,6 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
             set => Projectile.ai[0] = value;
         }
 
-        // ai[1] = 0 right hand, 1 left hand
         public bool IsLeftHand
         {
             get => Projectile.ai[1] == 1f;

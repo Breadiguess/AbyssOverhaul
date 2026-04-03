@@ -40,6 +40,7 @@ namespace AbyssOverhaul.Core.Carcasses
 
         public void Update()
         {
+            Main.NewText($"ID: {ID}, " + position);
             oldPosition = position;
             oldVelocity = velocity;
             oldDirection = direction;

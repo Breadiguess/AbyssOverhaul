@@ -43,7 +43,44 @@ namespace AbyssOverhaul.Core.Utilities
             distanceToClosestPredator = closestPredator is null ? float.MaxValue : MathF.Sqrt(closestDistSq);
             return closestPredator;
         }
+        public static NPC FindClosestAbyssPrey(this NPC npc, out float distanceToClosestPrey)
+        {
+            NPC closestPrey = null;
+            float closestDistSq = float.MaxValue;
 
+            for (int i = 0; i < Main.maxNPCs; i++)
+            {
+                NPC other = Main.npc[i];
+
+                if (!other.active || other.whoAmI == npc.whoAmI)
+                    continue;
+
+                if (!EcologyRegistry.HasParticipant(other.type))
+                    continue;
+
+                var eco = other.Ecology();
+                if (!eco.HasTrait(NpcTraitFlags.Prey))
+                    continue;
+
+                float extraDistance = (other.width * 0.5f) + (other.height * 0.5f);
+                float allowedDistSqPadding = extraDistance * extraDistance;
+
+                Vector2 diff = other.Center - npc.Center;
+                float distSq = diff.LengthSquared();
+
+                if (distSq >= closestDistSq + allowedDistSqPadding)
+                    continue;
+
+                if (!Collision.CanHit(npc.Center, 1, 1, other.Center, 1, 1))
+                    continue;
+
+                closestDistSq = distSq;
+                closestPrey = other;
+            }
+
+            distanceToClosestPrey = closestPrey is null ? float.MaxValue : MathF.Sqrt(closestDistSq);
+            return closestPrey;
+        }
         public static void TargetClosestAbyssPredator(NPC searcher, bool passiveToPlayers, float preySearchDistance, float playerSearchDistance)
         {
             bool playerSearchFilter(Player p)

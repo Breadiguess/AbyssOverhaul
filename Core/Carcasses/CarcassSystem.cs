@@ -248,7 +248,7 @@ namespace AbyssOverhaul.Core.Carcasses
                 CarcassEntity carcass = pair.Value;
                 carcass.Update();
 
-                if (carcass.PendingDelete)
+                //if (carcass.PendingDelete)
                 {
                     toRemove.Add(pair.Key);
                     continue;

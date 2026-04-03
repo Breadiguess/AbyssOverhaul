@@ -12,14 +12,14 @@ namespace AbyssOverhaul.Core.Ecosystem.Simulation
         none = 0,
         Swim = 1 << 0,
         Walk = 1<<1,
-        Fly = 1 << 2,
+        Fly = 1 << 2,b
     }
     public sealed class EcologyCell
     {
         public Point Coord;
         public Rectangle WorldBounds;
 
-        public List<long> ActorIDs = new();
+        public HashSet<long> ActorIDs = new();
         public Dictionary<int, PopulationBucket> Populations = new();
 
         public float PlantFood;

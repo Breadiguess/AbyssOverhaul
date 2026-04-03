@@ -31,7 +31,7 @@ namespace AbyssOverhaul.Core.Ecosystem.Simulation
         {
             public static EcologySystem Instance;
 
-            public readonly Dictionary<long, EcologyActor> Actors = new();
+            public readonly Dictionary<long, EcologyActor   > Actors = new();
             public readonly Dictionary<Point, EcologyCell> Cells = new();
             public readonly Dictionary<int, PersistentTerritory> Territories = new();
 
@@ -62,9 +62,7 @@ namespace AbyssOverhaul.Core.Ecosystem.Simulation
             public override void PostUpdateWorld()
             {
                 MaterializeNearbyActors();
-
                 UpdateLoadedActors();
-                Cells.Clear();
                 //SimulateOffscreenCells();
             }
 
@@ -93,9 +91,9 @@ namespace AbyssOverhaul.Core.Ecosystem.Simulation
             #region ActorManagement
             public IEnumerable<EcologyActor> EnumerateActorsInCell(EcologyCell cell)
             {
-                for (int i = 0; i < cell.ActorIDs.Count; i++)
+                foreach (long actorID in cell.ActorIDs)
                 {
-                    if (Actors.TryGetValue(cell.ActorIDs[i], out EcologyActor actor))
+                    if (Actors.TryGetValue(actorID, out EcologyActor actor))
                         yield return actor;
                 }
             }
@@ -111,10 +109,8 @@ namespace AbyssOverhaul.Core.Ecosystem.Simulation
                 actor.IsLoaded = true;
                 actor.LoadedNpcWhoAmI = npc.whoAmI;
                 actor.LastKnownWorldPosition = npc.Center;
-                actor.CellCoord = EcologyMath.WorldToCell(npc.Center);
 
                 eco.ActorID = actor.ActorID;
-                eco.SpawnedFromActor = false;
                 EcologyActorBridge.CopyActorToNpc(actor, npc, eco);
             }
             public bool TryGetActor(NPC npc, out EcologyActor actor)
@@ -180,7 +176,7 @@ namespace AbyssOverhaul.Core.Ecosystem.Simulation
                 }
             }
 
-
+            //todo: fix collection was modified error
             private void MaterializeNearbyActors()
             {
                 for (int p = 0; p < Main.maxPlayers; p++)
@@ -196,9 +192,8 @@ namespace AbyssOverhaul.Core.Ecosystem.Simulation
                         if (!Cells.TryGetValue(coord, out EcologyCell cell))
                             continue;
 
-                        for (int i = 0; i < cell.ActorIDs.Count; i++)
+                        foreach (long actorID in cell.ActorIDs)
                         {
-                            long actorID = cell.ActorIDs[i];
                             if (!Actors.TryGetValue(actorID, out EcologyActor actor))
                                 continue;
 
@@ -238,6 +233,7 @@ namespace AbyssOverhaul.Core.Ecosystem.Simulation
                 eco.ActorID = actor.ActorID;
                 eco.SpawnedFromActor = true;
 
+
                 BindNpcToActor(npc, eco, actor);
             }
 
@@ -250,13 +246,30 @@ namespace AbyssOverhaul.Core.Ecosystem.Simulation
 
                 actor.CellCoord = coord;
             }
-
-            public void MoveActorToCell(EcologyActor actor, Point newCoord)
+            public void MoveActorToCell(ref EcologyActor actor, Point newCoord)
             {
-                if (Cells.TryGetValue(actor.CellCoord, out EcologyCell oldCell))
-                    oldCell.ActorIDs.Remove(actor.ActorID);
+                Point oldCoord = actor.CellCoord;
 
-                AddActorToCell(actor, newCoord);
+
+                if (oldCoord == newCoord)
+                    return;
+
+                if (Cells.TryGetValue(oldCoord, out EcologyCell oldCell))
+                {
+                    while (oldCell.ActorIDs.Remove(actor.ActorID))
+                    {
+                        Main.NewText(actor.ActorID);
+                    }
+
+                    Cells[oldCoord] = oldCell;
+                }
+
+                EcologyCell newCell = GetOrCreateCell(newCoord);
+
+                if (!newCell.ActorIDs.Contains(actor.ActorID))
+                    newCell.ActorIDs.Add(actor.ActorID);
+
+                actor.CellCoord = newCoord;
             }
             #endregion
 
@@ -311,9 +324,8 @@ namespace AbyssOverhaul.Core.Ecosystem.Simulation
                 {
                     RegenerateResources(cell, dt);
 
-                    for (int i = 0; i < cell.ActorIDs.Count; i++)
+                    foreach (long actorID in cell.ActorIDs)
                     {
-                        long actorID = cell.ActorIDs[i];
                         if (!Actors.TryGetValue(actorID, out EcologyActor actor))
                             continue;
 
@@ -527,7 +539,7 @@ namespace AbyssOverhaul.Core.Ecosystem.Simulation
 
                 if (bestCoord != actor.CellCoord)
                 {
-                    MoveActorToCell(actor, bestCoord);
+                    MoveActorToCell(ref actor, bestCoord);
                     actor.LastKnownWorldPosition = GetOrCreateCell(bestCoord).WorldBounds.Center.ToVector2();
                 }
 
@@ -544,7 +556,7 @@ namespace AbyssOverhaul.Core.Ecosystem.Simulation
 
                     if (newCoord != actor.CellCoord)
                     {
-                        MoveActorToCell(actor, newCoord);
+                        MoveActorToCell(ref actor, newCoord);
                         actor.LastKnownWorldPosition = GetOrCreateCell(newCoord).WorldBounds.Center.ToVector2();
                     }
                 }
@@ -562,9 +574,8 @@ namespace AbyssOverhaul.Core.Ecosystem.Simulation
                 if (predatorSpecies is null)
                     return -1;
 
-                for (int i = 0; i < cell.ActorIDs.Count; i++)
+                foreach (long actorID in cell.ActorIDs)
                 {
-                    long actorID = cell.ActorIDs[i];
                     if (actorID == predator.ActorID)
                         continue;
 
@@ -624,9 +635,9 @@ namespace AbyssOverhaul.Core.Ecosystem.Simulation
                 cell.Carrion = MathHelper.Clamp(cell.Carrion - 0.35f * dt, 0f, 100f);
 
                 int predatorCount = 0;
-                for (int i = 0; i < cell.ActorIDs.Count; i++)
+                foreach (long actorID in cell.ActorIDs)
                 {
-                    if (!Actors.TryGetValue(cell.ActorIDs[i], out EcologyActor actor))
+                    if (!Actors.TryGetValue(actorID, out EcologyActor actor))
                         continue;
 
                     SpeciesEcologyDefinition species = EcologyRegistry.GetSpecies(actor.SpeciesID);

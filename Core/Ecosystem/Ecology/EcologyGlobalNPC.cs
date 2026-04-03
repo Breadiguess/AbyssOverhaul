@@ -7,6 +7,22 @@ namespace AbyssOverhaul.Core.Ecosystem.Ecology
 {
     public sealed class EcologyGlobalNPC : GlobalNPC
     {
+
+        public override void Load()
+        {
+            On_NPC.EncourageDespawn += HibernateEcologyNPC;
+        }
+
+        private void HibernateEcologyNPC(On_NPC.orig_EncourageDespawn orig, NPC self, int despawnTime)
+        {
+            if (self.Ecology() is not null)
+            {
+                EcologySystem.Instance.HibernateNpc(self);
+            }
+
+            orig(self, despawnTime);
+        }
+
         public override bool InstancePerEntity => true;
 
         public bool displayDebugInfo;
@@ -51,11 +67,14 @@ namespace AbyssOverhaul.Core.Ecosystem.Ecology
 
         public override void OnSpawn(NPC npc, IEntitySource source)
         {
-            base.OnSpawn(npc, source);
 
             SpeciesDefinition = EcologyRegistry.GetSpecies(npc.type);
             if (SpeciesDefinition is null)
                 return;
+
+
+
+
 
             if (SpawnedFromActor &&
                 ActorID >= 0 &&
@@ -77,6 +96,7 @@ namespace AbyssOverhaul.Core.Ecosystem.Ecology
 
             if (ActorID < 0 && EcologySystem.Instance is not null)
                 ActorID = EcologySystem.Instance.RegisterFreshLoadedNpc(npc, this);
+
         }
 
         public override void OnKill(NPC npc)
@@ -86,9 +106,9 @@ namespace AbyssOverhaul.Core.Ecosystem.Ecology
                 EcologySystem.Instance is not null &&
                 EcologySystem.Instance.Actors.TryGetValue(ActorID, out EcologyActor actor))
             {
-                EcologyActorBridge.CopyNpcToActor(npc, this, actor);
                 actor.IsLoaded = false;
                 actor.Alive = false;
+                EcologyActorBridge.CopyNpcToActor(npc, this, actor);
             }
 
         }
@@ -116,7 +136,7 @@ namespace AbyssOverhaul.Core.Ecosystem.Ecology
 
             Metabolism ??= new MetabolismState();
 
-            if (Main.GameUpdateCount % 15 <= 1)
+            if (Main.GameUpdateCount % 65 <= 1)
                 UpdateMetabolism(npc, 0.25f);
 
             ApplyMetabolicEffectsToEcology(npc);
@@ -125,14 +145,18 @@ namespace AbyssOverhaul.Core.Ecosystem.Ecology
                 EcologySystem.Instance is not null &&
                 EcologySystem.Instance.Actors.TryGetValue(ActorID, out EcologyActor actor))
             {
-                EcologyActorBridge.CopyNpcToActor(npc, this, actor);
-                actor.IsLoaded = true;
-                actor.LoadedNpcWhoAmI = npc.whoAmI;
-                actor.LastKnownWorldPosition = npc.Center;
-                actor.LastSimulatedTime = Main.GameUpdateCount;
-                actor.Alive = npc.life > 0;
 
-                EcologySystem.Instance.MoveActorToCell(actor, EcologyMath.WorldToCell(npc.Center));
+                //if(!actor.CellCoord.Equals(EcologyMath.WorldToCell(npc.Center)))
+
+                Main.NewText(actor.CellCoord + ", " + EcologyMath.WorldToCell(npc.Center));
+
+                EcologySystem.Instance.MoveActorToCell(ref actor, EcologyMath.WorldToCell(npc.Center));
+
+                if (Main.GameUpdateCount%10 <= 0.4f)
+                {
+                    EcologyActorBridge.CopyNpcToActor(npc, this, actor);
+                }
+
             }
         }
 
