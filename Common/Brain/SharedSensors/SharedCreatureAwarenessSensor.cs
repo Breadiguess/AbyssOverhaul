@@ -154,7 +154,8 @@ namespace AbyssOverhaul.Common.Brain.SharedSensors
                 float proximityScore = 1f - dist / NpcThreatRadius;
                 float totalScore = proximityScore * 0.5f + sizeAdvantage * 0.5f;
 
-                if (npc.Ecology() is not null && npc.Ecology().HasTrait(NpcTraitFlags.Predator))
+                if (npc.Ecology() is not null &&
+                npc.Ecology().AppliesToEntity(npc, false) && npc.Ecology().HasTrait(NpcTraitFlags.Predator))
                     totalScore += 1f;
 
 

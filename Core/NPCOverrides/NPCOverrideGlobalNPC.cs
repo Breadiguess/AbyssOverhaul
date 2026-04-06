@@ -87,6 +87,7 @@ namespace AbyssOverhaul.Core.NPCOverrides
             GetOverride(npc)?.ReceiveExtraAI(npc, binaryReader);
         }
 
+        #region Hit stuff
         public override void OnHitPlayer(NPC npc, Player target, Player.HurtInfo hurtInfo)
         {
             GetOverride(npc)?.OnHitPlayer(npc, target, hurtInfo);
@@ -94,6 +95,15 @@ namespace AbyssOverhaul.Core.NPCOverrides
         public override void ModifyHitPlayer(NPC npc, Player target, ref Player.HurtModifiers modifiers)
         {
             GetOverride(npc)?.ModifyHitPlayer(npc, target, ref modifiers);
+        }
+
+        public override void OnHitByItem(NPC npc, Player player, Item item, NPC.HitInfo hit, int damageDone)
+        {
+            GetOverride(npc)?.OnHitByItem(npc, player, item, hit, damageDone);
+        }
+        public override void OnHitByProjectile(NPC npc, Projectile projectile, NPC.HitInfo hit, int damageDone)
+        {
+            GetOverride(npc)?.OnHitByProjectile(npc, projectile, hit, damageDone);
         }
 
         public override bool ModifyCollisionData(NPC npc, Rectangle victimHitbox, ref int immunityCooldownSlot, ref MultipliableFloat damageMultiplier, ref Rectangle npcHitbox)
@@ -105,7 +115,7 @@ namespace AbyssOverhaul.Core.NPCOverrides
             return base.ModifyCollisionData(npc, victimHitbox, ref immunityCooldownSlot, ref damageMultiplier, ref npcHitbox);
         }
 
-
+        #endregion
 
         public override bool PreDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {

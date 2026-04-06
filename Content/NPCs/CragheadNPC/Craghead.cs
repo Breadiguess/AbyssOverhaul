@@ -1,12 +1,9 @@
 ﻿using AbyssOverhaul.Core.Ecosystem.Simulation;
 using AbyssOverhaul.Core.Ecosystem.Simulation.AbyssOverhaul.Core.Ecosystem.Persistence;
 using AbyssOverhaul.Core.Utilities;
+using CalamityMod.Items.Accessories;
+using CalamityMod.Items.Placeables.Ores;
 using CalamityMod.Particles;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using Terraria;
-using Terraria.ID;
 
 namespace AbyssOverhaul.Content.NPCs.CragheadNPC
 {
@@ -31,6 +28,7 @@ namespace AbyssOverhaul.Content.NPCs.CragheadNPC
         {
             None,
             Iron,
+            BrineCrystal,
             Scoria,
             IronBoot
         }
@@ -54,6 +52,7 @@ namespace AbyssOverhaul.Content.NPCs.CragheadNPC
             set => NPC.ai[2] = (float)value;
         }
 
+        public int HeadLife = 10;
         public bool LostHeadMaterial;
 
         private const float IdleSwimSpeed = 3.2f;
@@ -95,7 +94,7 @@ namespace AbyssOverhaul.Content.NPCs.CragheadNPC
 
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[Type] = 3;
+            Main.npcFrameCount[Type] = 8;
         }
 
         public override void SetDefaults()
@@ -117,7 +116,14 @@ namespace AbyssOverhaul.Content.NPCs.CragheadNPC
         {
             if (HeadMaterial == OreType.None && !LostHeadMaterial)
             {
-                HeadMaterial = (OreType)Main.rand.Next(1, 4);
+
+                Array oreTypes = Enum.GetValues(typeof(OreType));
+                HeadMaterial = (OreType)oreTypes.GetValue(Main.rand.Next(1, oreTypes.Length - 1));
+
+                if (Main.rand.NextBool(40))
+                {
+                    HeadMaterial = OreType.IronBoot;
+                }
                 NPC.netUpdate = true;
             }
 
@@ -181,11 +187,11 @@ namespace AbyssOverhaul.Content.NPCs.CragheadNPC
                 return;
             }
 
-            NPC.frameCounter += 0.18 + NPC.velocity.Length() * 0.06f;
+            NPC.frameCounter += 0.10 + NPC.velocity.Length() * 0.06f;
             if (NPC.frameCounter >= Main.npcFrameCount[Type])
                 NPC.frameCounter = 0;
 
-            NPC.frame.Y = (int)NPC.frameCounter * frameHeight;
+            NPC.frame.Y = (int)NPC.frameCounter;
         }
 
         private void DoNormalBehavior(NPC prey, float preyDistance, bool hungry, EcologyGlobalNPC eco, EcologyActor actor, bool hasActor)
@@ -232,7 +238,7 @@ namespace AbyssOverhaul.Content.NPCs.CragheadNPC
             }
 
             Vector2 predictedPosition = prey.Center + prey.velocity * 10f;
-            SwimToward(predictedPosition, RamAcceleration, RamSpeed*4);
+            SwimToward(predictedPosition, RamAcceleration, RamSpeed * 4);
 
             Dust.NewDust(NPC.Center, 10, 10, DustID.Firefly);
             if (BiteCooldown <= 0)
@@ -261,18 +267,45 @@ namespace AbyssOverhaul.Content.NPCs.CragheadNPC
 
         private void HandleOutOfWater()
         {
-            NPC.noGravity = false;
-            NPC.velocity.X *= 0.95f;
+            // Sit helplessly if not in water.
+            if (!NPC.wet)
+            {
 
-            if (NPC.collideY && Math.Abs(NPC.velocity.Y) < 0.1f)
-                NPC.velocity.Y = -4.2f;
+                if (Math.Abs(NPC.velocity.Y) < 0.45f)
+                {
+                    NPC.velocity.X *= 0.95f;
+                    NPC.rotation = NPC.rotation.AngleLerp(0f, 0.15f).AngleTowards(0f, 0.15f);
+                    if ((Main.GameUpdateCount + NPC.whoAmI) % 70 <= 0.1f)
+                    {
 
-            float targetRotation = MathHelper.Clamp(NPC.velocity.X * 0.08f, -0.45f, 0.45f);
-            NPC.rotation = NPC.rotation.AngleLerp(targetRotation, 0.12f);
+                        NPC.velocity.X += Main.rand.NextFloat(-4, 5);
+                        NPC.rotation += NPC.velocity.X;
+                        NPC.velocity.Y -= 4;
+                    }
+                }
+                NPC.noGravity = false;
+                return;
+            }
         }
 
         private void SwimToward(Vector2 destination, float acceleration, float maxSpeed)
         {
+
+            Vector2 ahead = NPC.Center + NPC.velocity * 40f;
+            bool aboutToLeaveWorld = ahead.X >= Main.maxTilesX * 16f - 700f || ahead.X < 700f;
+            bool shouldTurnAround = aboutToLeaveWorld;
+            for (float x = -0.47f; x < 0.47f; x += 0.06f)
+            {
+                Vector2 checkDirection = NPC.velocity.SafeNormalize(Vector2.Zero).RotatedBy(x);
+                if (!Collision.CanHit(NPC.Center, 1, 1, NPC.Center + checkDirection * 125f, 1, 1))
+                {
+                    shouldTurnAround = true;
+                    break;
+                }
+            }
+
+           
+
             Vector2 toDestination = destination - NPC.Center;
             if (toDestination == Vector2.Zero)
                 return;
@@ -287,6 +320,9 @@ namespace AbyssOverhaul.Content.NPCs.CragheadNPC
 
             if (NPC.velocity.Length() > maxSpeed)
                 NPC.velocity = NPC.velocity.SafeNormalize(Vector2.Zero) * maxSpeed;
+
+
+
         }
 
         private void UpdateFacingAndRotation()
@@ -340,7 +376,7 @@ namespace AbyssOverhaul.Content.NPCs.CragheadNPC
                 if (!hitbox.Intersects(other.Hitbox))
                     continue;
 
-                other.SimpleStrikeNPC(NPC.defDamage *4, NPC.direction, noPlayerInteraction: true);
+                other.SimpleStrikeNPC(NPC.defDamage * 4, NPC.direction, noPlayerInteraction: true);
                 other.velocity += NPC.DirectionTo(other.Center) * 10f;
                 hitAnything = true;
             }
@@ -350,7 +386,7 @@ namespace AbyssOverhaul.Content.NPCs.CragheadNPC
 
         private void ReduceHunger(EcologyGlobalNPC eco, EcologyActor actor, bool hasActor, int amount)
         {
-           NPC.Ecology().Metabolism.StomachContent += amount*2;
+            NPC.Ecology().Metabolism.StomachContent += amount * 2;
         }
 
         private void ApplyHeadMaterialStats()
@@ -388,8 +424,14 @@ namespace AbyssOverhaul.Content.NPCs.CragheadNPC
             Utils.DrawBorderString(spriteBatch, HeadMaterial.ToString(), NPC.Center - screenPos, drawColor);
 
             var tex = TextureAssets.Npc[Type].Value;
-            Rectangle frame = tex.Frame(1, 3, 0, 1);
+            Rectangle frame = tex.Frame(1, 8, 0, NPC.frame.Y);
             Main.EntitySpriteDraw(tex, NPC.Center - screenPos, frame, drawColor, NPC.rotation, frame.Size() / 2, NPC.scale, (NPC.spriteDirection).ToSpriteDirection());
+
+
+            var HeadTex = ModContent.Request<Texture2D>(this.GetPath() + "_Head").Value;
+
+            Main.EntitySpriteDraw(HeadTex, NPC.Center - screenPos, frame, drawColor, NPC.rotation, frame.Size() / 2, NPC.scale, NPC.spriteDirection.ToSpriteDirection());
+            
             return false;
         }
 
@@ -420,10 +462,36 @@ namespace AbyssOverhaul.Content.NPCs.CragheadNPC
                     break;
             }
         }
+        public int CalculateItemDropType()
+        {
+            int dropType = -1;
 
+            switch (HeadMaterial)
+            {
+                case OreType.Iron:
+                    dropType = ItemID.IronOre;
+                    break;
+
+                case OreType.Scoria:
+                    dropType = ModContent.ItemType<ScoriaOre>();
+                    break;
+
+                case OreType.IronBoot:
+                    dropType = ModContent.ItemType<IronBoots>();
+                    break;
+            }
+
+            return dropType;
+        }
         public void HandleImpactEvent()
         {
-            Collision.HitTiles(NPC.position, NPC.velocity, NPC.width, NPC.height);
+            Collision.HitTiles(NPC.position, NPC.velocity, NPC.width * 2, NPC.height * 2);
+
+
+            if (NPC.velocity.Length() > 10)
+            {
+
+            }
 
             for (int i = 0; i < 8; i++)
             {

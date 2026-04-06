@@ -16,7 +16,9 @@ namespace AbyssOverhaul.Core.Systems
     {
         public override void PostUpdatePlayers()
         {
-            if(Main.netMode != NetmodeID.Server)
+
+
+            if (Main.netMode != NetmodeID.Server)
             {
                 foreach (Player player in Main.ActivePlayers)
                 {

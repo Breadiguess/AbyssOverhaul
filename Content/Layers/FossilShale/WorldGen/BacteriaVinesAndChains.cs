@@ -111,7 +111,7 @@ namespace AbyssOverhaul.Content.Layers.FossilShale.WorldGen
                     continue;
 
                 float widthFactor = MathHelper.Clamp((radius - 4f) / 10f, 0f, 1f);
-                float placeChance = MathHelper.Lerp(0.4f, 0.8f, widthFactor);
+                float placeChance = MathHelper.Lerp(0.6f, 1f, widthFactor);
 
                 if (rand.NextFloat() > placeChance)
                     continue;

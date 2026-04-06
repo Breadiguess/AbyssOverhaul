@@ -94,10 +94,18 @@ namespace AbyssOverhaul.Content.NPCs.DepthFeeder
             // Sit helplessly if not in water.
             if (!NPC.wet)
             {
+
                 if (Math.Abs(NPC.velocity.Y) < 0.45f)
                 {
                     NPC.velocity.X *= 0.95f;
                     NPC.rotation = NPC.rotation.AngleLerp(0f, 0.15f).AngleTowards(0f, 0.15f);
+                   if((Main.GameUpdateCount + NPC.whoAmI) % 70 <= 0.1f)
+                    {
+
+                        NPC.velocity.X += Main.rand.NextFloat(-4, 5);
+                        NPC.rotation += NPC.velocity.X;
+                        NPC.velocity.Y -= 4;
+                    }
                 }
                 NPC.noGravity = false;
                 return;

@@ -25,7 +25,7 @@ namespace AbyssOverhaul.Core.Systems
 
 
             tasks.RemoveAt(abyssIndex);
-            tasks.Insert(abyssIndex++, new PassLegacy("RevampedSulphurousSea", (progress, config) =>
+            tasks.Insert(abyssIndex+=2, new PassLegacy("RevampedSulphurousSea", (progress, config) =>
             {
                 progress.Message = Language.GetOrRegister("Mods.CalamityMod.UI.Abyss").Value;
                 SulphurousSeaRevamp.PlaceSulphurSea();
@@ -53,7 +53,7 @@ namespace AbyssOverhaul.Core.Systems
             }
 
 
-            tasks.Insert(abyssIndex, new PassLegacy("Flood The Sea", (progress, config) =>
+            tasks.Insert(abyssIndex++, new PassLegacy("Flood The Sea", (progress, config) =>
             {
                 AbyssWorldGenHelper.FloodOpenSpace(AbyssGenUtils.AbyssWorldMinX, AbyssGenUtils.AbyssWorldMaxX, AbyssGenUtils.TopY, AbyssGenUtils.BottomY);
             }));

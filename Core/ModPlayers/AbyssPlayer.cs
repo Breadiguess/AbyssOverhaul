@@ -82,26 +82,42 @@ namespace AbyssOverhaul.Core.ModPlayers
         /// </summary>
         public AbyssRegion Region;
 
-        
+
         /// <summary>
-        /// Returns the range at which an abyss enemy can detect the player
+        /// Returns the final distance at which abyss enemies can detect this player.
+        /// Pass in the enemy's normal/base aggro radius.
         /// </summary>
-        /// <param name="range">The default detection range</param>
-        /// <returns></returns>
-        public float GetAbyssAggro(float range)
+        public float GetAbyssAggro(float baseRange)
         {
+            CalamityPlayer CalPlayer = Player.Calamity();
 
-            range *= Player.Calamity().fishAlert ? 3f : 1f;
-            range *= Player.Calamity().eidolonSnailPet ? 0.85f : 1f;
-            range *= Player.Calamity().anechoicCoating ? 0.5f : 1f;
-            range *= Player.Calamity().anechoicPlating ? 0.5f : 1f;
-            range *= Player.Calamity().abyssalMirror ? 0.65f : 1f;
-            range *= Player.Calamity().eclipseMirror ? 0.3f : 1f;
-            range *= Player.Calamity().reaverExplore ? 0.9f : 1f;
-            return range;
+            float multiplier = 1f;
+
+            if (CalPlayer.fishAlert)
+                multiplier *= 5f;
+
+            if (CalPlayer.eidolonSnailPet)
+                multiplier *= 0.85f;
+
+            if (CalPlayer.anechoicCoating)
+                multiplier *= 0.5f;
+
+            if (CalPlayer.anechoicPlating)
+                multiplier *= 0.5f;
+
+            if (CalPlayer.abyssalMirror)
+                multiplier *= 0.65f;
+
+            if (CalPlayer.eclipseMirror)
+                multiplier *= 0.3f;
+
+            if (CalPlayer.reaverExplore)
+                multiplier *= 0.9f;
+
+            float finalRange = baseRange * multiplier;
+
+            return MathHelper.Clamp(finalRange, 40f, 99999f);
         }
-
-
 
 
         public override void ResetEffects()

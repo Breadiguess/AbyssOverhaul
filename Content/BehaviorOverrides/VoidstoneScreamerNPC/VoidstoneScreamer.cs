@@ -1,5 +1,7 @@
-﻿using AbyssOverhaul.Content.BehaviorOverrides.VoidstoneScreamerNPC;
+﻿using AbyssOverhaul.Common.Brain;
+using AbyssOverhaul.Content.BehaviorOverrides.VoidstoneScreamerNPC;
 using AbyssOverhaul.Core.Graphics.ReworkedAbyssDarkness;
+using AbyssOverhaul.Core.ModPlayers;
 using AbyssOverhaul.Core.Utilities;
 using BreadLibrary.Core.Graphics.Particles;
 using BreadLibrary.Core.Sounds;
@@ -158,6 +160,21 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.VoidstoneScreamerNPC
                             npc.rotation += MathHelper.Pi;
 
 
+                        float baseAggroRange = 600f;
+                        //todo: if npc has line of sight and then if so, start screaming at them
+                        foreach (Player Player in Main.ActivePlayers)
+                        {
+                            if (Player.Distance(npc.Center) > 1000)
+                                continue;
+                            float effectiveAggroRange = Player.Abyss().GetAbyssAggro(baseAggroRange);
+
+                            if (Vector2.DistanceSquared(npc.Center, Player.Center) <= effectiveAggroRange * effectiveAggroRange)
+                            {
+                                entity = Player;
+                                CurrentState = state.Scream;
+                            }
+                        }
+                       
                         
                     }
                     break;
@@ -169,7 +186,13 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.VoidstoneScreamerNPC
 
 
                     {
+                        if (ScreamLoop is null || !ScreamLoop.HasLoopSoundBeenStarted)
+                        {
+                            ScreamLoop = LoopedSoundManager.CreateNew(Assets.Sounds.NPCs.VoidstoneScreamer.ScreamLoop.Asset, () => npc.IsNullOrInactive());
+                        }
 
+
+                        Interpolant = float.Lerp(Interpolant, 1, 0.2f);
                         Rectangle Frame = TextureAssets.Npc[this.NPCType].Value.Frame(1, Main.npcFrameCount[NPCType], 0, 1);
                         if (!HasMadeLight)
                         {
@@ -207,10 +230,10 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.VoidstoneScreamerNPC
                             HasMadeLight = false;
                         }
                             Lighting.AddLight(npc.Center, TorchID.Ice);
-                        npc.rotation = npc.rotation.AngleLerp(npc.AngleTo(Main.LocalPlayer.Center), 0.2f);
+                        npc.rotation = npc.rotation.AngleLerp(npc.AngleTo(entity.Center), 0.2f);
 
 
-                        npc.spriteDirection = (npc.Center - Main.LocalPlayer.Center).X.DirectionalSign();
+                        npc.spriteDirection = (npc.Center - entity.Center).X.DirectionalSign();
                         if(Main.GameUpdateCount % 10 <= 1)
                         {
 
@@ -224,18 +247,21 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.VoidstoneScreamerNPC
 
                         if(ScreamTimer> MAX_SCREAM_TIME)
                         {
-                            CurrentState = state.SwimAroundWaterWithoutBumpingIntoWalls;
+                            CurrentState = state.Fuck_off_Before_Predators_Rip_you_to_shreds;
                         }
 
 
                         //todo: find/manifest hostile npcs to come to this location, and then fuck off as fast as possible
 
-
+                        
                     }
                     break;
 
                 case state.Fuck_off_Before_Predators_Rip_you_to_shreds:
+                    Interpolant = float.Lerp(Interpolant, 0, 0.2f);
+                    npc.noTileCollide = true;
 
+                    npc.velocity = Vector2.unitVector * 10;
                     break;
             }
         }
@@ -246,8 +272,8 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.VoidstoneScreamerNPC
             {
                 ScreamLoop.Update(npc.Center, (a) =>
                 {
-                    a.Volume = Interpolant;
-                    a.Pitch = Interpolant;
+                    a.Volume = 0.2f *Interpolant;
+                    a.Pitch = 0;
                 });
             }
         }
@@ -263,7 +289,7 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.VoidstoneScreamerNPC
 
             var texture = TextureAssets.Npc[this.NPCType].Value;
             var glowTex = GlowTex.Value;
-            SpriteEffects flip = (-npc.spriteDirection).ToSpriteDirection();
+            SpriteEffects flip = (npc.spriteDirection).ToSpriteDirection() | SpriteEffects.FlipVertically;
             //flip = flip ^( npc.rotation > MathHelper.Pi? SpriteEffects.FlipVertically: SpriteEffects.None);
             Main.EntitySpriteDraw(texture, DrawPos, npc.frame, drawColor, npc.rotation, npc.frame.Size() / 2, npc.scale, flip);
             Main.EntitySpriteDraw(glowTex, DrawPos, npc.frame, Color.White, npc.rotation, npc.frame.Size() / 2, npc.scale, flip);

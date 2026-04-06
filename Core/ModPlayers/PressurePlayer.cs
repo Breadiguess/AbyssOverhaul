@@ -38,6 +38,16 @@ namespace AbyssOverhaul.Core.ModPlayers
         public float Overpressure => Math.Max(EffectiveAmbientPressure - Adaptation, 0f);
         public float EffectivePressureStress => Math.Max(PressureStress, PressureResidue);
 
+
+
+        // Tune these however you want.
+        public const float MaxBreathBasedResistance = 120f;
+        public const float InfiniteBreathingFlatBonus = 20f;
+        public const float DivingHelmFlatBonus = 4f;
+        public const float WaterMobilityFlatBonus = 2f;
+
+
+
         public override void ResetEffects()
         {
             if (CurrentLayer is null)
@@ -56,6 +66,7 @@ namespace AbyssOverhaul.Core.ModPlayers
 
         public override void PostUpdateMiscEffects()
         {
+            PressureResistance += CalculateBreathBasedPressureResistance(Player);
             ApplyPressureDefensePenalty();
         }
 
@@ -208,6 +219,51 @@ namespace AbyssOverhaul.Core.ModPlayers
                     Player.lifeRegen -= 2;
             }
         }
+
+        public static float CalculateBreathBasedPressureResistance(Player player)
+        {
+            float resistance = 0f;
+
+            // breathCDMax is the final effective "ticks between breath loss".
+            // Vanilla baseline is 7.
+            float baseBreathCd = 7f;
+            float currentBreathCd = Math.Max(player.breathCDMax, baseBreathCd);
+
+            // Convert "how much better than baseline" into a normalized bonus.
+            // Example:
+            // 7  -> 0 extra
+            // 14 -> 1 extra
+            // 21 -> 2 extra
+            float extraBreathFactor = (currentBreathCd / baseBreathCd) - 1f;
+            extraBreathFactor = Math.Max(0f, extraBreathFactor);
+
+            // Soft cap curve:
+            // 0 extra -> 0
+            // grows quickly at first, then flattens out.
+            // This prevents absurd / infinite water breathing from giving absurd PR.
+            float normalized = extraBreathFactor / (extraBreathFactor + 2f);
+            resistance += MaxBreathBasedResistance * normalized;
+
+            // Special cases can add small flat amounts, but keep them modest.
+            // These should represent "qualitative underwater adaptation"
+            // rather than raw infinite scaling.
+            if (player.gills)
+                resistance += InfiniteBreathingFlatBonus;
+
+            if (player.accDivingHelm)
+                resistance += DivingHelmFlatBonus;
+
+            if (player.accFlipper || player.ignoreWater)
+                resistance += WaterMobilityFlatBonus;
+
+            // Hard final cap, just in case other modded effects stack strangely.
+            resistance = Math.Min(resistance, MaxBreathBasedResistance);
+
+            return resistance;
+        }
+
+
+
 
         #region NetSyncing
         private static ushort Pack01(float value) => (ushort)(MathHelper.Clamp(value, 0f, 1f) * 65535f);

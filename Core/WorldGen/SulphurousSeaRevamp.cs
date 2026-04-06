@@ -280,7 +280,7 @@ namespace AbyssOverhaul.Core.WorldGen
             if (!Main.remixWorld)
                 LayTreesOnSurface();
 
-            //SulphurSeaGenerationAfterAbyss();
+            SulphurSeaGenerationAfterAbyss();
         }
 
         public static void SulphurSeaGenerationAfterAbyss()
@@ -1718,17 +1718,18 @@ namespace AbyssOverhaul.Core.WorldGen
             TileID.VanityTreeSakura,
             TileID.VanityTreeYellowWillow,
         };
-
+        public static bool DungeonIsOnLeft()
+        {
+            return Main.dungeonX < Main.maxTilesX / 2;
+        }
         // This method is an involutory function, meaning that applying it to the same number twice always yields the original number.
         public static int GetActualX(int x)
         {
-            if (Math.Sign(Main.dungeonX - Main.maxTilesX)!=1)
+            if (DungeonIsOnLeft())
                 return x;
-            else
 
-                return (Main.maxTilesX - 1) - x;
+            return (Main.maxTilesX - 1) - x;
         }
-
         public static float CalculateDitherChance(int width, int top, int bottom, int x, int y)
         {
             float verticalCompletion = Utils.GetLerpValue(top, bottom, y, true);

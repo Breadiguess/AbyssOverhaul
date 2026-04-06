@@ -16,5 +16,7 @@ namespace AbyssOverhaul.Core.Ecosystem.Ecology
         AmbushPredator = 1 << 3,
         Territorial = 1 << 4,
         Scavager = 1 << 5,
+
+        Pack = 1 << 6,
     }
 }

@@ -25,7 +25,6 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
 
         public BrigandsCalling_Player BrigandsCalling_Player => Owner.GetModPlayer<BrigandsCalling_Player>();
         public bool Active => CurrentState == State.AttackNearbyEnemies;
-
         public float Depth => Projectile.ai[2];
         public override void SetStaticDefaults()
         {
@@ -56,8 +55,8 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
         {
             Projectile.Opacity = float.Lerp(Projectile.Opacity, 1, 0.1f);
             if (!Active)
-            {
-
+            {   
+               
                 foreach (Player player in Main.ActivePlayers)
                 {
                     if (player.Distance(Projectile.Center) < 50)
