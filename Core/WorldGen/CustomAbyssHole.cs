@@ -1,4 +1,4 @@
-﻿using AbyssOverhaul.Core.Utilities;
+using AbyssOverhaul.Core.Utilities;
 using AbyssOverhaul.Core.WorldGen;
 using CalamityMod.Tiles.Abyss;
 using CalamityMod.Walls;
@@ -665,15 +665,9 @@ namespace CalamityMod.World
         }
 
         private static void ApplyMaterialForDepth(Tile tile, int y, bool allowDither)
-        {
-            // Normalize depth across YOUR abyss, not the whole vanilla world.
+        { 
             float t = AbyssGenUtils.TAt(y);
 
-            // These thresholds mirror your current layer setup much better:
-            // 0.00 - 0.45  : upper abyss
-            // 0.45 - 0.60  : thermal vents / pyre zone
-            // 0.60 - 0.80  : veil-ish zone
-            // 0.80 - 1.00  : bottom voidstone zone
 
             ushort tileType;
             ushort wallType;
