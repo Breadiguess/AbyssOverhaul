@@ -5,6 +5,7 @@ using Terraria.Audio;
 
 namespace AbyssOverhaul.Content.NPCs.KarkinosNPC
 {
+    /*
     public partial class Karkinos
     {
 
@@ -55,7 +56,7 @@ namespace AbyssOverhaul.Content.NPCs.KarkinosNPC
                             ? MathHelper.ToRadians(160) // outward stretch
                             : MathHelper.ToRadians(-20) // outward stretch mirrored
                     }),
-                    ((32 * scale), new IKSkeleton.Constraints
+                    ((32 * scale), new IKSkeleton.JointLimit
                     {
 
                         MinAngle = i < 2 ? -MathHelper.Pi : MathHelper.ToRadians(-40),
@@ -71,7 +72,7 @@ namespace AbyssOverhaul.Content.NPCs.KarkinosNPC
             public readonly IKSkeleton Skeleton;
             public readonly int Index;
 
-            public Vector2 Tip => Skeleton.Position(Skeleton.PositionCount - 1);
+            public Vector2 Tip => Skeleton.GetJointPosition(Skeleton.JointCount - 1);
             public Vector2 StepDestination;
             public Vector2 DefaultStepPosition;
 
@@ -100,10 +101,10 @@ namespace AbyssOverhaul.Content.NPCs.KarkinosNPC
             }
             public void DrawLeg(KarkinosLeg leg, SpriteBatch spritebatch, Vector2 screenPos)
             {
-                for (int i = 0; i < leg.Skeleton.PositionCount - 1; i++)
+                for (int i = 0; i < leg.Skeleton.JointCount - 1; i++)
                 {
-                    Vector2 Start = leg.Skeleton.Position(i);
-                    Vector2 End = leg.Skeleton.Position(i + 1);
+                    Vector2 Start = leg.Skeleton.GetJointPosition(i);
+                    Vector2 End = leg.Skeleton.GetJointPosition(i + 1);
                     Utilities.DrawLineBetter(spritebatch, Start, End, Color.Purple, 5);
                 }
                 //Core.Utilities.Utilities.DrawLineBetter(spritebatch, leg.Skeleton.Position(0), leg.PlantLocation, Color.Purple, 5);
@@ -448,5 +449,5 @@ namespace AbyssOverhaul.Content.NPCs.KarkinosNPC
 
             return true;
         }
-    }
+    }*/
 }

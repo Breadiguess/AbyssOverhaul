@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AbyssOverhaul.Content.NPCs.GrumpfishNPC
+namespace AbyssOverhaul.Content.NPCs.Hostile.GrumpfishNPC
 {
     internal class GrumpFish : ModNPC, IEcologyParticipant
     {

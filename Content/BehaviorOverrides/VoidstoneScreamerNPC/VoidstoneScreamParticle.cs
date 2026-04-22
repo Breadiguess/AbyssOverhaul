@@ -7,7 +7,7 @@ using Terraria.Graphics.Renderers;
 
 namespace AbyssOverhaul.Content.BehaviorOverrides.VoidstoneScreamerNPC
 {
-    internal class VoidstoneScreamParticle : BaseParticle<VoidstoneScreamParticle>, IDrawPixellated
+    internal class VoidstoneScreamParticle : BaseParticle<VoidstoneScreamParticle>, IDrawPixelated
     {
         public static Texture2D tex => Assets.Textures.Burst.T_Burst006.Asset.Value;
         Vector2 Position;
@@ -78,9 +78,9 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.VoidstoneScreamerNPC
             Vector2 Scale = new Vector2(this.Scale*0.2f, this.Scale);
             Main.EntitySpriteDraw(tex, drawPos, null, Color with { A = 0 } * Opacity, Velocity.ToRotation(), tex.Size() / 2, Scale*(1-Opacity), SpriteEffects.None, 0);
         }
-        PixelLayer IDrawPixellated.PixelLayer => PixelLayer.AboveNPCs;
+        PixelLayer IDrawPixelated.PixelLayer => PixelLayer.AboveNPCs;
 
-        void IDrawPixellated.DrawPixelated(SpriteBatch spriteBatch)
+        void IDrawPixelated.DrawPixelated(SpriteBatch spriteBatch)
         {
             Texture2D tex = Assets.Textures.Burst.T_Burst048.Asset.Value;
 

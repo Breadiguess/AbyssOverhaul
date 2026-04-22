@@ -1,4 +1,4 @@
-﻿<Project Sdk="Tomat.Terraria.ModLoader.Sdk/1.0.9">
+﻿<Project Sdk="Tomat.Terraria.ModLoader.Sdk/2.0.0">
   <PropertyGroup>
     <LangVersion>preview</LangVersion>
     <DebugSymbols>true</DebugSymbols>
@@ -11,6 +11,47 @@
     <Publicize Include="FNA" IncludeCompilerGeneratedMembers="false" IncludeVirtualMembers="false" />
     <Publicize Include="ReLogic" IncludeCompilerGeneratedMembers="false" IncludeVirtualMembers="false" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Content\NPCs\KarkinosNPC\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="Content\NPCs\KarkinosNPC\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Content\NPCs\KarkinosNPC\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <LocalizationCompile Remove="Content\NPCs\KarkinosNPC\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Remove="Content\NPCs\KarkinosNPC\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ShaderCompile Remove="Content\NPCs\KarkinosNPC\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Content\NPCs\KarkinosNPC\Karkinos.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Remove="Content\NPCs\KarkinosNPC\Karkinos.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Content\NPCs\KarkinosNPC\Karkinos.IK.Legs.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Content\NPCs\KarkinosNPC\Karkinos.cs" />
+  </ItemGroup>
+
 
  
 </Project>

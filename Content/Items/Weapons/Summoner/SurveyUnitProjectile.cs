@@ -216,7 +216,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Summoner
             for (int i = 0; i < _Arms.Count; i++)
             {
                 var Arm = _Arms[i];
-                Arm.IKSkeleton.Update(Projectile.Bottom, ArmTargets[i]);
+                Arm.IKSkeleton.Solve(Projectile.Bottom, ArmTargets[i]);
                 _Arms[i] = Arm;
             }
 
@@ -450,7 +450,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Summoner
                     if (Arm.IKSkeleton is not null)
                         for (int i = 0; i < Arm.IKSkeleton.JointCount; i++)
                         {
-                            Utils.DrawLine(spriteBatch, Arm.IKSkeleton.Position(i), Arm.IKSkeleton.Position(i + 1), Color.White);
+                            Utils.DrawLine(spriteBatch, Arm.IKSkeleton.GetJointPosition(i), Arm.IKSkeleton.GetJointPosition(i + 1), Color.White);
                             //DrawLine(spriteBatch, Arm.IKSkeleton.JointPositions[i],, Color.White, 12);
                         }
                 }

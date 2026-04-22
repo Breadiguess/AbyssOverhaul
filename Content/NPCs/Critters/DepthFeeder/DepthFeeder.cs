@@ -4,7 +4,7 @@ using CalamityMod.BiomeManagers;
 using Terraria.GameContent.Bestiary;
 using Terraria.ModLoader.Utilities;
 
-namespace AbyssOverhaul.Content.NPCs.DepthFeeder
+namespace AbyssOverhaul.Content.NPCs.Critters.DepthFeeder
 {
     public class DepthFeeder : ModNPC, IEcologyParticipant
     {
@@ -126,7 +126,7 @@ namespace AbyssOverhaul.Content.NPCs.DepthFeeder
             }
 
             // Avoid walls and exiting water.
-            NPC closestPredator = AbyssUtilities.FindClosestAbyssPredator(NPC, out _);
+            NPC closestPredator = NPC.FindClosestAbyssPredator(out _);
             if (shouldTurnAround && (closestPredator is null || !NPC.WithinRange(closestPredator.Center, 400f)))
             {
                 float distanceToTileOnLeft = Utilities.DistanceToTileCollisionHit(NPC.Center, NPC.velocity.RotatedBy(-MathHelper.PiOver2)) ?? 999f;

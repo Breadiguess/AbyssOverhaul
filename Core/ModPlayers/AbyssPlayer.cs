@@ -17,6 +17,11 @@ namespace AbyssOverhaul.Core.ModPlayers
 {
     public class AbyssPlayer : ModPlayer
     {
+
+        public bool ShouldHaveWaterCollisionDisabled;
+
+
+
         /// <summary>
         /// Final darkness strength used by the overlay shader.
         /// 0 = no darkness, 1 = full darkness.
@@ -136,6 +141,8 @@ namespace AbyssOverhaul.Core.ModPlayers
 
             computedBrightnessFactor = 0f;
             darknessIntensity = 0f;
+
+            ShouldHaveWaterCollisionDisabled = false;
         }
 
         public override void UpdateDead()
@@ -255,6 +262,18 @@ namespace AbyssOverhaul.Core.ModPlayers
 
 
 
+        public override void Load()
+        {
+            On_Player.WaterCollision += On_Player_WaterCollision;
+        }
+
+        private void On_Player_WaterCollision(On_Player.orig_WaterCollision orig, Player self, bool fallThrough, bool ignorePlats)
+        {
+            if (self.Abyss().ShouldHaveWaterCollisionDisabled)
+                return;
+
+            orig(self, fallThrough, ignorePlats);
+        }
     }
 
 
@@ -323,6 +342,8 @@ namespace AbyssOverhaul.Core.ModPlayers
 
             if (mp.littleLightPet)
                 ap.abyssDarkness -= 0.05f;
+
+            ap.abyssDarkness -= 1;
 
         }
     }

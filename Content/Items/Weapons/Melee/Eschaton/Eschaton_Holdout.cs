@@ -12,19 +12,26 @@ using Terraria.Localization;
 namespace AbyssOverhaul.Content.Items.Weapons.Melee.Eschaton
 {
     [PierceResistException]
-    public class Eschaton_Holdout : BaseCustomUseStyleProjectile, ILocalizedModType
+    public class Eschaton_Holdout : ModProjectile, ILocalizedModType
     {
-        public override int AssignedItemID => ModContent.ItemType<EschatonItem>();
+        public enum SwingState
+        {
+            Windup,
+            Swing,
+            Recover
+        }
+        public SwingState State = SwingState.Windup;
+        public ref Player Owner => ref Main.player[Projectile.owner];
+        public int AssignedItemID => ModContent.ItemType<EschatonItem>();
 
         public override LocalizedText DisplayName => CalamityUtils.GetItemName<EschatonItem>();
         public override string Texture => EschatonItem.Path;
-        public override float HitboxOutset => 175;
 
-        public override Vector2 HitboxSize => new Vector2(210, 210) * Projectile.scale * 1.05f;
-        public override float HitboxRotationOffset => MathHelper.ToRadians(-45);
+        
 
-        public override Vector2 SpriteOrigin => new(0, 166);
-        public Vector2 mousePos;
+        public float FinalRotation { get; private set; }
+
+        public Vector2 mousePos =>  Owner.Calamity().mouseWorld;
         public Vector2 aimVel;
         public bool doSwing = true;
         public bool postSwing = false;
@@ -36,11 +43,23 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.Eschaton
         public int armoredHits = 0;
 
 
+        public static Asset<Texture2D> SwordTex;
+        public static Asset<Texture2D> glowTex;
+
+
+        public override void SetStaticDefaults()
+        {
+            SwordTex = ModContent.Request<Texture2D>(EschatonItem.Path);
+            glowTex = ModContent.Request<Texture2D>(EschatonItem.Path + "_Glow");
+        }
         public override void SetDefaults()
         {
             base.SetDefaults();
+            Projectile.penetrate = -1;
+            
             Projectile.usesLocalNPCImmunity = true;
             Projectile.localNPCHitCooldown = -1;
+            
             Projectile.DamageType = DamageClass.MeleeNoSpeed;//TrueMeleeDamageClass.Instance;
 
 
@@ -51,184 +70,55 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.Eschaton
             //Projectile.extraUpdates = 1;
 
         }
-
-        public override void WhenSpawned()
+        public override bool PreAI()
         {
-            Projectile.timeLeft = Owner.HeldItem.useAnimation + 1;
-            Projectile.knockBack = 0;
-            Projectile.scale = 1;
-            Projectile.ai[1] = -1;
+            if(Owner.HeldItem.type != AssignedItemID || Owner.dead || Owner.CCed)
+            {
+                Projectile.active = false;
 
-            mousePos = Owner.Calamity().mouseWorld;
-            aimVel = (Owner.Center - Owner.Calamity().mouseWorld).SafeNormalize(Vector2.UnitX) * 65;
+            }
 
+            else
+            {
+                Owner.heldProj = this.Projectile.whoAmI;
+                Projectile.timeLeft = 2;
+            }
 
-            if (mousePos.X < Owner.Center.X) Owner.direction = -1;
-            else Owner.direction = 1;
-
-            FlipAsSword = Owner.direction == -1;
-
-            ResetSlash();
-
+                return true;
         }
-        private int previousUseAnim;
-        private bool initializedUseAnim;
-        public override void UseStyle()
+        public override void AI()
         {
-            if (AnimationProgress == 0)// (Owner.itemAnimation == Owner.itemAnimationMax)
-            {
-                //Main.NewText(Owner.itemAnimationMax - Owner.HeldItem.useTime);
-                Projectile.scale = Owner.GetAdjustedItemScale(Owner.HeldItem);
-                useAnim = Owner.itemAnimationMax;
-            }
-            int currentUseAnim = Math.Max(1, Owner.itemAnimationMax);
+            Projectile.Center = Owner.Center;
 
-            if (!initializedUseAnim && AnimationProgress == 0)
-            {
-                previousUseAnim = currentUseAnim;
-                initializedUseAnim = true;
-
-                //Main.NewText($"ResetUseAnim:{useAnim}, {Animation}");
-            }
-
-            if (currentUseAnim != previousUseAnim)
-            {
-                float progress = Animation / previousUseAnim;
-                Animation = Utils.Clamp(progress * currentUseAnim, 0f, currentUseAnim + 1f);
-                previousUseAnim = currentUseAnim;
-            }
-
-            AnimationProgress = Animation % useAnim;
-            DrawUnconditionally = false;
-
-            if (CanHit || postSwing)
-                mousePos = Owner.Center - aimVel;
-            else
-            {
-                mousePos = Owner.Calamity().mouseWorld;
-            }
-
-            if (CanHit)
-                fadeIn = MathHelper.Lerp(fadeIn, 1, 0.3f);
-            else
-                fadeIn = MathHelper.Lerp(fadeIn, 0, 0.35f);
-
-
-            if (!doSwing)
-            {
-                for (int i = 0; i < Main.maxNPCs; i++)
-                    Projectile.localNPCImmunity[i] = 0;
-
-                Projectile.numHits = 0;
-
-                mousePos = Owner.Calamity().mouseWorld;
-                aimVel = (Owner.Center - Owner.Calamity().mouseWorld).SafeNormalize(Vector2.UnitX) * 65;
-                CanHit = false;
-                if (mousePos.X < Owner.Center.X) Owner.direction = -1;
-                else Owner.direction = 1;
-                FlipAsSword = Owner.direction == -1;
-
-                doSwing = true;
-                swingCount++;
-                finalFlip = false;
-                swingSound = true;
-                armoredHits = 0;
-                ResetSlash();
-            }
-            else
-            {
-                if (!CanHit && !postSwing)
-                {
-
-                    if (mousePos.X < Owner.Center.X) Owner.direction = -1;
-                    else Owner.direction = 1;
-
-                    ResetSlash();
-                }
-                else
-                {
-                    if ((Owner.Center - aimVel).X < Owner.Center.X) Owner.direction = -1;
-                    else Owner.direction = 1;
-                }
-
-                Projectile.rotation = Projectile.rotation.AngleLerp(Owner.AngleTo(mousePos) + MathHelper.ToRadians(45f), 0.1f);
-
-                if (AnimationProgress < useAnim / 1.5f)
-                {
-                    aimVel = (Owner.Center - Owner.Calamity().mouseWorld).SafeNormalize(Vector2.UnitX) * 65;
-                    CanHit = false;
-                    postSwing = false;
-                    if (AnimationProgress == 0)
-                    {
-                        doSwing = false;
-                        Projectile.ai[1] = -Projectile.ai[1];
-                    }
-                    RotationOffset = MathHelper.Lerp(RotationOffset, MathHelper.ToRadians(120f * Projectile.ai[1] * Owner.direction * (1 + Utils.GetLerpValue(useAnim * 0.8f, useAnim, Animation, true) * 0.35f)), 0.2f);
-                }
-                else
-                {
-                    if (!finalFlip)
-                    {
-                        FlipAsSword = Owner.direction < 0;
-                    }
-
-                    float time = AnimationProgress - useAnim / 3;
-                    float timeMax = useAnim - useAnim / 3;
-
-                    if (time >= (int)(timeMax * 0.4f) && swingSound)
-                    {
-                        SoundStyle fire = new("CalamityMod/Sounds/Item/HeavySwing");
-                        SoundEngine.PlaySound(fire with { Volume = 0.8f, Pitch = -0.2f * (Owner.GetModPlayer<EschatonPlayer>().FinalityStacks / EschatonPlayer.MaxFinalityStacks), PitchVariance = 0.3f }, Projectile.Center);
-                        swingSound = false;
-                    }
-                    if (time > (int)(timeMax * 0.3f) && time < (int)(timeMax * 0.8f))
-                    {
-                        CanHit = true;
-                    }
-                    else
-                        CanHit = false;
-
-                    Owner.SetDummyItemTime(2);
-                    float attackT = Utilities.InverseLerp(0, timeMax, time);
-
-
-                    float eased = CalamityUtils.ExpInOutEasing(attackT, 1);
-                    float swingDegrees = MathHelper.Lerp(
-                        150f * Projectile.ai[1] * Owner.direction,
-                        120f * -Projectile.ai[1] * Owner.direction,
-                        eased
-                    );
-
-
-                    RotationOffset = MathHelper.Lerp(
-                       RotationOffset,
-                       MathHelper.ToRadians(swingDegrees),
-                       0.2f
-                   );
-
-                    if (time >= timeMax)
-                    {
-                        Owner.controlUseItem = true;
-                        doSwing = false; postSwing = true;
-
-                    }
-
-
-
-                }
-
-                UpdateSlash();
-            }
-
-            ArmRotationOffset = MathHelper.ToRadians(-140f);
-            ArmRotationOffsetBack = MathHelper.ToRadians(-140f);
+            StateMachine();
         }
 
+        void StateMachine()
+        {
+            switch (State)
+            {
+                case SwingState.Windup:
+                    FinalRotation = FinalRotation.AngleLerp(MathHelper.ToRadians(-60) + Owner.AngleTo(Owner.Calamity().mouseWorld), 0.2f);
+                    State = SwingState.Swing;
+                    break;
+
+                case SwingState.Swing:
+
+                    FinalRotation = FinalRotation.AngleLerp(MathHelper.ToRadians(120), 0.15f);
+                    break;
+
+                case SwingState.Recover:
+
+                    break;
+            }
+        }
+
+      
 
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
-
-            return base.Colliding(projHitbox, targetHitbox);
+            return Collision.CheckAABBvAABBCollision(projHitbox.Center.ToVector2(), projHitbox.Size(), projHitbox.Center.ToVector2() + new Vector2(SwordLength, 0).RotatedBy(FinalRotation), projHitbox.Size());
+            //return base.Colliding(projHitbox, targetHitbox);
         }
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
@@ -388,25 +278,12 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.Eschaton
         #endregion
         public override bool PreDraw(ref Color lightColor)
         {
-            // Only draw the projectile if the projectile's owner is currently using the item this projectile is attached to.
-            if ((useAnim > 0 || DrawUnconditionally) && Owner.ItemAnimationActive)
-            {
-                if (AnimationProgress > 0)
-                    DrawSlash();
-                Asset<Texture2D> tex = ModContent.Request<Texture2D>(Texture);
-                Asset<Texture2D> glowTex = ModContent.Request<Texture2D>(EschatonItem.Path + "_Glow");
+            var tex = SwordTex.Value;
+            Vector2 DrawPos = Projectile.Center - Main.screenPosition;
+            Vector2 Origin = new Vector2(0, tex.Height);
+            Main.EntitySpriteDraw(tex, DrawPos, null, lightColor, FinalRotation, Origin, Projectile.scale, SpriteEffects.None);
 
-                float r = FlipAsSword ? MathHelper.ToRadians(90) : 0f;
-
-
-
-
-                Main.EntitySpriteDraw(tex.Value, Projectile.Center - Main.screenPosition + new Vector2(0, Owner.gfxOffY), tex.Frame(1, FrameCount, 0, Frame), lightColor, Projectile.rotation + RotationOffset + r, FlipAsSword ? new Vector2(tex.Width() - SpriteOrigin.X, SpriteOrigin.Y) : SpriteOrigin, Projectile.scale, spriteEffects != SpriteEffects.None ? spriteEffects : FlipAsSword ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
-                Main.EntitySpriteDraw(glowTex.Value, Projectile.Center - Main.screenPosition + new Vector2(0, Owner.gfxOffY), glowTex.Frame(1, FrameCount, 0, Frame), Color.White, Projectile.rotation + RotationOffset + r, FlipAsSword ? new Vector2(glowTex.Width() - SpriteOrigin.X, SpriteOrigin.Y) : SpriteOrigin, Projectile.scale, spriteEffects != SpriteEffects.None ? spriteEffects : FlipAsSword ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
-
-            }
-
-            //Utils.DrawLine(Main.spriteBatch, Projectile.Center, Projectile.Center + new Vector2(500, 0).RotatedBy(FinalRotation-MathHelper.PiOver4), Color.White);
+            Utils.DrawLine(Main.spriteBatch, Projectile.Center, Projectile.Center + new Vector2(500, 0).RotatedBy(FinalRotation-MathHelper.PiOver4), Color.White);
             return false;
         }
     }

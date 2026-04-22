@@ -227,16 +227,15 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
 
         private void UpdateArm()
         {
-            float armRotation = Rotation - MathHelper.PiOver2 + MathHelper.ToRadians(20f + HandPhaseOffset) * Projectile.direction;
+            float armRotation = Rotation - MathHelper.PiOver2 + MathHelper.ToRadians(30f + HandPhaseOffset) * Projectile.direction;
 
-            // Whichever gun is on the front visual side uses the front arm.
-            bool useFrontArm = !IsLeftHand;
+            bool useFrontArm = IsLeftHand;
 
-            if (!useFrontArm)
+            if (useFrontArm)
             {
                 Owner.SetCompositeArmFront(
                     true,
-                    Player.CompositeArmStretchAmount.Full,
+                    GetStretch(Recoil),
                     armRotation
                 );
             }
@@ -244,11 +243,28 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
             {
                 Owner.SetCompositeArmBack(
                     true,
-                    Player.CompositeArmStretchAmount.Full,
+                    GetStretch(Recoil),
                     armRotation
                 );
             }
         }
+        private Player.CompositeArmStretchAmount GetStretch(float Interp)
+        {
+
+            if (Interp > .4f)
+            {
+                return Player.CompositeArmStretchAmount.Quarter;
+            }
+            else if (Interp > 0.2f)
+                return Player.CompositeArmStretchAmount.ThreeQuarters;
+            else
+                return Player.CompositeArmStretchAmount.Full;
+
+
+
+                return Player.CompositeArmStretchAmount.None;
+        }
+
 
         private void DoPlayerCheck()
         {
@@ -282,6 +298,8 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
 
             Main.EntitySpriteDraw(tex, adjustedDrawPos, null, lightColor, rot, origin, 1f, flip);
 
+            if(IsLeftHand)
+            Utils.DrawBorderString(Main.spriteBatch, Recoil.ToString(), drawPos, Color.White, anchory:-1);
             return false;
         }
     }

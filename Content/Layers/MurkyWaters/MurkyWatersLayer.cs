@@ -1,4 +1,4 @@
-﻿using AbyssOverhaul.Content.NPCs.DeepSnapperNPC;
+﻿using AbyssOverhaul.Content.NPCs.Hostile.DeepSnapperNPC;
 using AbyssOverhaul.Core.DataStructures;
 using AbyssOverhaul.Core.Utilities;
 using CalamityMod.NPCs.Abyss;

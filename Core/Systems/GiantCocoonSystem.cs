@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Terraria.ModLoader.IO;
 
 namespace AbyssOverhaul.Core.Systems
 {
@@ -26,8 +27,8 @@ namespace AbyssOverhaul.Core.Systems
 
             CocoonBack = Assets.Textures.Moon.Asset;
             CocoonMid = Assets.Textures.Moon.Asset;
-            CocoonFront = Assets.Textures.Moon.Asset;
-            CocoonStrands = Assets.Textures.Moon.Asset;// ModContent.Request<Texture2D>("YourMod/Assets/Cocoon/CocoonStrands");
+            CocoonFront = Assets.Textures.SilvaCocoon.Cocoon_Tex.Asset;
+            CocoonStrands = Assets.Textures.SilvaCocoon.CocoonStrands.Asset;// ModContent.Request<Texture2D>("YourMod/Assets/Cocoon/CocoonStrands");
             CocoonGlow = Assets.Textures.Moon.Asset; //ModContent.Request<Texture2D>("YourMod/Assets/Cocoon/CocoonGlow");
         }
 
@@ -37,6 +38,48 @@ namespace AbyssOverhaul.Core.Systems
         {
             Cocoons.Clear();
         }
+
+        public override void OnWorldLoad()
+        {
+            Cocoons.Clear();
+        }
+
+        public override void OnWorldUnload()
+        {
+            Cocoons.Clear();
+        }
+
+        public override void SaveWorldData(TagCompound tag)
+        {
+            List<TagCompound> cocoonTags = new();
+
+            foreach (GiantCocoon cocoon in Cocoons)
+            {
+                if (cocoon is null)
+                    continue;
+
+                cocoonTags.Add(cocoon.Save());
+            }
+
+            tag["GiantCocoons"] = cocoonTags;
+        }
+
+        public override void LoadWorldData(TagCompound tag)
+        {
+            Cocoons.Clear();
+
+            if (!tag.ContainsKey("GiantCocoons"))
+                return;
+
+            List<TagCompound> cocoonTags = (List<TagCompound>)tag.GetList<TagCompound>("GiantCocoons");
+
+            foreach (TagCompound cocoonTag in cocoonTags)
+            {
+                Cocoons.Add(GiantCocoon.Load(cocoonTag));
+            }
+        }
+
+
 
         public static GiantCocoon AddCocoon(Vector2 worldCenter, float scale = 1f, float rotation = 0f)
         {
@@ -75,43 +118,19 @@ namespace AbyssOverhaul.Core.Systems
 
             float time = (float)Main.GlobalTimeWrappedHourly;
 
-            DrawLayer(
-                spriteBatch,
-                CocoonBack.Value,
-                cocoon.WorldCenter,
-                cameraDelta,
-                parallaxFactor: 0.03f,
-                scale: cocoon.BaseScale * 1.18f,
-                rotation: cocoon.Rotation - 0.02f,
-                color: Lighting.GetColor((int)cocoon.WorldCenter.X / 16, (int)cocoon.WorldCenter.Y / 16) * 0.65f,
-                verticalBob: 2f,
-                bobSpeed: 0.7f,
-                time: time);
 
-            DrawLayer(
-                spriteBatch,
-                CocoonMid.Value,
-                cocoon.WorldCenter,
-                cameraDelta,
-                parallaxFactor: 0.06f,
-                scale: cocoon.BaseScale * 1.08f,
-                rotation: cocoon.Rotation,
-                color: Lighting.GetColor((int)cocoon.WorldCenter.X / 16, (int)cocoon.WorldCenter.Y / 16) * 0.85f,
-                verticalBob: 3f,
-                bobSpeed: 1.0f,
-                time: time);
-
+  
             DrawLayer(
                 spriteBatch,
                 CocoonStrands.Value,
                 cocoon.WorldCenter,
                 cameraDelta,
-                parallaxFactor: 0.095f,
-                scale: cocoon.BaseScale * 1.02f,
+                parallaxFactor: 0.5f,
+                scale: cocoon.BaseScale * 0.92f,
                 rotation: cocoon.Rotation + 0.01f,
                 color: Color.White * 0.75f,
                 verticalBob: 4f,
-                bobSpeed: 1.3f,
+                bobSpeed: 0f,
                 time: time);
 
             DrawLayer(
@@ -119,26 +138,15 @@ namespace AbyssOverhaul.Core.Systems
                 CocoonFront.Value,
                 cocoon.WorldCenter,
                 cameraDelta,
-                parallaxFactor: 0.13f,
-                scale: cocoon.BaseScale,
+                parallaxFactor: 0.5f,
+                scale: cocoon.BaseScale*0.8f,
                 rotation: cocoon.Rotation + 0.03f,
                 color: Color.White,
-                verticalBob: 5f,
-                bobSpeed: 1.6f,
+                verticalBob: 4f,
+                bobSpeed:0,
                 time: time);
 
-            DrawLayer(
-                spriteBatch,
-                CocoonGlow.Value,
-                cocoon.WorldCenter,
-                cameraDelta,
-                parallaxFactor: 0.16f,
-                scale: cocoon.BaseScale * 1.04f,
-                rotation: cocoon.Rotation,
-                color: new Color(120, 170, 200, 0) * 0.5f,
-                verticalBob: 6f,
-                bobSpeed: 1.8f,
-                time: time);
+           
         }
 
         private static void DrawLayer(

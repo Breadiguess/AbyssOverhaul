@@ -1,6 +1,7 @@
 ﻿using AbyssOverhaul.Core.Utilities;
 using AbyssOverhaul.Core.WorldGen;
 using CalamityMod.World;
+using Terraria.GameContent.Events;
 using Terraria.Localization;
 
 namespace AbyssOverhaul.Core.Systems
@@ -51,9 +52,7 @@ namespace AbyssOverhaul.Core.Systems
                 }
 
             }
-
-
-            tasks.Insert(abyssIndex++, new PassLegacy("Flood The Sea", (progress, config) =>
+            tasks.Add(new PassLegacy("Flood The Sea", (progress, config) =>
             {
                 AbyssWorldGenHelper.FloodOpenSpace(AbyssGenUtils.AbyssWorldMinX, AbyssGenUtils.AbyssWorldMaxX, AbyssGenUtils.TopY, AbyssGenUtils.BottomY);
             }));

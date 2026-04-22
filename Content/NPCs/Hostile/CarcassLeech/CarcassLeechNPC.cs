@@ -5,7 +5,7 @@ using AbyssOverhaul.Common.Brain.SharedSensors;
 using AbyssOverhaul.Core.Carcasses;
 using CalamityMod;
 
-namespace AbyssOverhaul.Content.NPCs.CarcassLeech
+namespace AbyssOverhaul.Content.NPCs.Hostile.CarcassLeech
 {
     internal class CarcassLeechNPC : ModNPC, IEcologyParticipant
     {

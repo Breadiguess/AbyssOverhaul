@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 using Terraria.Audio;
 using Terraria.DataStructures;
 
-namespace AbyssOverhaul.Content.NPCs.DeepSnapperNPC
+namespace AbyssOverhaul.Content.NPCs.Hostile.DeepSnapperNPC
 {
     internal class DeepSnapper : ModNPC, IEcologyParticipant
     {
@@ -311,7 +311,7 @@ namespace AbyssOverhaul.Content.NPCs.DeepSnapperNPC
                 context.SchoolTargetPosition = leader.Center;
 
                 // Slight per-fish variation so they do not stack in one exact ring.
-                context.DesiredSchoolDistanceFromTarget = 72f + (NPC.whoAmI % 3) * 18f;
+                context.DesiredSchoolDistanceFromTarget = 72f + NPC.whoAmI % 3 * 18f;
             }
 
             NpcBrain.Update(NPC);

@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace AbyssOverhaul.Content.NPCs.KarkinosNPC
 {
+    /*
     public partial class Karkinos : ModNPC, IEcologyParticipant
     {
 
@@ -279,5 +280,5 @@ namespace AbyssOverhaul.Content.NPCs.KarkinosNPC
         }
 
       
-    }
+    }*/
 }

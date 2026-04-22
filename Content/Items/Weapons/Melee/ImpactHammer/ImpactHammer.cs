@@ -17,7 +17,7 @@ using Terraria.GameContent;
 
 namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
 {
-    public class ImpactHammer : ModProjectile, ILocalizedModType, IDrawPixellated
+    public class ImpactHammer : ModProjectile, ILocalizedModType, IDrawPixelated
     {
 
 
@@ -978,8 +978,8 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
             return false;
         }
 
-        PixelLayer IDrawPixellated.PixelLayer => PixelLayer.AbovePlayer;
-        void IDrawPixellated.DrawPixelated(SpriteBatch spriteBatch)
+        PixelLayer IDrawPixelated.PixelLayer => PixelLayer.AbovePlayer;
+        void IDrawPixelated.DrawPixelated(SpriteBatch spriteBatch)
         {
             if (FunChain is not null && FunChain.Positions is { Length: >= 2 })
             {

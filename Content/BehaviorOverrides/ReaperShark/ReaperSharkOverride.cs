@@ -54,7 +54,7 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.ReaperShark
             {
                 var a = arms[i];
 
-                a.Skeleton.Update(NPC.Center, Main.MouseWorld);
+                a.Skeleton.Solve(NPC.Center, Main.MouseWorld);
                 arms[i] = a;
             }
 
@@ -87,10 +87,10 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.ReaperShark
                 {
                     var t = arms[i].Skeleton;
 
-                    for (int x = 0; x < t.PositionCount; x++)
+                    for (int x = 0; x < t.JointCount; x++)
                     {
-                        Vector2 start = t.Position(x);
-                        Vector2 end = t.Position(x + 1);
+                        Vector2 start = t.GetJointPosition(x);
+                        Vector2 end = t.GetJointPosition(x + 1);
 
                         Utils.DrawLine(Main.spriteBatch, start, end, Color.Black, Color.Black, 10);
                     }

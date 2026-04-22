@@ -18,6 +18,8 @@ global using Terraria.IO;
 global using Terraria.ModLoader;
 global using Terraria.WorldBuilding;
 global using Terraria.DataStructures;
+global using AbyssOverhaul.Core.DataStructures;
+global using AbyssOverhaul.Core.Graphics;
 global using static AbyssOverhaul.AbyssOverhaul;
 global using AbyssOverhaul.Core.Ecosystem.Ecology;
 global using Terraria.Audio;

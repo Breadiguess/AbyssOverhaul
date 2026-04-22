@@ -78,6 +78,8 @@ NPCs: {
 	Karkinos.DisplayName: Karkinos
 	GrumpFish.DisplayName: Grump Fish
 	DepthFeeder.DisplayName: Depth Feeder
+	SilvaBoss.DisplayName: Silva Boss
+	MagmaSlug.DisplayName: Magma Slug
 }
 
 Buffs: {
@@ -107,4 +109,7 @@ Projectiles: {
 	BrigandsCalling_Held.DisplayName: Brigands Calling_ Held
 	BrigandsCalling_WaterSpout.DisplayName: Brigands Calling_ Water Spout
 	DebugProjectile.DisplayName: Debug Projectile
+	WindingRootsProjectile.DisplayName: Winding Roots Projectile
+	FloralProjectile.DisplayName: Floral Projectile
+	BrutalVine.DisplayName: Brutal Vine
 }

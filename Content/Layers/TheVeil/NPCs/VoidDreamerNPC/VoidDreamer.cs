@@ -14,7 +14,7 @@ using Terraria.GameContent.Bestiary;
 
 namespace AbyssOverhaul.Content.Layers.TheVeil.NPCs.VoidDreamerNPC
 {
-    internal class VoidDreamer : ModNPC, IDrawPixellated
+    internal class VoidDreamer : ModNPC, IDrawPixelated
     {
 
         private const int HeadVariationCount = 6;

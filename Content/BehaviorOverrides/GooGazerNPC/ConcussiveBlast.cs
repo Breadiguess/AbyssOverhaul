@@ -12,7 +12,7 @@ using Terraria.Localization;
 
 namespace AbyssOverhaul.Content.BehaviorOverrides.GooGazerNPC
 {
-    internal class ConcussiveBlast : ModProjectile, IDrawPixellated
+    internal class ConcussiveBlast : ModProjectile, IDrawPixelated
     {
         public override string Texture => Assets.Textures.Extra.HollowCircleHardEdge.KEY;
 

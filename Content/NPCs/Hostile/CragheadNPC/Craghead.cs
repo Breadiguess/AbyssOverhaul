@@ -5,7 +5,7 @@ using CalamityMod.Items.Accessories;
 using CalamityMod.Items.Placeables.Ores;
 using CalamityMod.Particles;
 
-namespace AbyssOverhaul.Content.NPCs.CragheadNPC
+namespace AbyssOverhaul.Content.NPCs.Hostile.CragheadNPC
 {
     internal class Craghead : ModNPC, IEcologyParticipant
     {
@@ -425,7 +425,7 @@ namespace AbyssOverhaul.Content.NPCs.CragheadNPC
 
             var tex = TextureAssets.Npc[Type].Value;
             Rectangle frame = tex.Frame(1, 8, 0, NPC.frame.Y);
-            Main.EntitySpriteDraw(tex, NPC.Center - screenPos, frame, drawColor, NPC.rotation, frame.Size() / 2, NPC.scale, (NPC.spriteDirection).ToSpriteDirection());
+            Main.EntitySpriteDraw(tex, NPC.Center - screenPos, frame, drawColor, NPC.rotation, frame.Size() / 2, NPC.scale, NPC.spriteDirection.ToSpriteDirection());
 
 
             var HeadTex = ModContent.Request<Texture2D>(this.GetPath() + "_Head").Value;

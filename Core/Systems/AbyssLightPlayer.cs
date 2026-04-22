@@ -17,6 +17,8 @@ namespace AbyssOverhaul.Core.Systems
         public override void PostUpdatePlayers()
         {
 
+            if (GiantCocoonSystem.Cocoons.Count < 1 && Main.LocalPlayer.controlUseItem)
+                GiantCocoonSystem.AddCocoon(Main.LocalPlayer.Center, 1, 0);
 
             if (Main.netMode != NetmodeID.Server)
             {
