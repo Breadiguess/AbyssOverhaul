@@ -1,6 +1,5 @@
 ﻿using AbyssOverhaul.Content.NPCs.Hostile.CarcassLeech;
 using BreadLibrary.Core.Graphics;
-using BreadLibrary.Core.Graphics.PixelationShit;
 using CalamityMod;
 using Microsoft.Xna.Framework.Graphics;
 using System;

@@ -2,7 +2,7 @@
 using AbyssOverhaul.Common.Brain.SharedModules;
 using AbyssOverhaul.Core.Graphics.ReworkedAbyssDarkness;
 using BreadLibrary.Core.Graphics;
-using BreadLibrary.Core.Graphics.PixelationShit;
+using BreadLibrary.Core.Graphics.Pixelation;
 using BreadLibrary.Core.Sounds;
 using BreadLibrary.Core.Verlet;
 using CalamityMod.BiomeManagers;

@@ -1,5 +1,5 @@
 ﻿using BreadLibrary.Core.Graphics;
-using BreadLibrary.Core.Graphics.PixelationShit;
+using BreadLibrary.Core.Graphics.Pixelation;
 using ReLogic.Utilities;
 using System;
 using System.Collections.Generic;

@@ -2,7 +2,7 @@
 using BreadLibrary.Common.IK;
 using BreadLibrary.Core.Graphics;
 using BreadLibrary.Core.Graphics.Particles;
-using BreadLibrary.Core.Graphics.PixelationShit;
+using BreadLibrary.Core.Graphics.Pixelation;
 using BreadLibrary.Core.ScreenShake;
 using BreadLibrary.Core.Sounds;
 using BreadLibrary.Core.Verlet;

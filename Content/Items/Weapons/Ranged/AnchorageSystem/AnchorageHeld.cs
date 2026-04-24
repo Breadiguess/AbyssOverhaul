@@ -1,6 +1,6 @@
 ﻿using AbyssOverhaul.Core.Graphics;
 using BreadLibrary.Core.Graphics;
-using BreadLibrary.Core.Graphics.PixelationShit;
+using BreadLibrary.Core.Graphics.Pixelation;
 using BreadLibrary.Core.Verlet;
 using CalamityMod;
 using CalamityMod.Physics;

@@ -363,7 +363,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Summoner
 
 
                 Vector2 start = (_wings[i].Anchor + _wings[i].Tip) / 2f;
-                Point? DustPos = LineAlgorithm.RaycastTo(start, start - Vector2.UnitX.RotatedBy(_wings[i].ForceDirection.ToRotation()) * 100, debug: false);
+                Point? DustPos =  Utilities.RaycastTo(start, start - Vector2.UnitX.RotatedBy(_wings[i].ForceDirection.ToRotation()) * 100, debug: false);
                 if (DustPos.HasValue)
                 {
                     float EndLength = -start.Distance(DustPos.Value.ToWorldCoordinates());

@@ -1,7 +1,7 @@
 ﻿using AbyssOverhaul.Core.Graphics.ReworkedAbyssDarkness;
 using BreadLibrary.Core.Graphics;
 using BreadLibrary.Core.Graphics.Particles;
-using BreadLibrary.Core.Graphics.PixelationShit;
+using BreadLibrary.Core.Graphics.Pixelation;
 using Terraria;
 using Terraria.Graphics.Renderers;
 
@@ -78,17 +78,6 @@ namespace AbyssOverhaul.Content.BehaviorOverrides.VoidstoneScreamerNPC
             Vector2 Scale = new Vector2(this.Scale*0.2f, this.Scale);
             Main.EntitySpriteDraw(tex, drawPos, null, Color with { A = 0 } * Opacity, Velocity.ToRotation(), tex.Size() / 2, Scale*(1-Opacity), SpriteEffects.None, 0);
         }
-        PixelLayer IDrawPixelated.PixelLayer => PixelLayer.AboveNPCs;
-
-        void IDrawPixelated.DrawPixelated(SpriteBatch spriteBatch)
-        {
-            Texture2D tex = Assets.Textures.Burst.T_Burst048.Asset.Value;
-
-            Vector2 drawPos = Position - Main.screenPosition;
-
-            float Opacity = Utilities.InverseLerp(0, MaxTime, TimeLeft);
-            
-            Main.EntitySpriteDraw(tex, drawPos, null, Color * Opacity, 0, tex.Size() / 2, Scale, SpriteEffects.None, 0);
-        }
+     
     }
 }

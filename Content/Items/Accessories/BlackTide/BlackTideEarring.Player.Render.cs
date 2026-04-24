@@ -1,6 +1,6 @@
 ﻿using AbyssOverhaul.Content.Items.Accessories.OmegaBlue_Wings;
 using BreadLibrary.Core.Graphics;
-using BreadLibrary.Core.Graphics.PixelationShit;
+using BreadLibrary.Core.Graphics.Pixelation;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;

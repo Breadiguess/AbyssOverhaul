@@ -325,7 +325,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
             Player.maxFallSpeed = FLIP_DASH_SPEED;
             Player.fallStart = (int)(Player.position.Y / 16f);
 
-            Point? raycast = LineAlgorithm.RaycastTo(Player.Center, Player.Center + Player.velocity*4, debug: true);
+            Point? raycast = Utilities.RaycastTo(Player.Center, Player.Center + Player.velocity*4, debug: true);
 
             if (raycast.HasValue)
             {

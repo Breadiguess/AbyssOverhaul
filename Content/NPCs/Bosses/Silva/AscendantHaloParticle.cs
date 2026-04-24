@@ -1,5 +1,5 @@
 ﻿using BreadLibrary.Core.Graphics.Particles;
-using BreadLibrary.Core.Graphics.PixelationShit;
+using BreadLibrary.Core.Graphics.Pixelation;
 using System;
 using System.Collections.Generic;
 using System.Linq;

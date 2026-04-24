@@ -25,7 +25,9 @@ global using AbyssOverhaul.Core.Ecosystem.Ecology;
 global using Terraria.Audio;
 global using Terraria.GameContent;
 global using Terraria.Localization;
+global using BreadLibrary.Core.Graphics.Pixelation;
 using System.Runtime.CompilerServices;
+
 using Wayfarer.API;
 
 [assembly: IgnoresAccessChecksTo("CalamityMod")]
