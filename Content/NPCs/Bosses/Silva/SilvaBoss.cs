@@ -90,9 +90,6 @@ namespace AbyssOverhaul.Content.NPCs.Bosses.Silva
         public override void OnSpawn(Terraria.DataStructures.IEntitySource source)
         {
             SetState(State.Intro);
-            //AscendantHaloParticle particle = new();
-            //particle.Prepare(NPC, NPC.Top);
-            //ParticleEngine.BehindProjectiles.Add(particle);
         }
 
         public override void AI()

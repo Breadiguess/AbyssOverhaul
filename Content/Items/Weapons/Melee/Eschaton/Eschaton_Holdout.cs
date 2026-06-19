@@ -283,6 +283,8 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.Eschaton
             Vector2 Origin = new Vector2(0, tex.Height);
             Main.EntitySpriteDraw(tex, DrawPos, null, lightColor, FinalRotation, Origin, Projectile.scale, SpriteEffects.None);
 
+
+
             Utils.DrawLine(Main.spriteBatch, Projectile.Center, Projectile.Center + new Vector2(500, 0).RotatedBy(FinalRotation-MathHelper.PiOver4), Color.White);
             return false;
         }

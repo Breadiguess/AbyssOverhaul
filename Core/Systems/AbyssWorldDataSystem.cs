@@ -60,15 +60,13 @@ namespace AbyssOverhaul.Core.Systems
                 // Fallback for old worlds with no saved abyss data.
                 // This should mainly matter for singleplayer / host-side old worlds.
                 AbyssGenUtils.Initialize(Mod);
-                }
+            }
 
             PresssureSystem.RefreshAfterBoundsChanged();
         }
 
         public override void OnWorldLoad()
         {
-            // Do not initialize bounds here.
-            // World data load or net receive should be what populates AbyssGenUtils.
             if (AbyssGenUtils.Initialized)
                 PresssureSystem.RefreshAfterBoundsChanged();
         }

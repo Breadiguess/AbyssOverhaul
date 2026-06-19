@@ -26,8 +26,11 @@ global using Terraria.Audio;
 global using Terraria.GameContent;
 global using Terraria.Localization;
 global using BreadLibrary.Core.Graphics.Pixelation;
-using System.Runtime.CompilerServices;
-
+global using System.Runtime.CompilerServices;
+global using AbyssOverhaul.Common.Brain;
+global using AbyssOverhaul.Common.Brain.Contexts;
+global using AbyssOverhaul.Common.Brain.SharedModules;
+global using BreadLibrary.Core.MultiSegment;
 using Wayfarer.API;
 
 [assembly: IgnoresAccessChecksTo("CalamityMod")]

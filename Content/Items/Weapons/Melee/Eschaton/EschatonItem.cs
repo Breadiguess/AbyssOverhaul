@@ -20,7 +20,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.Eschaton
         {
             Item.width = 124;
             Item.height = 124;
-            Item.damage = 14007; // Feel free to change these 7s as balance requires. The other 7s should stay - Update: no more 2777... :(
+            Item.damage = 14007;
             Item.DamageType = DamageClass.MeleeNoSpeed;//TrueMeleeDamageClass.Instance;
             Item.useAnimation = 66;
             Item.useTime = 66;

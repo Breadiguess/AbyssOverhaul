@@ -1,7 +1,6 @@
-﻿using AbyssOverhaul.Common.Brain;
-using AbyssOverhaul.Common.Brain.Contexts;
-using AbyssOverhaul.Common.Brain.SharedModules;
+﻿
 using BreadLibrary.Core;
+using BreadLibrary.Core.MultiSegment;
 using BreadLibrary.Core.Verlet;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.DataStructures;

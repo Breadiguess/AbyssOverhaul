@@ -25,7 +25,6 @@ namespace AbyssOverhaul.Content.NPCs.Bosses.Silva
         public NPC Owner;
         public Vector2 Pos = Vector2.Zero;
 
-        public override PixelLayer PixelLayer => 0;
 
         public void Prepare(NPC Owner, Vector2 SpawnPos)
         {

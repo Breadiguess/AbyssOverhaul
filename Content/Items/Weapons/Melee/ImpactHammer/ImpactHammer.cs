@@ -348,7 +348,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
                 Owner.velocity += target.DirectionTo(Owner.Center) * 20;
                 HasbeenFlung = true;
             }
-            if (target.CanBeMoved(true))
+            if (target.CanBeMoved())
             {
                 target.noTileCollide = false;
                 Vector2 launchVel = Utils.DirectionTo(Owner.Center, Owner.Calamity().mouseWorld);
