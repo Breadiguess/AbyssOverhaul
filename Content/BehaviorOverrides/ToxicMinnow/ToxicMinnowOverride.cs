@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace AbyssOverhaul.Content.BehaviorOverrides.ToxicMinnow
 {
-    internal class ToxicMinnowOverride : NPCBehaviorOverride, IEcologyParticipant
+    internal class ToxicMinnowOverride : NPCBehaviorOverride//, IEcologyParticipant
     {
-        public override int NPCType => ModContent.npcType<ToxicMinnow>();
+        public override int NPCType => ModContent.NPCType<CalamityMod.NPCs.Abyss.ToxicMinnow>();
     }
 }
