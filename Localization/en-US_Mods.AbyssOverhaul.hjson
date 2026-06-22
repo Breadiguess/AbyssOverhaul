@@ -63,6 +63,27 @@ Items: {
 			after taking damage, the aformentioned stats are dropped, and you heal a tiny amount and gain increased dash
 			'''
 	}
+
+	Lore: {
+		LoreSilva: {
+			DisplayName: Silva, the Goddess of Life
+			Tooltip: ""
+			Lore:
+				'''
+				The goddess of life and the elemental of nature. She wears many titles.
+				Silva is the only other god besides Xeroc to have perfectly ascended. Holding the power of the world's life itself.
+				Due to her being a god, she was against my movement the moment it started. 
+				She approached me with her champion, Braelor and tried to reason with me to stop my crusades.
+				Her compassion towards me and the coming of the crusades did persuaded me, though I did not let her words fully convince me.
+				In return, I rose and challenged her. While Braelor was able to make out with his life, Silva wasn't so lucky.
+				Although, due to her being an elemental and the goddess of life, she wasn't able to die. Not without the destruction of her domain.
+				By the end, she was motionless, but still alive. With that, I picked her up and tossed her into the abyss for her second time.
+				Since then, she remained deep in the depths of the abyss. Healing in her cocoon until you forcibly freeded and bested her.
+				What you fought was only a fraction of her full power. 
+				And it will take a long while for her to return at her full power again. Long past both our times.
+				'''
+		}
+	}
 }
 
 NPCs: {
@@ -78,7 +99,7 @@ NPCs: {
 	Karkinos.DisplayName: Karkinos
 	GrumpFish.DisplayName: Grump Fish
 	DepthFeeder.DisplayName: Depth Feeder
-	SilvaBoss.DisplayName: Silva Boss
+	SilvaBoss.DisplayName: Silva, the Goddess of Life
 	MagmaSlug.DisplayName: Magma Slug
 }
 

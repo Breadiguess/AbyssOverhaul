@@ -1,10 +1,15 @@
-﻿using AbyssOverhaul.Content.NPCs.Bosses.Silva.Attacks;
+﻿using AbyssOverhaul.Content.Items.LoreItems;
+using AbyssOverhaul.Content.NPCs.Bosses.Silva.Attacks;
 using CalamityMod;
+using CalamityMod.Events;
+using CalamityMod.Items.Potions;
+using CalamityMod.NPCs;
 using System.IO;
 
 namespace AbyssOverhaul.Content.NPCs.Bosses.Silva
 {
-    internal class SilvaBoss : ModNPC
+	[AutoloadBossHead]
+	internal class SilvaBoss : ModNPC
     {
         public override void SetStaticDefaults()
         {
@@ -19,7 +24,13 @@ namespace AbyssOverhaul.Content.NPCs.Bosses.Silva
             NPC.knockBackResist = 0f;
             NPC.noGravity = true;
             NPC.noTileCollide = true;
-        }
+            NPC.boss = true;
+            if (!Main.dedServ)
+            {
+                Music = MusicLoader.GetMusicSlot(Mod, "Assets/Sounds/Music/Silva");
+                SceneEffectPriority = SceneEffectPriority.BossHigh;
+            }
+		}
 
         public enum State
         {
@@ -94,7 +105,7 @@ namespace AbyssOverhaul.Content.NPCs.Bosses.Silva
 
         public override void AI()
         {
-            HaloOffset = Vector2.Lerp(HaloOffset, NPC.Center+ new Vector2(-1,-7), 0.9f);
+            HaloOffset = Vector2.Lerp(HaloOffset, NPC.Center+ new Vector2(-1,-12), 0.9f);
             currentAttack ??= SilvaAttackRegistry.Get(CurrentState);
             currentAttack.Update(this);
             LocalTimer++;
@@ -127,8 +138,34 @@ namespace AbyssOverhaul.Content.NPCs.Bosses.Silva
             SetState(Combos[CurrentCombo][CurrentComboIndex]);
         }
 
+		public override void OnKill()
+		{
+			if (BossRushEvent.BossRushActive)
+				return;
 
-        public Vector2 HaloOffset;
+			CalamityGlobalNPC.SetNewBossJustDowned(NPC);
+
+			AbyssWorldDataSystem.downedSilva = true;
+			CalamityNetcode.SyncWorld();
+		}
+
+		public override void ModifyNPCLoot(NPCLoot npcLoot)
+		{
+			// Lore
+			npcLoot.AddConditionalPerPlayer(() => !AbyssWorldDataSystem.downedSilva, ModContent.ItemType<LoreSilva>(), desc: DropHelper.FirstKillText);
+		}
+
+		public override void BossLoot(ref int potionType)
+		{
+			potionType = ModContent.ItemType<OmegaHealingPotion>();
+		}
+
+		public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
+		{
+			return null;
+		}
+
+		public Vector2 HaloOffset;
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             var tex = ModContent.Request<Texture2D>("AbyssOverhaul/Content/NPCs/Bosses/Silva/AscendantHaloParticle").Value;

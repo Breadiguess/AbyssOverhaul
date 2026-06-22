@@ -17,7 +17,21 @@ namespace AbyssOverhaul.Core.Systems
         private const string ChasmXKey = "Abyss_ChasmX";
         private const string OnLeftKey = "Abyss_OnLeft";
 
-        public override void ClearWorld()
+		internal static bool _downedSilva = false;
+
+		public static bool downedSilva
+		{
+			get => _downedSilva;
+			set
+			{
+				if (!value)
+					_downedSilva = false;
+				else
+					NPC.SetEventFlagCleared(ref _downedSilva, -1);
+			}
+		}
+
+		public override void ClearWorld()
         {
             AbyssGenUtils.Reset();
             PresssureSystem.RefreshAfterBoundsChanged();
@@ -34,7 +48,10 @@ namespace AbyssOverhaul.Core.Systems
             tag[BottomYKey] = AbyssGenUtils.BottomY;
             tag[ChasmXKey] = AbyssGenUtils.ChasmX;
             tag[OnLeftKey] = AbyssGenUtils.OnLeft;
-        }
+
+			if (downedSilva)
+				tag.Add("downedSilvaFlag", downedSilva);
+		}
 
         public override void LoadWorldData(TagCompound tag)
         {
@@ -62,16 +79,22 @@ namespace AbyssOverhaul.Core.Systems
                 AbyssGenUtils.Initialize(Mod);
             }
 
-            PresssureSystem.RefreshAfterBoundsChanged();
+			if (tag.ContainsKey("downedSilvaFlag"))
+				downedSilva = true;
+
+			PresssureSystem.RefreshAfterBoundsChanged();
         }
 
         public override void OnWorldLoad()
         {
             if (AbyssGenUtils.Initialized)
                 PresssureSystem.RefreshAfterBoundsChanged();
-        }
+			downedSilva = false;
+		}
 
-        public override void NetSend(BinaryWriter writer)
+		public override void OnWorldUnload() => downedSilva = false;
+
+		public override void NetSend(BinaryWriter writer)
         {
             writer.Write(AbyssGenUtils.Initialized);
 
