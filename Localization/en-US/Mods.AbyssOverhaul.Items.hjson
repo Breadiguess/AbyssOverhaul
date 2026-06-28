@@ -39,3 +39,8 @@ ChainLinker: {
 	DisplayName: Chain Linker
 	Tooltip: ""
 }
+
+Lore: {
+	LoreSilva: {
+	}
+}
