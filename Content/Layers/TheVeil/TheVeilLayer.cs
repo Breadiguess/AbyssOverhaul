@@ -26,7 +26,7 @@ namespace AbyssOverhaul.Content.Layers.TheVeil
         private static int MantleType => ModContent.TileType<VoidstoneMantle>();
         private static int VoidstoneType => ModContent.TileType<Voidstone>();
         public override ModWaterStyle ModWaterStyle => VoidWater.Instance;
-        public override int MusicSlot => MusicLoader.GetMusicSlot(Mod, "Assets/Sounds/Music/VeilOst");
+        public new int MusicSlot => MusicLoader.GetMusicSlot(Mod, "Assets/Sounds/Music/VeilOst");
         public override void ModifyGenTasks()
         {
             AddGenTask("TheVeil", static (_, progress, config) =>

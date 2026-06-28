@@ -24,9 +24,6 @@ namespace AbyssOverhaul.Content.Rarities
             var text = item.AffixName();
             var position = new Vector2(line.X, line.Y);
 
-            //SpawnDroplets(in position, text);
-            //UpdateDroplets();
-            //DrawDroplets();
 
             var font = FontAssets.MouseText.Value;
             var size = font.MeasureString(text);
@@ -42,52 +39,153 @@ namespace AbyssOverhaul.Content.Rarities
         }
 
 
-        //todo:allow me to scale each letter without offsetting any other letters in the chain.
+        private static readonly Color[] PulseColors =
+        [
+             Color.DeepSkyBlue,
+            Color.Purple,
+        ];
+
         private static void DrawText(in Vector2 position, string text)
         {
             var font = FontRegistry.BlackSide;
-            var cursor = position;
-
-
             var batch = Main.spriteBatch;
 
-            for (var i = 0; i < text.Length; i++)
+            const float baseScale = 1.25f;
+            const float cycleDuration = 3f;
+            const float transitionWidth = 78f;
+
+            float time = Main.GlobalTimeWrappedHourly;
+
+            float cycleRaw = time / cycleDuration;
+            int cycleIndex = (int)MathF.Floor(cycleRaw);
+            float cycleProgress = cycleRaw - cycleIndex;
+
+            Color oldColor = PulseColors[cycleIndex % PulseColors.Length];
+            Color newColor = PulseColors[(cycleIndex + 1) % PulseColors.Length];
+
+            float totalWidth = font.MeasureString(text).X * baseScale;
+            float centerX = position.X + totalWidth * 0.5f;
+            float maxDistance = MathF.Max(totalWidth * 0.5f, 1f);
+
+            float rawProgress = cycleProgress;
+
+            float easedProgress = rawProgress * rawProgress * rawProgress *
+                                  (rawProgress * (rawProgress * 6f - 15f) + 10f);
+
+            float startDistance = -transitionWidth;
+            float endDistance = maxDistance + transitionWidth;
+
+            float frontDistance = MathHelper.Lerp(startDistance, endDistance, easedProgress);
+
+            var cursor = position;
+
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(
+                SpriteSortMode.Deferred,
+                BlendState.Additive,
+                SamplerState.PointClamp,
+                default,
+                Main.graphics.GraphicsDevice.RasterizerState,
+                null,
+                Main.UIScaleMatrix
+            );
+
+            for (int i = 0; i < text.Length; i++)
             {
-                var letter = text[i].ToString();
+                string letter = text[i].ToString();
 
-                var color = Color.Crimson * 0.5f;
+                float letterWidth = font.MeasureString(letter).X;
+                bool empty = string.IsNullOrWhiteSpace(letter);
 
+                float letterCenterX = cursor.X + letterWidth * baseScale * 0.5f;
+                float distanceFromCenter = MathF.Abs(letterCenterX - centerX);
+                
+                float reached = frontDistance - distanceFromCenter;
 
-                var offset = font.MeasureString(letter) / 1f;
+                float swapAmount = MathHelper.Clamp(reached / transitionWidth, 0f, 1f);
+                swapAmount = MathHelper.SmoothStep(0f, 1f, swapAmount);
 
-                var empty = string.IsNullOrEmpty(letter) || string.IsNullOrWhiteSpace(letter);
-
-
-
-                var wave = MathF.Cos(i / (float)(text.Length) + Main.GlobalTimeWrappedHourly);
-
-                offset = new Vector2(0f, wave);
-
-                color = Color.Lerp(Color.DeepSkyBlue, Color.Purple, 1 + MathF.Sin(Main.GlobalTimeWrappedHourly));
+                Color color = Color.Lerp(oldColor, newColor, swapAmount);
                 color.A = 255;
 
-                var scale = 1.2f + wave * 0.01f;
-                Main.spriteBatch.End();
-                Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, default, Main.graphics.graphicsDevice.RasterizerState, null, Main.UIScaleMatrix);
-                for (int x = 0; x < 10; x++)
-                {
-                    float thing = x / 10f * MathHelper.TwoPi * 2 + Main.GlobalTimeWrappedHourly * 1f;
-                    Utils.DrawBorderStringFourWay(batch, font, letter, cursor.X + (new Vector2(1).RotatedBy(thing)).X, cursor.Y + (new Vector2(1).RotatedBy(thing)).Y, color, Color.Black, Vector2.zeroVector);
+                float bandCenterDistance = MathF.Abs(reached);
 
-                    //Utils.DrawBorderString(Main.spriteBatch, letter, cursor + new Vector2(1).RotatedBy(thing), color, scale * 1.2f);
+                float bandAmount = 1f - bandCenterDistance / transitionWidth;
+                bandAmount = MathHelper.Clamp(bandAmount, 0f, 1f);
+
+                float birthFade = MathHelper.SmoothStep(0f, 1f, MathHelper.Clamp(rawProgress / 0.18f, 0f, 1f));
+
+                bandAmount *= birthFade;
+                bandAmount = MathHelper.Clamp(bandAmount, 0f, 1f);
+
+                float wave = MathF.Cos(i * 0.35f + time * 3f);
+                float scale = baseScale + wave * 0.01f;
+
+                if (!empty)
+                {
+                    for (int x = 0; x < 10; x++)
+                    {
+                        float angle = x / 10f * MathHelper.TwoPi + time * 2f;
+                        Vector2 glowOffset = new Vector2(1f).RotatedBy(angle) * (1f + bandAmount * 3f);
+
+                        Utils.DrawBorderStringFourWay(
+                            batch,
+                            font,
+                            letter,
+                            cursor.X + glowOffset.X,
+                            cursor.Y + glowOffset.Y + wave,
+                            color,
+                            Color.Black,
+                            Vector2.Zero,
+                            scale
+                        );
+                    }
                 }
 
+                cursor.X += letterWidth * scale;
+            }
 
-                Main.spriteBatch.ResetToDefaultUI();
-                Utils.DrawBorderStringFourWay(batch, font, letter, cursor.X, cursor.Y, Color.Black, Color.Transparent, Vector2.zeroVector);
-                //Utils.DrawBorderString(Main.spriteBatch, letter, cursor + offset, Color.Black, scale);
-                Utils.DrawLine(Main.spriteBatch, cursor, cursor + Vector2.UnitX * 140, Color.White);
-                cursor.X += font.MeasureString(letter).X * scale;
+            Main.spriteBatch.ResetToDefaultUI();
+
+            cursor = position;
+
+            for (int i = 0; i < text.Length; i++)
+            {
+                string letter = text[i].ToString();
+
+                float letterWidth = font.MeasureString(letter).X;
+                bool empty = string.IsNullOrWhiteSpace(letter);
+
+                float letterCenterX = cursor.X + letterWidth * baseScale * 0.5f;
+                float distanceFromCenter = MathF.Abs(letterCenterX - centerX);
+
+                float reached = frontDistance - distanceFromCenter;
+
+                float swapAmount = MathHelper.Clamp(reached / transitionWidth, 0f, 1f);
+                swapAmount = MathHelper.SmoothStep(0f, 1f, swapAmount);
+
+                Color color = Color.Lerp(oldColor, newColor, swapAmount);
+                color.A = 255;
+
+                float wave = MathF.Cos(i * 0.35f + time * 3f);
+                float scale = baseScale + wave * 0.01f;
+
+                if (!empty)
+                {
+                    Utils.DrawBorderStringFourWay(
+                        batch,
+                        font,
+                        letter,
+                        cursor.X,
+                        cursor.Y + wave,
+                        Color.Black,
+                        Color.Transparent,
+                        Vector2.Zero,
+                        scale
+                    );
+                }
+
+                cursor.X += letterWidth * scale;
             }
         }
     }

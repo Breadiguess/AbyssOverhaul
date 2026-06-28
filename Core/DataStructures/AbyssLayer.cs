@@ -11,8 +11,21 @@ namespace AbyssOverhaul.Core.DataStructures
     public abstract class AbyssLayer : ModType
     {
         public virtual string MusicPath => null;
-        public virtual int MusicSlot => MusicPath is null ? -1 : MusicLoader.GetMusicSlot(Mod, MusicPath);
-        
+
+        private int? cachedMusicSlot;
+
+        public int MusicSlot
+        {
+            get
+            {
+                if (MusicPath is null)
+                    return -1;
+
+                cachedMusicSlot ??= MusicLoader.GetMusicSlot(Mod, MusicPath);
+                return cachedMusicSlot.Value;
+            }
+        }
+
         public virtual ModWaterStyle ModWaterStyle=> null;
         public virtual SceneEffectPriority ScenePriority => SceneEffectPriority.BiomeHigh;
 
@@ -20,11 +33,9 @@ namespace AbyssOverhaul.Core.DataStructures
         public virtual string VisualKey => "AbyssOverhaul:GenericAbyss";
 
 
-        // Optional map tint / ambient tint ideas.
         public virtual Color MapBackgroundColor => Color.Black;
         public virtual Color LightTint => Color.White;
 
-        // Lets each layer do custom client-side setup every tick while active.
         public virtual void OnSceneActive(Player player, ref AbyssSceneContext context) { }
 
         internal Dictionary<string, Action<AbyssLayer, GenerationProgress, GameConfiguration>> Tasks = new();

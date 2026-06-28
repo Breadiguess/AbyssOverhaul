@@ -32,7 +32,7 @@ namespace AbyssOverhaul.Content.Layers.ThermalVents
 
         public static ThermalVentsLayer Instance => ModContent.GetInstance<ThermalVentsLayer>();
         public override ModWaterStyle ModWaterStyle => ThermalVentsWater.Instance;
-        public override int MusicSlot
+        public new int MusicSlot
         {
             get
             {
