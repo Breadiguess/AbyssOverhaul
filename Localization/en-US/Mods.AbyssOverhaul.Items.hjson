@@ -42,5 +42,62 @@ ChainLinker: {
 
 Lore: {
 	LoreSilva: {
+		DisplayName: Silva, the Goddess of Life
+		Tooltip: ""
+		Lore:
+			'''
+			The goddess of life and the elemental of nature. She wears many titles.
+			Silva is the only other god besides Xeroc to have perfectly ascended. Holding the power of the world's life itself.
+			Due to her being a god, she was against my movement the moment it started. 
+			She approached me with her champion, Braelor and tried to reason with me to stop my crusades.
+			Her compassion towards me and the coming of the crusades did persuaded me, though I did not let her words fully convince me.
+			In return, I rose and challenged her. While Braelor was able to make out with his life, Silva wasn't so lucky.
+			Although, due to her being an elemental and the goddess of life, she wasn't able to die. Not without the destruction of her domain.
+			By the end, she was motionless, but still alive. With that, I picked her up and tossed her into the abyss for her second time.
+			Since then, she remained deep in the depths of the abyss. Healing in her cocoon until you forcibly freeded and bested her.
+			What you fought was only a fraction of her full power. 
+			And it will take a long while for her to return at her full power again. Long past both our times.
+			'''
+	}
+
+	LorePrimordialWyrm: {
+		DisplayName: Primordial Wyrm
+		Tooltip: ""
+		Lore:
+			'''
+			The wyrm was the first of its kind, the first to graze the abyss. 
+			Despite this, its size and age isn't what makes it so powerful.
+			After I had thrown Silva's body into the abyss, the wyrm came to aid her and her cocoon's construction.
+			Due to this amount of generosity, Silva's powers seeped out and came to bless the wyrm to thank it for all it had done.
+			After this blessing, the wyrm was given a permanent task. The task to guard the Terminus.
+			This task then gave it markings of primordial light along its body, as a symbol of its power and what to protect.
+			Although, not too long after, the wyrm would come to hate this symbol, and the energy it leaked out in the darkest waters.
+			It would start to attack anything that would illuminate the depths. With the power granted slowing driving it insane.
+			It sent the deep abyss into a period of darkness, a period void of sight. Everything that used to light the abyss, now destroyed.
+			All that illuminates the depths now are the twinkles of lumenyl within the walls of the deep abyss. Walls it cannot destroy.
+			I do give my deepest sympathy to the wyrm.
+			It did not ask for this power, and it did not ask for the insanity that it would come with. 
+			Yet another hallmark of what the Gods have done.
+			'''
+	}
+
+	LoreTerminus: {
+		DisplayName: The Terminus
+		Tooltip: ""
+		Lore:
+			'''
+			During the Dragonic Era, the leader of the dragon monks carved out a large stone from the Aerie.
+			The monk would use it for various rituals, soon carving the sigil of Primordial Light into the face of said stone.
+			Though, as the dragons fought off Fovos, The Moon Lord, the monk would approach Zeratros for a final time.
+			In a ritual with the stone, the monk would kill Zeratros, becoming Xeroc. This stone would be called "The Terminus".
+			After Zeratros' death, and soon after Xeroc witnessed providence's imperfect ascension, Silva would approach Xeroc.
+			She was someone already well respected by the monks, and would come to ask Xeroc for the Terminus to ascend.
+			Using the Terminus, Xeroc would help Silva ritualistically take the soul from the dragon of life.
+			As Silva perfectly ascended, Xeroc finally noticed something about Silva's ascension compared to Providence's attempt.
+			The Terminus was the key to prefect ascension. Without it, all ascensions would be impure.
+			As a final act of selfishness, Xeroc and Silva would bless the Terminus before then locking it away deep in the abyss.
+			Others would come to ask for the Terminus for themselves, though Xeroc nor Silva would reveal its location.
+			Even I did not know where it was kept until now. Though still, I doubt its useful for the purpose it once served.
+			'''
 	}
 }

@@ -72,7 +72,6 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
         {
             Time++;
 
-
             // Keep projectile facing synced to the player's current direction.
             // This is what makes the pistols swap sides when the player turns around.
             Projectile.direction = Owner.direction;
@@ -112,23 +111,27 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
 
             // Shared clock keeps both guns phase-locked.
             int firingClock = (int)Main.GameUpdateCount + HandPhaseOffset;
+            bool hasShot = false;
 
             if (firingClock % ShotInterval == 0)
             {
-                FireShot();
-                if (!forcedFire)
-                    Recoil = 1f;
-                else
-                    Recoil = 0.2f;
+                hasShot = FireShot();
+                if (hasShot)
+                {
+                    if (!forcedFire)
+                        Recoil = 1f;
+                    else
+                        Recoil = 0.2f;
                     Dip = 0f;
+                }
             }
         }
 
-        private void FireShot()
+        private bool FireShot()
         {
             Item weapon = Owner.HeldItem;
             if (weapon == null || weapon.IsAir)
-                return;
+                return false;
             Vector2 muzzleDirection = Projectile.rotation.ToRotationVector2();
 
             // Muzzle shifts to the visual side, so it also swaps correctly when turning around.
@@ -138,10 +141,6 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
 
             Vector2 spawnPos = Projectile.Center + muzzleOffset;
             Vector2 shotVelocity = muzzleDirection * 16f;
-
-
-
-
 
             int ammoItemId = 0;
             float shootSpeed = weapon.shootSpeed;
@@ -159,15 +158,14 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
                ref knockback,
                out int usedAmmoItemId,
                false
-           );
-
-            projectileType = Item.shoot;
+            );
 
             if (!canShoot)
-                return;
+                return false;
 
+			projectileType = Item.shoot;
 
-            SoundEngine.PlaySound(
+			SoundEngine.PlaySound(
                 Assets.Sounds.Items.Ranged.BrigandsCalling.BrigandsCallingFire.Asset with
                 {
                     Volume = 0.4f,
@@ -205,6 +203,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.BrigandsCalling
 
             if (ammoItemId > 0)
                 Owner.ConsumeItem(ammoItemId);
+            return true;
         }
 
         private void UpdateRecoilVisuals()

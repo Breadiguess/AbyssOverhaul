@@ -9,7 +9,7 @@ using System.IO;
 namespace AbyssOverhaul.Content.NPCs.Bosses.Silva
 {
 	[AutoloadBossHead]
-	internal class SilvaBoss : ModNPC
+	public class SilvaBoss : ModNPC
     {
         public override void SetStaticDefaults()
         {
@@ -168,7 +168,7 @@ namespace AbyssOverhaul.Content.NPCs.Bosses.Silva
 		public Vector2 HaloOffset;
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            var tex = ModContent.Request<Texture2D>("AbyssOverhaul/Content/NPCs/Bosses/Silva/AscendantHaloParticle").Value;
+            var tex = ModContent.Request<Texture2D>("AbyssOverhaul/Content/NPCs/Bosses/Silva/AscendantHaloParticle").Value; // should make some kind of sprite bank to save loaded assets rather than getting it each frame.
             var texGlow = ModContent.Request<Texture2D>("AbyssOverhaul/Content/NPCs/Bosses/Silva/AscendantHaloParticle_Glow").Value;
             var Glow = Assets.Textures.Flare.T_Flare006.Asset.Value;
             spriteBatch.UseBlendState(BlendState.Additive);
