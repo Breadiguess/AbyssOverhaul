@@ -114,3 +114,14 @@ Projectiles: {
 	FloralProjectile.DisplayName: Floral Projectile
 	BrutalVine.DisplayName: Brutal Vine
 }
+
+Configs: {
+	AbyssOverhaulClientConfig: {
+		DisplayName: Abyss Overhaul Client Config
+
+		UniqueRarityFont: {
+			Label: Unique Rarity Font
+			Tooltip: ""
+		}
+	}
+}

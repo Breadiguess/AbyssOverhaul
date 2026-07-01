@@ -1,4 +1,5 @@
-﻿using CalamityMod.Items.LoreItems;
+﻿using AbyssOverhaul.Content.Rarities;
+using CalamityMod.Items.LoreItems;
 using CalamityMod.Rarities;
 
 namespace AbyssOverhaul.Content.Items.LoreItems
@@ -10,7 +11,7 @@ namespace AbyssOverhaul.Content.Items.LoreItems
 			Item.width = 20;
 			Item.height = 20;
 			Item.consumable = false;
-			Item.rare = ModContent.RarityType<CalamityRed>();
+			Item.rare = ModContent.RarityType<PrimordialYellow>();
 		}
 
 		// Add when primordial wyrm has a trophy

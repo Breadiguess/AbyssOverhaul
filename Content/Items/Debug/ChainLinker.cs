@@ -1,4 +1,5 @@
 ﻿using AbyssOverhaul.Content.Layers.FossilShale.Systems;
+using AbyssOverhaul.Content.Rarities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +32,7 @@ namespace AbyssOverhaul.Content.Items.Debug
             Item.useAnimation = 12;
             Item.useStyle = ItemUseStyleID.Swing;
             Item.UseSound = SoundID.Grab;
-            Item.rare = ItemRarityID.Blue;
+            Item.rare = ModContent.RarityType<PrimordialYellow>(); //test the primordial yellow on a no tooltip item
             Item.value = Item.buyPrice(silver: 50);
             Item.noMelee = true;
             Item.useTurn = true;
