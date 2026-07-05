@@ -9,7 +9,7 @@ namespace AbyssOverhaul.Content.Rarities
 
 		// Pulse times
 		private const float pulseDuration = 4; // Amount of time in seconds
-		private const float halfTime = pulseDuration / 4f;
+		private const float quarterTime = pulseDuration / 4f;
 		private const float glowDuration = pulseDuration / 2f;
 		private static float Time => Main.GlobalTimeWrappedHourly;
 		private static float pulseTime => Time % pulseDuration;
@@ -24,7 +24,7 @@ namespace AbyssOverhaul.Content.Rarities
 			DynamicSpriteFont rarityFont = FontAssets.MouseText.Value;
 			var crystalTextGlow = ModContent.Request<Texture2D>("CalamityMod/ExtraTextures/UI/CrystalTextGlow").Value;
 
-			float pulseAmount = (pulseTime <= pulseDuration / 2f) ? pulseTime / halfTime : (pulseDuration - pulseTime) / halfTime;
+			float pulseAmount = (pulseTime <= pulseDuration / 2f) ? pulseTime / quarterTime : (pulseDuration - pulseTime) / quarterTime;
 			pulseAmount -= 0.5f;
 			pulseAmount = Math.Clamp(pulseAmount, 0f, 1f);
 
@@ -146,7 +146,7 @@ namespace AbyssOverhaul.Content.Rarities
 			Vector2 vineStartPos = position - new Vector2(vineExtraWidth, 0);
 
 			int vineAmount = (int)(totalTextWidth / vineSpriteWidth) + 1;
-			int vineProgressTemp = (int)MathHelper.Lerp(0, totalTextWidth, pulseTime / halfTime); //temp for testing purposes
+			int vineProgressTemp = (int)MathHelper.Lerp(0, totalTextWidth, pulseTime / quarterTime); //temp for testing purposes
 
 			for (int i = 0; i < (vineAmount / 2); i++)
 			{
