@@ -1,5 +1,5 @@
-﻿using CalamityMod.Items.LoreItems;
-using CalamityMod.Rarities;
+﻿using AbyssOverhaul.Content.Rarities;
+using CalamityMod.Items.LoreItems;
 
 namespace AbyssOverhaul.Content.Items.LoreItems
 {
@@ -12,7 +12,7 @@ namespace AbyssOverhaul.Content.Items.LoreItems
 			Item.width = 20;
 			Item.height = 20;
 			Item.consumable = false;
-			Item.rare = ModContent.RarityType<PureGreen>(); // TODO: Silva rarity for her items/related items
+			Item.rare = ModContent.RarityType<SilvaLime>();
 		}
 
 		// Add when silva has a trophy
