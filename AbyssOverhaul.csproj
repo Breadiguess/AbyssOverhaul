@@ -1,4 +1,4 @@
-﻿<Project Sdk="Tomat.Terraria.ModLoader.Sdk/2.0.0">
+﻿<Project Sdk="Tomat.Terraria.ModLoader.Sdk/2.1.1">
   <PropertyGroup>
     <LangVersion>preview</LangVersion>
     <DebugSymbols>true</DebugSymbols>
