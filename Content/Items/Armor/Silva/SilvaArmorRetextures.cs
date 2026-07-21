@@ -6,10 +6,6 @@ using CalamityMod.Items.Armor.Silva;
 using CalamityMod.Projectiles.Summon;
 using MonoMod.Cil;
 using System.Reflection;
-using Terraria.Graphics.Shaders;
-using Terraria.ModLoader;
-using Wayfarer.Edges;
-using static Daybreak.Common.Features.Hooks.GlobalNPCHooks;
 
 namespace AbyssOverhaul.Content.Items.Armor.Silva
 {
@@ -34,15 +30,34 @@ namespace AbyssOverhaul.Content.Items.Armor.Silva
 			IL_PlayerDrawLayers.DrawPlayer_28_ArmOverItemComposite += SilvaArmorReplaceArms;
 			On_PlayerDrawLayers.DrawPlayer_09_Wings += RerenderSilvaWings;
 
-			// Could be a detour, but I honestly couldn't care lol as I already wrote it as an IL edit
 			PropertyInfo? cooldownTextureGetter = typeof(SilvaRevive).GetProperty(nameof(SilvaRevival.Texture), BindingFlags.Instance | BindingFlags.Public);
+			PropertyInfo? cooldownOutlineColorGetter = typeof(SilvaRevive).GetProperty("OutlineColor", BindingFlags.Instance | BindingFlags.Public);
+			PropertyInfo? cooldownStartColoreGetter = typeof(SilvaRevive).GetProperty("CooldownStartColor", BindingFlags.Instance | BindingFlags.Public);
+			PropertyInfo? cooldownEndColoreGetter = typeof(SilvaRevive).GetProperty("CooldownEndColor", BindingFlags.Instance | BindingFlags.Public);
 
-			if (cooldownTextureGetter != null)
-				MonoModHooks.Modify(
-					cooldownTextureGetter.GetGetMethod(),
-					SilvaCooldownReplacement
+			ApplyGetPropertyDetour(cooldownTextureGetter, SilvaCooldownTexture);
+			ApplyGetPropertyDetour(cooldownOutlineColorGetter, SilvaCooldownOutline);
+			ApplyGetPropertyDetour(cooldownStartColoreGetter, SilvaCooldownStartColor);
+			ApplyGetPropertyDetour(cooldownEndColoreGetter, SilvaCooldownEndColor);
+		}
+
+		internal static void ApplyGetPropertyDetour(PropertyInfo? propertyToDetour, Delegate detourDelegate)
+		{
+			if (propertyToDetour != null)
+				MonoModHooks.Add(
+					propertyToDetour.GetGetMethod(),
+					detourDelegate
 				);
 		}
+
+		// Replaces the silva cooldown properties for texture and colors
+		internal static string SilvaCooldownTexture(Func<SilvaRevive, string> orig, SilvaRevive self) => nameof(AbyssOverhaul) + "/Content/Items/Armor/Silva/SilvaRevive";
+
+		internal static Color SilvaCooldownOutline(Func<SilvaRevive, Color> orig, SilvaRevive self) => new(244, 254, 117);
+
+		internal static Color SilvaCooldownStartColor(Func<SilvaRevive, Color> orig, SilvaRevive self) => new(182, 132, 64);
+
+		internal static Color SilvaCooldownEndColor(Func<SilvaRevive, Color> orig, SilvaRevive self) => new(244, 254, 117);
 
 		internal static void RerenderSilvaWings(On_PlayerDrawLayers.orig_DrawPlayer_09_Wings orig, ref PlayerDrawSet drawinfo)
 		{
@@ -91,18 +106,6 @@ namespace AbyssOverhaul.Content.Items.Armor.Silva
 				return;
 			}
 			orig.Invoke(ref drawinfo);
-		}
-
-		// Replaces the cooldown Icon for the silva revive by replacing the path string
-		private void SilvaCooldownReplacement(ILContext il)
-		{
-			ILCursor c = new(il);
-
-			c.GotoNext(MoveType.After, i => i.MatchLdstr(out _));
-			c.EmitDelegate((string originalPath) =>
-			{
-				return nameof(AbyssOverhaul) + "/Content/Items/Armor/Silva/SilvaRevive";
-			});
 		}
 
 		// Replaces the arm graphic on players when they wear the silva armor by injecting into all cases where arms are rendered
