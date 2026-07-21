@@ -5,6 +5,7 @@ using AbyssOverhaul.Common.Brain.SharedSensors;
 using AbyssOverhaul.Core.DataStructures;
 using AbyssOverhaul.Core.Graphics;
 using BreadLibrary.Core;
+using BreadLibrary.Core.MultiSegment;
 using BreadLibrary.Core.Verlet;
 using CalamityMod.Tiles.Abyss;
 using Terraria.GameContent;

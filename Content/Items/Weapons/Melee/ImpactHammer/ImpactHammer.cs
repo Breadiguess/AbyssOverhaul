@@ -2,7 +2,6 @@
 using BreadLibrary.Common.IK;
 using BreadLibrary.Core.Graphics;
 using BreadLibrary.Core.Graphics.Particles;
-using BreadLibrary.Core.Graphics.PixelationShit;
 using BreadLibrary.Core.ScreenShake;
 using BreadLibrary.Core.Sounds;
 using BreadLibrary.Core.Verlet;
@@ -17,7 +16,7 @@ using Terraria.GameContent;
 
 namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
 {
-    public class ImpactHammer : ModProjectile, ILocalizedModType, IDrawPixellated
+    public class ImpactHammer : ModProjectile, ILocalizedModType, IDrawPixelated
     {
 
 
@@ -348,7 +347,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
                 Owner.velocity += target.DirectionTo(Owner.Center) * 20;
                 HasbeenFlung = true;
             }
-            if (target.CanBeMoved(true))
+            if (target.CanBeMoved())
             {
                 target.noTileCollide = false;
                 Vector2 launchVel = Utils.DirectionTo(Owner.Center, Owner.Calamity().mouseWorld);
@@ -978,8 +977,8 @@ namespace AbyssOverhaul.Content.Items.Weapons.Melee.ImpactHammer
             return false;
         }
 
-        PixelLayer IDrawPixellated.PixelLayer => PixelLayer.AbovePlayer;
-        void IDrawPixellated.DrawPixelated(SpriteBatch spriteBatch)
+        PixelLayer IDrawPixelated.PixelLayer => PixelLayer.AbovePlayer;
+        void IDrawPixelated.DrawPixelated(SpriteBatch spriteBatch)
         {
             if (FunChain is not null && FunChain.Positions is { Length: >= 2 })
             {

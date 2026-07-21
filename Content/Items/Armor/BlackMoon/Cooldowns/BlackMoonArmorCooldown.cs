@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AbyssOverhaul.Content.Items.Armor.BlackMoon
+namespace AbyssOverhaul.Content.Items.Armor.BlackMoon.Cooldowns
 {
     public class BlackMoonArmorCooldown : CooldownHandler
     {

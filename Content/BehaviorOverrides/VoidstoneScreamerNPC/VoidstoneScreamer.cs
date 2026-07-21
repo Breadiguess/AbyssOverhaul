@@ -2,7 +2,7 @@
 using Terraria.Audio;
 using Terraria.GameContent;
 
-namespace AbyssOverhaul.Content.BehaviorOverrides
+namespace AbyssOverhaul.Content.BehaviorOverrides.VoidstoneScreamerNPC
 {
     public sealed class VoidstoneScreamer : NPCBehaviorOverride, IEcologyParticipant
     {
@@ -19,7 +19,7 @@ namespace AbyssOverhaul.Content.BehaviorOverrides
         {
 
         }
-        public override int NPCType => ModContent.NPCType<CalamityMod.NPCs.Abyss.LuminousCorvina>();
+        public override int NPCType => ModContent.NPCType<LuminousCorvina>();
 
 
         public static readonly SoundStyle ScreamSound = new("CalamityMod/Sounds/Custom/CorvinaScream");
@@ -98,7 +98,7 @@ namespace AbyssOverhaul.Content.BehaviorOverrides
         {
             Vector2 DrawPos = npc.Center - screenPos;
 
-            var texture = TextureAssets.Npc[this.NPCType].Value;
+            var texture = TextureAssets.Npc[NPCType].Value;
 
             SpriteEffects flip = npc.spriteDirection.ToSpriteDirection();
             Main.EntitySpriteDraw(texture, DrawPos, npc.frame, drawColor, npc.rotation, npc.frame.Size() / 2, npc.scale, flip);

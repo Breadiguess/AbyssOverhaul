@@ -1,11 +1,10 @@
 ﻿using AbyssOverhaul.Core.Utilities;
-using AbyssOverhaul.Core.WorldGen;
 using CalamityMod.Tiles.Abyss;
 using CalamityMod.Walls;
 using CalamityMod.Walls.UnsafeWalls;
 using Terraria.ID;
 
-namespace CalamityMod.World
+namespace AbyssOverhaul.Core.WorldGen
 {
     public class CustomAbyssHole
     {
@@ -105,7 +104,7 @@ namespace CalamityMod.World
                 abyssBottomY,
                 abyssChasmX,
                 AtLeftSideOfWorld,
-                ModContent.GetInstance<AbyssOverhaul.AbyssOverhaul>()
+                ModContent.GetInstance<AbyssOverhaul>()
             );
             FillContainer(abyssMinX, abyssMaxX, abyssTopY, abyssBottomY, settings);
             CarveMainTrench(abyssMinX, abyssMaxX, abyssTopY, abyssBottomY, abyssChasmX, settings);
@@ -164,7 +163,7 @@ namespace CalamityMod.World
             {
                 for (int y = topY; y <= bottomY; y++)
                 {
-                    if (!WorldGen.InWorld(x, y, 20))
+                    if (!Terraria.WorldGen.InWorld(x, y, 20))
                         continue;
 
                     Tile tile = Main.tile[x, y];
@@ -186,8 +185,8 @@ namespace CalamityMod.World
 
             int alignedStartX = chasmX;
 
-            if (AbyssOverhaul.Core.WorldGen.SulphurousSeaRevamp.UpperAbyssTransitionX > 0)
-                alignedStartX = Utils.Clamp(AbyssOverhaul.Core.WorldGen.SulphurousSeaRevamp.UpperAbyssTransitionX, leftLimit + 10, rightLimit - 10);
+            if (WorldGen.SulphurousSeaRevamp.UpperAbyssTransitionX > 0)
+                alignedStartX = Utils.Clamp(WorldGen.SulphurousSeaRevamp.UpperAbyssTransitionX, leftLimit + 10, rightLimit - 10);
 
             // Main aligned descent.
             CalamityStyleChasmGenerator(
@@ -413,7 +412,7 @@ namespace CalamityMod.World
             {
                 for (int y = topY + 1; y < bottomY - 1; y++)
                 {
-                    if (!WorldGen.InWorld(x, y, 20))
+                    if (!Terraria.WorldGen.InWorld(x, y, 20))
                         continue;
 
                     Tile tile = Main.tile[x, y];
@@ -451,7 +450,7 @@ namespace CalamityMod.World
 
         private static void ForceSolid(int x, int y, TrenchSettings settings)
         {
-            if (!WorldGen.InWorld(x, y, 20))
+            if (!Terraria.WorldGen.InWorld(x, y, 20))
                 return;
 
             Tile tile = Main.tile[x, y];
@@ -520,7 +519,7 @@ namespace CalamityMod.World
                 Point p = new Point(x, y);
                 if (visited.Contains(p))
                     return;
-                if (!WorldGen.InWorld(x, y, 20))
+                if (!Terraria.WorldGen.InWorld(x, y, 20))
                     return;
                 if (x < minX || x > maxX || y < topY || y > bottomY)
                     return;
@@ -539,7 +538,7 @@ namespace CalamityMod.World
             {
                 for (int y = topY; y <= bottomY; y++)
                 {
-                    if (!WorldGen.InWorld(x, y, 20))
+                    if (!Terraria.WorldGen.InWorld(x, y, 20))
                         continue;
 
                     Tile tile = Main.tile[x, y];
@@ -585,7 +584,7 @@ namespace CalamityMod.World
             unchecked
             {
                 int h = x * 374761393 + y * 668265263;
-                h = (h ^ (h >> 13)) * 1274126177;
+                h = (h ^ h >> 13) * 1274126177;
                 h ^= h >> 16;
                 return (h & 0x7fffffff) / (float)int.MaxValue;
             }
@@ -599,7 +598,7 @@ namespace CalamityMod.World
             {
                 for (int y = topY; y <= bottomY; y++)
                 {
-                    if (!WorldGen.InWorld(x, y, 10))
+                    if (!Terraria.WorldGen.InWorld(x, y, 10))
                         continue;
 
                     Tile tile = Main.tile[x, y];
@@ -661,7 +660,7 @@ namespace CalamityMod.World
                 _ => 8
             };
 
-            return WorldGen.genRand.NextBool(chance);
+            return Terraria.WorldGen.genRand.NextBool(chance);
         }
 
         private static void ApplyMaterialForDepth(Tile tile, int y, bool allowDither)
@@ -685,7 +684,7 @@ namespace CalamityMod.World
                 wallType = (ushort)ModContent.WallType<UnsafeVoidstoneWall>();
             }
             // Layer 3 -> 4 dithering
-            else if (t >= 0.78f && allowDither && WorldGen.genRand.NextBool(2))
+            else if (t >= 0.78f && allowDither && Terraria.WorldGen.genRand.NextBool(2))
             {
                 tileType = (ushort)ModContent.TileType<Voidstone>();
                 wallType = (ushort)ModContent.WallType<UnsafeVoidstoneWall>();
@@ -697,7 +696,7 @@ namespace CalamityMod.World
                 wallType = (ushort)ModContent.WallType<PyreMantleWall>();
             }
             // Layer 2 -> 3 dithering
-            else if (t >= 0.43f && allowDither && WorldGen.genRand.NextBool(2))
+            else if (t >= 0.43f && allowDither && Terraria.WorldGen.genRand.NextBool(2))
             {
                 tileType = (ushort)ModContent.TileType<PyreMantle>();
                 wallType = (ushort)ModContent.WallType<PyreMantleWall>();
@@ -705,7 +704,7 @@ namespace CalamityMod.World
             // Layer 1 -> 2 dithering
             else if (t >= 0.12f && t <= 0.16f)
             {
-                if (WorldGen.genRand.NextBool(2))
+                if (Terraria.WorldGen.genRand.NextBool(2))
                 {
                     tileType = (ushort)ModContent.TileType<AbyssGravel>();
                     wallType = (ushort)ModContent.WallType<UnsafeAbyssGravelWall>();

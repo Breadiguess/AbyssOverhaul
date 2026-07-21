@@ -363,7 +363,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Summoner
 
 
                 Vector2 start = (_wings[i].Anchor + _wings[i].Tip) / 2f;
-                Point? DustPos = LineAlgorithm.RaycastTo(start, start - Vector2.UnitX.RotatedBy(_wings[i].ForceDirection.ToRotation()) * 100, debug: false);
+                Point? DustPos = Utilities.RaycastTo(start, start - Vector2.UnitX.RotatedBy(_wings[i].ForceDirection.ToRotation()) * 100, debug: false);
                 if (DustPos.HasValue)
                 {
                     float EndLength = -start.Distance(DustPos.Value.ToWorldCoordinates());
@@ -450,7 +450,7 @@ namespace AbyssOverhaul.Content.Items.Weapons.Summoner
                     if (Arm.IKSkeleton is not null)
                         for (int i = 0; i < Arm.IKSkeleton.JointCount; i++)
                         {
-                            Utils.DrawLine(spriteBatch, Arm.IKSkeleton.Position(i), Arm.IKSkeleton.Position(i + 1), Color.White);
+                            Utils.DrawLine(spriteBatch, Arm.IKSkeleton.GetJointPosition(i), Arm.IKSkeleton.GetJointPosition(i + 1), Color.White);
                             //DrawLine(spriteBatch, Arm.IKSkeleton.JointPositions[i],, Color.White, 12);
                         }
                 }

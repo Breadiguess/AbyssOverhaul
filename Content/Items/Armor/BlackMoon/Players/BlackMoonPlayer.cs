@@ -52,7 +52,7 @@
                 {
                     Vector2 Start = Player.Center + Vector2.UnitX * i * 10;
 
-                    tilesToHit = LineAlgorithm.RaycastTo(Start, Start + Vector2.UnitY * 600, debug: true);
+                    tilesToHit = Utilities.RaycastTo(Start, Start + Vector2.UnitY * 600, debug: true);
                     if (tilesToHit.HasValue)
                     {
                         Collision.HitTiles(tilesToHit.Value.ToWorldCoordinates() - Vector2.UnitY * 32, new Vector2(0, 40), 10, 10);
@@ -87,7 +87,7 @@
 
             Vector2 StartPos = Player.Center;
             Vector2 EndPos = StartPos + Vector2.UnitX.RotatedBy(-new Vector2(Player.velocity.X * 0.2f, -4).ToRotation()) * 700;
-            Point? HitTile = LineAlgorithm.RaycastTo(StartPos, EndPos, debug: true);
+            Point? HitTile = Utilities.RaycastTo(StartPos, EndPos, debug: true);
 
 
             if (HitTile.HasValue)

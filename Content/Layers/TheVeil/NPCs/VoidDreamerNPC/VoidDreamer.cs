@@ -2,7 +2,6 @@
 using AbyssOverhaul.Common.Brain.SharedModules;
 using AbyssOverhaul.Core.Graphics.ReworkedAbyssDarkness;
 using BreadLibrary.Core.Graphics;
-using BreadLibrary.Core.Graphics.PixelationShit;
 using BreadLibrary.Core.Sounds;
 using BreadLibrary.Core.Verlet;
 using CalamityMod.BiomeManagers;
@@ -14,7 +13,7 @@ using Terraria.GameContent.Bestiary;
 
 namespace AbyssOverhaul.Content.Layers.TheVeil.NPCs.VoidDreamerNPC
 {
-    internal class VoidDreamer : ModNPC, IDrawPixellated
+    internal class VoidDreamer : ModNPC, IDrawPixelated
     {
 
         private const int HeadVariationCount = 6;

@@ -26,15 +26,9 @@ namespace AbyssOverhaul.Core.Subworlds.TransitionScreen
             BodyFrameCounter = 0d;
             LegFrameCounter = 0d;
         }
-        public override void Load()
+      
+        public static void UpdateMenuPlayer(GameTime gameTime)
         {
-            //On_Main.DrawMenu += On_Main_DrawMenu;
-        }
-
-        private void On_Main_DrawMenu(On_Main.orig_DrawMenu orig, Main self, GameTime gameTime)
-        {
-            orig(self, gameTime);
-
 
             Player p = Main.LocalPlayer;
             if (p is null || !p.active)
@@ -123,16 +117,23 @@ namespace AbyssOverhaul.Core.Subworlds.TransitionScreen
 
             // Example edge detection if you need it later:
             bool justPressedSpace = k.IsKeyDown(Keys.Space) && !old.IsKeyDown(Keys.Space);
-
         }
-
-        //laggy as shit, move somehwere else
-
    
 
         public override void PostUpdatePlayers()
         {
-          
-        }
+            if (Initialized)
+            {
+
+
+                ScreenCenter = default;
+                ScreenVelocity = default;
+                Direction = 1;
+                BodyFrameCounter = default;
+                LegFrameCounter = default;
+                Initialized = false;
+
+    }
+}
     }
 }

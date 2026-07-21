@@ -20,6 +20,8 @@ global using Terraria.WorldBuilding;
 global using Terraria.DataStructures;
 global using static AbyssOverhaul.AbyssOverhaul;
 global using AbyssOverhaul.Core.Ecosystem.Ecology;
+global using BreadLibrary.Core.Graphics;
+global using BreadLibrary.Core.Graphics.Pixelation;
 using System.Runtime.CompilerServices;
 using Wayfarer.API;
 

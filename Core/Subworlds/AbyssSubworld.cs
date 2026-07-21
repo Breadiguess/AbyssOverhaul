@@ -2,8 +2,9 @@
 using AbyssOverhaul.Core.Subworlds.WorldGen;
 using AbyssOverhaul.Core.Utilities;
 using AbyssOverhaul.Core.WorldGen;
-using CalamityMod;
+using BreadLibrary.Core.Graphics.Spritebatch;
 using SubworldLibrary;
+using Terraria.GameContent;
 
 namespace AbyssOverhaul.Core.Subworlds
 {
@@ -23,20 +24,300 @@ namespace AbyssOverhaul.Core.Subworlds
         private bool FixOceanWaterTakingPriority(On_WorldGen.orig_oceanDepths orig, int x, int y) =>
             orig(x, y) && !SubworldSystem.IsActive<AbyssSubworld>();
 
+        private Player? _menuPlayerClone;
+        private int _menuPlayerSource = -1;
+        private Player GetOrCreateMenuPlayerClone(Player source)
+        {
+            if (_menuPlayerClone is not null &&
+                _menuPlayerSource == source.whoAmI)
+            {
+                return _menuPlayerClone;
+            }
 
+            // Expensive operation, but now it only happens once per transition.
+            _menuPlayerClone = source.SerializedClone();
+            _menuPlayerSource = source.whoAmI;
+
+            Player clone = _menuPlayerClone;
+
+            clone.isDisplayDollOrInanimate = true;
+            clone.dead = false;
+            clone.ghost = false;
+
+            clone.honeyWet = false;
+            clone.lavaWet = false;
+
+            clone.UpdateDyes();
+
+            return clone;
+        }
+
+        private float _layer1ScrollY;
+        private float _layer2ScrollY;
+        private float _layer3ScrollY;
+
+
+        private readonly List<Bubble> _bubbles = new();
+
+        private float _bubbleSpawnTimer;
+        private bool _bubblesInitialized;
+
+        private const int MaximumBubbles = 55;
         public override void DrawMenu(GameTime gameTime)
         {
 
-            base.DrawMenu(gameTime);
             Player source = Main.LocalPlayer;
+
+            var tex = TextureAssets.MagicPixel.Value;
+            Main.EntitySpriteDraw(tex, Vector2.zeroVector, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), new Color(12, 41, 41), 0, Vector2.zeroVector, 1, SpriteEffects.None);
+
+
+
+                MenuSwimCloneSystem.UpdateMenuPlayer(gameTime);
             if (source is null || !source.active || !MenuSwimCloneSystem.Initialized)
                 return;
 
-            Player clone = source.SerializedClone();
-            clone.isDisplayDollOrInanimate = true;
+
+            UpdateLoopingLayers(gameTime);
+
+            //todo: draw Background
+            DrawLoopingLayer3();
+            DrawLoopingLayer2();
+            DrawPlayer(source);
+            UpdateBubbles(gameTime);
+            DrawBubbles(foreground: false);
+
+            DrawLoopingLayer1();
+            if (source is not null &&
+                source.active &&
+                MenuSwimCloneSystem.Initialized)
+            {
+                DrawPlayer(source);
+            }
+            DrawBubbles(foreground: true);
+            DrawGradient();
+
+            RenderDebugText(gameTime);
+            
+        }
+
+        private void UpdateBubbles(GameTime gameTime)
+        {
+            float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            deltaTime = Math.Min(deltaTime, 1f / 20f);
+
+            /*
+             * Populate the screen immediately when the menu opens.
+             * Otherwise, every bubble would initially have to enter from the bottom.
+             */
+            if (!_bubblesInitialized)
+            {
+                _bubblesInitialized = true;
+
+                for (int i = 0; i < 24; i++)
+                {
+                    SpawnBubble(
+                        Main.rand.NextFloat(0f, Main.screenHeight)
+                    );
+                }
+            }
+
+            _bubbleSpawnTimer -= deltaTime;
+
+            if (_bubbleSpawnTimer <= 0f && _bubbles.Count < MaximumBubbles)
+            {
+                int spawnCount = Main.rand.NextBool(5)
+                    ? Main.rand.Next(2, 5)
+                    : 1;
+
+                for (int i = 0; i < spawnCount; i++)
+                {
+                    SpawnBubble(
+                        Main.screenHeight + Main.rand.NextFloat(10f, 90f)
+                    );
+                }
+
+                _bubbleSpawnTimer = Main.rand.NextFloat(0.08f, 0.32f);
+            }
+
+            for (int i = _bubbles.Count - 1; i >= 0; i--)
+            {
+                Bubble bubble = _bubbles[i];
+
+                bubble.Update(gameTime);
+
+                if (bubble.ShouldBeRemoved)
+                    _bubbles.RemoveAt(i);
+            }
+        }
+        private void DrawBubbles(bool foreground)
+        {
+            foreach (Bubble bubble in _bubbles)
+            {
+                if (bubble.Foreground == foreground)
+                    bubble.Draw(Main.spriteBatch);
+            }
+        }
+        private void SpawnBubble(float y)
+        {
+            bool foreground = Main.rand.NextBool(4);
+
+            float scale;
+
+            if (foreground)
+            {
+                scale = Main.rand.NextFloat(0.8f, 1.35f);
+            }
+            else
+            {
+                scale = Main.rand.NextFloat(0.3f, 0.85f);
+            }
+
+            float riseSpeed = MathHelper.Lerp(
+                35f,
+                105f,
+                MathHelper.Clamp(scale / 1.35f, 0f, 1f)
+            )
+                * 4;
+
+            Vector2 position = new Vector2(
+                Main.rand.NextFloat(-20f, Main.screenWidth + 20f),
+                y - 1
+            );
+
+            _bubbles.Add(
+                new Bubble(
+                    position,
+                    scale,
+                    riseSpeed,
+                    foreground
+                )
+            );
+        }
+        private void RenderDebugText(GameTime gameTime)
+        {
+            base.DrawMenu(gameTime);
+        }
+        private void DrawGradient()
+        {
+            var tex = Assets.Textures.Extra.Overlay.Asset.Value;
+            var cap = Main.spriteBatch.Capture();
+
+            Main.spriteBatch.UseBlendState(BlendState.NonPremultiplied);
+
+            Main.EntitySpriteDraw(tex, Vector2.zeroVector, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.White *0.6f, 0, Vector2.zeroVector, 1, 0);
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(cap);
+        }
+        private void DrawLoopingLayer3()
+        {
+            Texture2D texture = Assets.Textures.Extra.Layer3.Asset.Value;
+
+            DrawVerticallyLoopingLayer(
+                texture,
+                _layer3ScrollY,
+                Color.White
+            );
+        }
+
+        #region Draw Entrance and Stuff
+
+        private void UpdateLoopingLayers(GameTime gameTime)
+        {
+            float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds*1.2f;
+
+            const float foregroundSpeed = 100f*5;
+            const float midgroundSpeed = 45f*5;
+
+            _layer1ScrollY += foregroundSpeed * deltaTime;
+            _layer2ScrollY += midgroundSpeed * deltaTime;
+
+            _layer3ScrollY += midgroundSpeed * deltaTime*0.5f;
+        }
+
+        // Foreground.
+        private void DrawLoopingLayer1()
+        {
+            Texture2D texture = Assets.Textures.Extra.Layer1.Asset.Value;
+
+            DrawVerticallyLoopingLayer(
+                texture,
+                _layer1ScrollY,
+                Color.White
+            );
+        }
+
+        // Midground.
+        private void DrawLoopingLayer2()
+        {
+            Texture2D texture = Assets.Textures.Extra.Layer2.Asset.Value;
+
+            DrawVerticallyLoopingLayer(
+                texture,
+                _layer2ScrollY,
+                Color.White
+            );
+        }
+
+        private static void DrawVerticallyLoopingLayer(
+            Texture2D texture,
+            float scrollY,
+            Color color)
+        {
+            if (texture.Width <= 0 || texture.Height <= 0)
+                return;
+
+      
+      
+      
+      
+            float scale = Main.screenWidth / (float)texture.Width;
+
+            float scaledWidth = texture.Width * scale;
+            float scaledHeight = texture.Height * scale;
+
+        
+            float wrappedScroll = PositiveModulo(scrollY, scaledHeight);
+
+            float startY = -wrappedScroll - scaledHeight;
+            for (
+                float drawY = startY;
+                drawY < Main.screenHeight + scaledHeight;
+                drawY += scaledHeight
+            )
+            {
+                Main.EntitySpriteDraw(
+                    texture,
+                    new Vector2(0f, MathF.Floor(drawY)),
+                    null,
+                    color,
+                    0f,
+                    Vector2.Zero,
+                    scale,
+                    SpriteEffects.None,
+                    0f
+                );
+            }
+        }
+
+        private static float PositiveModulo(float value, float modulus)
+        {
+            float result = value % modulus;
+
+            if (result < 0f)
+                result += modulus;
+
+            return result;
+        }
+
+        #endregion
+        private void DrawPlayer(Player source)
+        {
+            Player clone = GetOrCreateMenuPlayerClone(source);
 
             clone.dead = false;
             clone.ghost = false;
+
             clone.wet = true;
             clone.wetCount = 10;
             clone.honeyWet = false;
@@ -45,18 +326,27 @@ namespace AbyssOverhaul.Core.Subworlds
             clone.direction = MenuSwimCloneSystem.Direction;
             clone.velocity = MenuSwimCloneSystem.ScreenVelocity;
 
-            Vector2 bob =
-                new Vector2(
-                    MathF.Cos((float)Main.GlobalTimeWrappedHourly * 1.4f) * 2f,
-                    MathF.Sin((float)Main.GlobalTimeWrappedHourly * 2.7f) * 3f
-                );
+            Vector2 bob = new(
+                MathF.Cos((float)Main.GlobalTimeWrappedHourly * 1.4f) * 2f,
+                MathF.Sin((float)Main.GlobalTimeWrappedHourly * 2.7f) * 3f
+            );
 
-            Vector2 screenPos = MenuSwimCloneSystem.ScreenCenter + bob - clone.Size * 0.5f;
-            Vector2 worldPos = Main.screenPosition + screenPos;
+            Vector2 screenPosition =
+                MenuSwimCloneSystem.ScreenCenter +
+                bob -
+                clone.Size * 0.5f;
 
-            clone.position = worldPos;
-            clone.oldPosition = worldPos - clone.velocity;
-            clone.fullRotation = MathHelper.Clamp(clone.velocity.Y * 0.045f, -0.30f, 0.30f);
+            Vector2 worldPosition = Main.screenPosition + screenPosition;
+
+            clone.position = worldPosition;
+            clone.oldPosition = worldPosition - clone.velocity;
+
+            clone.fullRotation = MathHelper.Clamp(
+                clone.velocity.Y * 0.045f,
+                -0.30f,
+                0.30f
+            );
+
             clone.fullRotationOrigin = clone.Size * 0.5f;
             clone.gfxOffY = 0f;
 
@@ -95,9 +385,9 @@ namespace AbyssOverhaul.Core.Subworlds
             Main.spriteBatch.Begin(
                 SpriteSortMode.Deferred,
                 BlendState.AlphaBlend,
-                Main.DefaultSamplerState,
+                SamplerState.LinearClamp,
                 DepthStencilState.None,
-                RasterizerState.CullNone,
+                Main.Rasterizer,
                 null,
                 Main.UIScaleMatrix
             );
@@ -106,12 +396,12 @@ namespace AbyssOverhaul.Core.Subworlds
         // Silence the loading screen.
         public override bool ChangeAudio()
         {
-            Main.newMusic = 0; // no music
-            return true;       // suppress vanilla music choice
+            Main.newMusic = 0;
+            return true;       
         }
 
         public static int EntryTileX => ModContent.GetInstance<AbyssSubworld>().Width / 2;
-        public const int EntryTileY = 90;
+        public const int EntryTileY = 0;
 
 
         public override List<GenPass> Tasks => BuildAbyssTasks();
@@ -165,82 +455,4 @@ namespace AbyssOverhaul.Core.Subworlds
         }
     }
 
-
-    internal sealed class AbyssSubworldUpdateSystem : ModSystem
-    {
-
-        public override void Load()
-        {
-            OnEnter += PlayTransition;
-        }
-
-        private void PlayTransition()
-        {
-
-        }
-
-
-        /// <summary>
-        /// An event that's invoked when the Abyss is entered.
-        /// </summary>
-        public static event Action OnEnter;
-        public static bool WasInSubworldLastFrame
-        {
-            get;
-            private set;
-        }
-
-
-        public override void PreUpdateEntities()
-        {
-            bool inSubworld = SubworldSystem.IsActive<AbyssSubworld>();
-            if (WasInSubworldLastFrame != inSubworld)
-            {
-                WasInSubworldLastFrame = inSubworld;
-                if (inSubworld)
-                    OnEnter?.Invoke();
-            }
-
-            if (!WasInSubworldLastFrame)
-                return;
-
-
-        }
-
-
-
-
-
-        public override void PreUpdateWorld()
-        {
-            if (!SubworldSystem.IsActive<AbyssSubworld>())
-                return;
-
-            var sw = System.Diagnostics.Stopwatch.StartNew();
-
-            // suspicious system here
-
-            Wiring.UpdateMech();
-
-            TileEntity.UpdateStart();
-            foreach (TileEntity te in TileEntity.ByID.Values)
-                te.Update();
-            TileEntity.UpdateEnd();
-
-
-
-
-            sw.Stop();
-            if (sw.ElapsedMilliseconds > 5)
-                Main.NewText($"PreUpdateWorld section took {sw.ElapsedMilliseconds} ms");
-
-
-            if (Main.GameUpdateCount % 120 == 0)
-            {
-                Main.NewText($"Liquids: {Liquid.numLiquid}");
-                Main.NewText($"TileEntities: {TileEntity.ByID.Count}");
-            }
-        }
-
-    }
 }

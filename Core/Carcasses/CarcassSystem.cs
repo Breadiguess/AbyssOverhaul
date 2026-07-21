@@ -1,6 +1,5 @@
 ﻿using AbyssOverhaul.Content.NPCs.CarcassLeech;
 using BreadLibrary.Core.Graphics;
-using BreadLibrary.Core.Graphics.PixelationShit;
 using CalamityMod;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -16,12 +15,12 @@ using Terraria.ModLoader.IO;
 
 namespace AbyssOverhaul.Core.Carcasses
 {
-    public class CarcassSystem : ModSystem, IDrawPixellated
+    public class CarcassSystem : ModSystem, IDrawPixelated
     {
         public static Dictionary<int, CarcassEntity> Carcasses = new();
         public static int NextID;
 
-        PixelLayer IDrawPixellated.PixelLayer => PixelLayer.BehindTiles;
+        PixelLayer IDrawPixelated.PixelLayer => PixelLayer.BehindTiles;
 
         public bool ShouldDrawPixelated => Carcasses.Count > 0;
 
@@ -387,7 +386,7 @@ namespace AbyssOverhaul.Core.Carcasses
             Utils.DrawBorderString(spriteBatch, msg, screenPos, drawColor);
 
             }
-        void IDrawPixellated.DrawPixelated(SpriteBatch spriteBatch)
+        void IDrawPixelated.DrawPixelated(SpriteBatch spriteBatch)
         {
             foreach (var carcass in Carcasses.Values)
                 DrawCarcass(spriteBatch, carcass);

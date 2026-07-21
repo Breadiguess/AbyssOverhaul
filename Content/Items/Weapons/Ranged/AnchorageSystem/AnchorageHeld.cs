@@ -1,6 +1,5 @@
 ﻿using AbyssOverhaul.Core.Graphics;
 using BreadLibrary.Core.Graphics;
-using BreadLibrary.Core.Graphics.PixelationShit;
 using BreadLibrary.Core.Verlet;
 using CalamityMod;
 using CalamityMod.Physics;
@@ -19,7 +18,7 @@ using Terraria.GameContent.Events;
 
 namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
 {
-    internal class AnchorageHeld : ModProjectile, IDrawPixellated
+    internal class AnchorageHeld : ModProjectile, IDrawPixelated
     {
         public VerletChain rope;
         public Projectile drillProjectile;
@@ -309,8 +308,8 @@ namespace AbyssOverhaul.Content.Items.Weapons.Ranged.AnchorageSystem
                 
             }
         }
-        PixelLayer IDrawPixellated.PixelLayer => PixelLayer.AboveProjectiles;
-        void IDrawPixellated.DrawPixelated(SpriteBatch spriteBatch)
+        PixelLayer IDrawPixelated.PixelLayer => PixelLayer.AboveProjectiles;
+        void IDrawPixelated.DrawPixelated(SpriteBatch spriteBatch)
         {
            
         }

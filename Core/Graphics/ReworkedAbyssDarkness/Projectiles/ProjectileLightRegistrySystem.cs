@@ -1,5 +1,4 @@
 ﻿using AbyssOverhaul.Content.Layers.FossilShale.Tiles.Rubble;
-using AbyssOverhaul.Core.Graphics.ReworkedAbyssDarkness.Projectiles;
 using CalamityMod.Projectiles.Environment;
 using CalamityMod.Tiles.Abyss;
 using CalamityMod.Tiles.Abyss.AbyssAmbient;
@@ -10,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AbyssOverhaul.Core.Graphics.ReworkedAbyssDarkness
+namespace AbyssOverhaul.Core.Graphics.ReworkedAbyssDarkness.Projectiles
 {
     internal class ProjectileLightRegistrySystem : ModSystem
     {

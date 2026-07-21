@@ -1,6 +1,5 @@
 ﻿using AbyssOverhaul.Core.Utilities;
 using AbyssOverhaul.Core.WorldGen;
-using CalamityMod.World;
 using Terraria.Localization;
 
 namespace AbyssOverhaul.Core.Systems

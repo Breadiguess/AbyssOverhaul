@@ -51,7 +51,6 @@ namespace AbyssOverhaul.Core.Subworlds
 
             Rectangle portalWorldRect = new Rectangle(left * 16, top * 16, Width * 16, Height * 16);
 
-            // Keep this if you want the player to actually be standing in the portal.
             if (!player.Hitbox.Intersects(portalWorldRect))
                 return false;
 
