@@ -51,6 +51,8 @@ namespace AbyssOverhaul.Content.Items.Armor.Silva
 		}
 
 		// Replaces the silva cooldown properties for texture and colors
+		// Normally, you use orig to avoid completely replacing the original code, but in this instance we're swapping out the whole method code with our own single line
+		// For future reference, we're doing something thats normally HEAVILY DISCOURAGED. Make sure you always call orig in your detours, these are the exception
 		internal static string SilvaCooldownTexture(Func<SilvaRevive, string> orig, SilvaRevive self) => nameof(AbyssOverhaul) + "/Content/Items/Armor/Silva/SilvaRevive";
 
 		internal static Color SilvaCooldownOutline(Func<SilvaRevive, Color> orig, SilvaRevive self) => new(244, 254, 117);

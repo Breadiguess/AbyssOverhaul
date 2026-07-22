@@ -101,3 +101,38 @@ Lore: {
 			'''
 	}
 }
+
+AncientSilvaArmor: {
+	DisplayName: Ancient Silva Armor
+	Tooltip: ""
+}
+
+AncientSilvaHeadMagic: {
+	DisplayName: Ancient Silva Cap
+	Tooltip: ""
+}
+
+AncientSilvaHeadSummon: {
+	DisplayName: Ancient Silva Horned Hood
+	Tooltip: ""
+}
+
+AncientSilvaLeggings: {
+	DisplayName: Ancient Silva Leggings
+	Tooltip: ""
+}
+
+AncientSilvaHelm: {
+	DisplayName: Ancient Silva Helm
+	Tooltip: ""
+}
+
+AncientSilvaHornedHelm: {
+	DisplayName: Ancient Silva Horned Helm
+	Tooltip: ""
+}
+
+AncientSilvaMask: {
+	DisplayName: Ancient Silva Mask
+	Tooltip: ""
+}
