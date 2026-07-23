@@ -8,21 +8,18 @@ namespace AbyssOverhaul.Content.Items.Armor.Silva
 {
 	public class SilvaEffectsEditor
 	{
-		public static bool SilvaReviveSpawnsChloroDusts() => false;
+		public static bool SilvaReviveSpawnsChloroDusts() => true; // Whether the armour can produce chlorothyte dusts (its normal player effects)
 
-		public static void SilvaReviveEffects(Player player)
+		public static void SilvaReviveEffects(Player player) // for doing effects when the revive buff is active
 		{
-			Main.NewText("SILVA EFFECTS");
 		}
 
-		public static void SilvaReviveEndEffect(Player player)
+		public static void SilvaReviveEndEffect(Player player) // for doing effects when the revive "ends" (SilvaReviveEffects is called 1 frame after this is called, do keep that in mind)
 		{
-			Main.NewText("SILVA EFFECTS End");
 		}
 
-		public static void SilvaReviveStartEffect(Player player)
+		public static void SilvaReviveStartEffect(Player player) // For doing effects when the revive is activated
 		{
-			Main.NewText("SILVA EFFECTS Start");
 		}
 	}
 }
