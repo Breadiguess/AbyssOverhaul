@@ -39,22 +39,19 @@ namespace AbyssOverhaul
 {
     public partial class AbyssOverhaul : Mod
     {
-		public static ILog? Log = null;
-
 		public AbyssOverhaul()
         {
             MusicAutoloadingEnabled = false;
         }
 
-		public override void Load()
-		{
-            Log = Logger;
-		}
-
         public override void Unload()
         {
             WayfarerAPI.Shutdown();
-            Log = null;
         }
+
+		public static void LogILError(string errorMsg)
+		{
+			ModContent.GetInstance<AbyssOverhaul>().Logger.Warn("IL Edit: " + errorMsg);
+		}
     }
 }

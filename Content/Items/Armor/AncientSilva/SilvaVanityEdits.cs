@@ -41,7 +41,7 @@ namespace AbyssOverhaul.Content.Items.Armor.AncientSilva
 			int modItem_varNum = -1;
 
 			if (!c.TryGotoNext(MoveType.After, i => i.MatchLdloc(out modItem_varNum), i => i.MatchCallvirt<ModItem>("get_" + nameof(ModItem.DisplayName))))
-				Log?.Warn("IL Edit: Failed to find where Modded Items set their names");
+				LogILError("Failed to find where Modded Items set their names");
 			else
 			{
 				c.EmitLdloc(modItem_varNum);
